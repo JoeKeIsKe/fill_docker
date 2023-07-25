@@ -1,0 +1,38 @@
+/* [type='text']:focus{
+    border: 1px solid 0093E9;
+    box-shadow: transparent;
+} */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.btn-primary {
+    padding: 10px 20px;
+    border-radius: 10px;
+    background-color: #00E892;
+}
+
+.btn-default {
+     background-color: #0093E9;
+     background-image: linear-gradient(160deg, #0093E9 0%, #80D0C7 100%);
+}
+
+.banlance-card {
+    background-color: #0093E9;
+    background-image: linear-gradient(160deg, #0093E9 0%, #80D0C7 100%);
+}
+
+
+.default-card {
+     background-color: #fff;
+     background-image: linear-gradient(180deg, #fff 20%, #80D0C7 70%, #0093E9 100%);
+}
+
+
+.custom_icon_right{
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+}
