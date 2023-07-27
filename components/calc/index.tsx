@@ -1,13 +1,10 @@
-import { walletList } from '@/constants';
 import { getSvg } from '@/svgTypes';
 import Modal from '@/packages/modal';
 import { CalcItem, calcType,CALC } from './varible';
 import Input from '@/packages/input';
 import InputNumber from '@/packages/inputNumber';
-// import { Progress } from 'flowbite-react';
-import Progress from '@/packages/progress'
 import Button from '@/packages/button';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 
 interface Props { 
     type: keyof CALC,
@@ -16,6 +13,7 @@ interface Props {
 
 function Calc(props:Props) { 
     const { type, data = {} } = props;
+    const [isCalc,setIsCalc] = useState(false)
     
 
     const renderChange = (record: CalcItem) => { 
@@ -27,8 +25,6 @@ function Calc(props:Props) {
             case 'InputNumber':
                 content = <InputNumber />
                 break;
-            case 'Progress':
-                content=<Progress value={10} />
         }
         return <div key={ record.label}>
             <label >{record.label}</label>
@@ -38,12 +34,18 @@ function Calc(props:Props) {
 
     const typeData = useMemo(() => { 
         return calcType[type]
-    },[type])
+    }, [type])
+    
+    const handleChange = () => { 
+        setIsCalc(false)
+    }
       return (
-         <Modal title='Calculate'
-              btn_text='Connect'
-              btn={<span className='cursor-pointer'>{getSvg('calc')}</span>}
-                footer={false} >
+          <>
+            <div className='cursor-pointer w-4' onClick={()=> setIsCalc(true)}>{getSvg('calc')}</div>
+              <Modal title='Calculate'
+                show={isCalc}
+                onChange={handleChange}
+              >
                 <div className="space-y-6">
                   {typeData.list.map((item,index) => { 
                       return renderChange(item)
@@ -58,6 +60,7 @@ function Calc(props:Props) {
                   <Button className='default-btn w-full'>{typeData.btn.label}</Button>
           </div>        
         </Modal>
+          </>
   )
 }
 

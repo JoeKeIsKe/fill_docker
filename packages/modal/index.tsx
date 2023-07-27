@@ -1,67 +1,49 @@
 'use client';
 
-import { Modal } from 'flowbite-react';
-import { useState } from 'react';
+import { Modal } from 'antd';
 import Button from '@/packages/button';
-import { data } from 'autoprefixer';
+import { ITEM } from '@/utils/type';
 
 
 
+interface footerItem extends ITEM { 
+    className: number | string,
+    onClick?: () => void
+}
 interface Props{ 
-    btn_text: string
     children: JSX.Element,
     title: string,
     btn?:JSX.Element,
     onChange?: (type: boolean) => void,
-    footer?:JSX.Element|boolean
+    footer?: JSX.Element | Array<footerItem>,
+    show:boolean
     
 }
 
 export default function DefaultModal(props: Props) {
-    const { btn,btn_text,children,title,onChange,footer} = props;
-    const [openModal, setOpenModal] = useState<string | undefined>();
-    const propsModal = { openModal, setOpenModal };
-    
-
-
+    const { show, children, title, onChange, footer } = props;    
     const renderFooter = () => { 
-         if(typeof footer === 'boolean') { 
-          return footer
-         }
-        if (footer) { 
-        return <Modal.Footer>
-                {footer}
-            </Modal.Footer>
-        }
-        return <Modal.Footer>
-                    <Button className='bg-focus' onClick={() => { 
-                        propsModal.setOpenModal(undefined);
-                        if (onChange) { 
-                            onChange(true)
-                        }
-                    }}>Confirm</Button>
-                    <Button  onClick={() => { 
-                        propsModal.setOpenModal(undefined);
-                        if (onChange) { 
-                            onChange(false)
-                        }
-                    }}>
-                Cancel
-            </Button>
-                </Modal.Footer>
-    }
+        if (Array.isArray(footer)) { 
+        return <div>
+            {
+                footer.map(footerItem => { 
+                const showClass = footerItem.value === 'cancel' ?'bg-transparent' :'btn-default'
+                    return <Button key={footerItem.value} className={`${showClass} ${footerItem?.className}`}
+                        onClick={() => { if(typeof footerItem?.onClick === 'function' )  footerItem.onClick() }
+                    }>{ footerItem.label}</Button>
+            })}
+            </div>
+        } 
+        return <div>
+            {footer}
+        </div>
 
+    }
+    
     return (
-        <>
-        {btn ? <span  onClick={() => propsModal.setOpenModal('default')}>{btn}</span> :<Button className='bg-focus' onClick={() => propsModal.setOpenModal('default')}>{btn_text}</Button>}
-      <Modal show={propsModal.openModal === 'default'} onClose={() => propsModal.setOpenModal(undefined)}>
-        <Modal.Header>{title}</Modal.Header>
-        <Modal.Body>
-                { children}
-                </Modal.Body>
-        {renderFooter()}
+        <Modal title={title} open={show} footer={footer ? renderFooter() : null} onCancel={() => {onChange}}>
+        { children}
       </Modal>
-    </>
   )
 }
 

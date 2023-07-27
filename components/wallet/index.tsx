@@ -5,35 +5,44 @@ import { getSvg } from '@/svgTypes';
 import Modal from '@/packages/modal';
 import { IWalletItem } from '@/utils/type';
 import { loginMarck } from '@/server/wallet';
+import Button from "@/packages/button";
+import { useState } from "react";
 
 
 export default function DefaultModal() {
-//   const dispath = useDispatch();
+    const dispath = useDispatch();
+    const [isConnect,setConnect] = useState<boolean>(false)
     
     const connectWallet = async (wallet:IWalletItem) => { 
         console.log('connectWallet');
         loginMarck()?.then(res => { 
-            console.log('===33', res)
-            if (res && Array.isArray(res)) {
-                 localStorage.setItem('account', JSON.stringify(res[0]))
-                // dispath({
-                //     type: "wallet/change",
-                //     payload: {
-                //     wallet: wallet.value,
-                //     result: res,
-                //     },
-                // });
-            }
-            
+        if (res && Array.isArray(res)) {
+            dispath({
+                type: "wallet/change",
+                payload: {
+                wallet: wallet.value,
+                account: res[0],
+                },
+            });           
+        }     
         })
     }
 
+    const handleChange = () => { 
+        setConnect(false)
+    }
+
     return (
-         <Modal title='Connect Wallet'
-                btn_text ='Connect'
-                footer={false}  >
-                <div className="space-y-6">
-                 {walletList.map((wallet:IWalletItem) => {
+        <>
+            <Button onClick={()=>setConnect(true)}>Connect Wallet</Button>
+            <Modal
+                show={isConnect}
+                title='Connect Wallet'
+               // footer={[{ label: 'Connect', value: 'confirm', className: 'w-full mt-5', onClick={handleChange} }]}
+                onChange={handleChange}
+            >
+            <div className="space-y-6 mt-5">
+                {walletList.map((wallet:IWalletItem) => {
                  return (
                         <p
                             className='flex items-center gap-x-2.5 p-2.5 rounded cursor-pointer hover:bg-slate-200'
@@ -47,6 +56,7 @@ export default function DefaultModal() {
                  })}
           </div>        
         </Modal>
+        </>
   )
 }
 

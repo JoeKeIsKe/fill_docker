@@ -7,7 +7,7 @@ import { getValueDivide } from '@/utils';
 import { FillState } from './content';
 import {  Banlance_type } from '@/utils/type';
 
-const web3 = new Web3(window.ethereum);
+const web3 = new Web3(window?.ethereum);
 class contract {
     contractAbi: any;
     contractAddress: string;

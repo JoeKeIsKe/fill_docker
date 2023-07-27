@@ -11,8 +11,8 @@ import { walletState,contractState } from "./type";
   },
   reducers: {
       change: (state: walletState, action: any) => {
-      let newState = { ...state, ...action.payload }
-        localStorage.setItem('login', JSON.stringify({account:newState.result,wallet:newState.wallet}))
+      let newState = { ...state, ...action.payload };
+        localStorage.setItem('login', JSON.stringify(newState))
         return newState;
     },
   },

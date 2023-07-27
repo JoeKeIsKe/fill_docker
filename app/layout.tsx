@@ -2,11 +2,9 @@ import './globals.css'
 import './custom.css'
 import type { Metadata } from 'next'
 import bg from '@/assets/bg1.jpg';
+import StyledComponentsRegistry from './lib/AntdRegistry';
 import { Inter } from 'next/font/google'
-import Header from '@/components/header';
-import { Banlance_type } from '@/utils/type';
-import { Provider } from "react-redux";
-import store from "@/store";
+import CustomProvider from './lib/Provider'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -21,25 +19,19 @@ export default function RootLayout({
   children: React.ReactNode
   }) {
   
-  // const [account,setAccount] = useState(JSON.parse(localStorage?.getItem('account')||''))
-  // const [banlance, setBanlance] = useState<Record<string,number>>({
-  //   FIL_banlance: 0,
-  //   FIT_banlance: 0,
-  //   FIG_banlance:0
-  // })
-
-
-  // console.log('-banlance----3',banlance)
+ 
   return (
     <html lang="en">
       <body className={inter.className} style={{ backgroundImage: `url(${bg.src})`, }}>
-          <div className='max-w-screen-xl p-5 m-auto'>
-         <Header />
-         {children}
-          </div> 
-       
-               
+        <StyledComponentsRegistry>
+          <CustomProvider>
+          {children}
+        </CustomProvider>
+        </StyledComponentsRegistry>
+      
       </body>
     </html>
   )
 }
+
+

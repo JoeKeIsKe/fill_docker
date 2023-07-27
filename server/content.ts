@@ -4,14 +4,6 @@ import { createContext } from "react";
 
 
 
-const WalletState = createContext({
-    wallet: 'metamask',
-    account: localStorage.getItem('account'),
-    //setWallet: (type: string) => { },
-    setAccount: (account: string) => { }
-});
-
-
 type banlance_type  = 'FIL_banlance'|'FIT_banlance'|'FIG_banlance'
  const FillState:any = createContext({
     FIL_banlance: 0,
@@ -21,4 +13,4 @@ type banlance_type  = 'FIL_banlance'|'FIT_banlance'|'FIG_banlance'
 });
 
 
-export  {WalletState,FillState}
+export  {FillState}

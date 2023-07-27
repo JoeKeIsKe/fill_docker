@@ -97,9 +97,9 @@ function Chart (props: Props) {
 
   useEffect(() => {
     const handleSize = () => {};
-    window.addEventListener("resize", handleSize);
+    window?.addEventListener("resize", handleSize);
     return () => {
-      window.removeEventListener("resize", handleSize);
+      window?.removeEventListener("resize", handleSize);
     };
   }, []);
 

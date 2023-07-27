@@ -7,14 +7,15 @@ import Card from "@/packages/card"
 import { default_opt } from '@/constants';
 import Chart from "@/components/charts";
 import FIT from "@/server/FIT";
-import { useContext, useEffect, useMemo } from 'react';
-import { WalletState } from '@/server/content';
+import { useEffect, useMemo } from 'react';
+import { shallowEqual, useSelector } from 'react-redux';
+import { rootState } from '@/store/type';
 
 
 
 function Deposit() {
-  const { account } = useContext<any>(WalletState);
-
+    const account = useSelector((state: rootState) => state?.wallet?.account, shallowEqual);
+    
     const contract = useMemo(() => {
         return FIT
     }, []);
@@ -26,7 +27,8 @@ function Deposit() {
            // contract.getBalance(account,'FIT')
         }
 
-    },[account,contract])
+    }, [account, contract])
+    
     return <>
         <div className='flex gap-x-4'>
             <Banlance banlance={banlance_card.banlance} className='mt-12 rounded-lg'>
