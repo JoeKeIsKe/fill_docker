@@ -4,8 +4,8 @@ import fa from "@glif/filecoin-address";
 import { Fill_contract } from '@/contract';
 import { BanlanceList } from '@/constants';
 import { getValueDivide } from '@/utils';
-import { FillState } from './content';
 import {  Banlance_type } from '@/utils/type';
+import store from '@/store';
 
 const web3 = new Web3(window?.ethereum);
 class contract {
@@ -33,31 +33,24 @@ class contract {
     // get banlance 
      getBalance(acc: string,type:Banlance_type) {
          this.account = acc;
-        for (const balancesItem of BanlanceList[type]) {
-            switch (balancesItem) {
-                  case 'FIL':
-                        web3.eth.getBalance(this.account).then((res) => {
-                            const balance = getValueDivide(Number(res), 18, 4);
-                            console.log('----33',balance)
-                            FillState.setBanlance({
-                                    FIL:balance
-                            })
-                            })
-                    break;
-                case 'FIT':
-                    this.myContract.methods.filTrustBalanceOf(this.account).call((err: any, res: any) => {
-                                if (!err) {
-                                    const FITBalance = getValueDivide(Number(res), 18);
-                                    
-                                }
-                            });
-                    break;
-              
-
-             
-            }
-        }
-    
+         //fil 
+         web3.eth.getBalance(this.account).then((res) => {
+             const balance = getValueDivide(Number(res), 18, 4);
+             store.dispatch({
+                 type: 'contract/change',
+                 payload: { FIL: balance }
+             })
+         });
+         //fit 
+        this.myContract.methods.filTrustBalanceOf(this.account).call((err: any, res: any) => {
+            if (!err) {
+                const FITBalance = getValueDivide(Number(res), 18);
+                  store.dispatch({
+                    type: 'contract/change',
+                    payload: { FIT: FITBalance }
+                     })                   
+                }
+            });
      }
     
 

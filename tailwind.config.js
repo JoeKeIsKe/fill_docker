@@ -12,9 +12,9 @@ module.exports = {
   theme: {    
     extend: {
       colors: {
-        'parmas': '#00E892',
-        'active': '#0093E9',
-        'main':'#80D0C7'
+        'parmas': '#1e40af',
+        'hover': '#0093E9',
+        'active':'#0273b5'
         },
       backgroundImage: {
         'header_bg': "url('/assets/bg1.jpg')",

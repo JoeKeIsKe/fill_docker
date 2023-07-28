@@ -1,5 +1,6 @@
 import { CardItem } from "@/utils/type"
 import Calc from '@/components/calc'
+
 //Total Credit committed
 export const banlance_card = {
     banlance: [
@@ -36,4 +37,17 @@ export const banlance_list:Array<CardItem> = [
             </span>
         }
     },
+]
+
+
+export const FIT_banlance_tabs = [
+  {
+    label: 'Deposit',
+    value:'deposit',
+  },
+   {
+    label: 'WidthDrow',
+    value:'reedom',
+  },
+
 ]

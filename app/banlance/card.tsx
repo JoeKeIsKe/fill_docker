@@ -10,7 +10,8 @@ interface Props {
 
 
 function Accect(props: Props) { 
-    const {list,className='' } = props
+    const { list, className = '' } = props;
+    
     const handleChange = () => { 
         console.log('---maxwell')
     }

@@ -21,9 +21,8 @@ import { walletState,contractState } from "./type";
 
 
 const contractSlice = createSlice({
-    name: 'contract',
+    name: 'FIT_contract',
     initialState: {
-      account: '0x5C045CFAfE8387a98eccaCAcCd24b852E95624Ee',
       FIL: '',
       FIT: "",
       loading:false,

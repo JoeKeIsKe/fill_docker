@@ -23,7 +23,7 @@ export const  RouterList:Array<ITEM> = [
   
       {
         label: 'Deposit/WidthDraw',
-        value:'deposit'
+        value:'banlance'
     },
     {
         label: 'Borrow/Reply',
@@ -62,4 +62,6 @@ export const  default_opt = {
           areaStyle: undefined,
         },
       ],
-    }
+}
+
+
