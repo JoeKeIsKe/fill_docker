@@ -23,10 +23,11 @@ import { walletState,contractState, commonState } from "./type";
 
 
 const contractSlice = createSlice({
-    name: 'FIT_contract',
+    name: 'contract',
     initialState: {
-      FIL: '',
-      FIT: "",
+      FIL: 0,
+      FIT: 0,
+      currentRate:1,
       loading:false,
       minerList: [],
       borrowList:[]

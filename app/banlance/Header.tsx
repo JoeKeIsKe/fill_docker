@@ -1,7 +1,7 @@
 import { getSvg } from "@/svgTypes"
 import { FIT_banlance_tabs } from "./veriable"
 
-function Header({ active,onChange }: {active:string,onChange:(value:string)=>void}) { 
+function Header({ active,onChange,currentRate }: {currentRate:number|string,active:string,onChange:(value:string)=>void}) { 
     return <div className="pt-20 flex items-center justify-between">
             <div>
                  <h3 className="flex text-3xl font-medium items-center gap-x-2">
@@ -18,7 +18,7 @@ function Header({ active,onChange }: {active:string,onChange:(value:string)=>voi
              </div>
             <div className="flex text-2xl  items-center gap-x-2	">
                 <h3 className="text-gray-700">Current Rate:</h3>
-                <span className='text-2xl font-medium text-blue-focus'>1</span>
+            <span className='text-2xl font-medium text-blue-focus'>{ currentRate}</span>
             </div>
          </div>
 }

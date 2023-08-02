@@ -1,14 +1,27 @@
 "use client";
 
-import { ReactNode, useEffect } from "react";
+import { ReactNode, useState, useEffect } from "react";
 import Header from "@/components/header";
-import { Provider, useSelector } from "react-redux";
+import { Provider, useDispatch } from "react-redux";
 import store from "@/store";
-import { ConfigProvider, Spin } from "antd";
+import { ConfigProvider } from "antd";
 import theme from "./ThemeConfig";
-import GlobalLoading from './GlobalLoading'
+import Loading from "../loading";
+import GlobalLoading from "./GlobalLoading";
 
 function CustomProvider({ children }: { children: ReactNode }) {
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (window) {
+      setLoading(false);
+    }
+  }, []);
+
+  if (loading) {
+    return <Loading />;
+  }
+
   return (
     <Provider store={store}>
       <ConfigProvider theme={theme}>

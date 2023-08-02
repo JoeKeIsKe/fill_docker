@@ -1,4 +1,3 @@
-import { BigNumber } from "ethers";
 
 export interface ITEM { 
     label: string;
@@ -20,11 +19,12 @@ export interface contractState {
     account?: number | string,
     FIL: number | string,
     FIT: number | string,
+    currentRate:number|string,
     loading: boolean,
     minerList: Record<string, any>,
     borrowList: Array<any>
-    contractBalance?: Number;
-    contractBalanceRes?:BigNumber
+    contractBalance?: number;
+    contractBalanceRes?:number
 
 }
 

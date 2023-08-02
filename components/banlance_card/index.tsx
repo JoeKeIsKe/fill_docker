@@ -2,11 +2,12 @@
 interface Props{
     banlance: Array<any>,
     children?: JSX.Element,
-    className?:string
+    className?: string,
+    data:Record<string,string|number>
 }
 
 function Banlance(props: Props) { 
-    const { banlance,children,className } = props
+    const { banlance,children,className,data } = props
     return <div className={`w-1/2 banlance-card  rounded-2xl ${className}`}> 
                 <ul className='p-5'>
                         {banlance.map((banlanceItem, index) => { 
@@ -15,7 +16,7 @@ function Banlance(props: Props) {
                                     {banlanceItem.label} Banlance
                                 </span>
                                 <span className='font-medium'>
-                                    {banlanceItem.value}
+                                    {data[banlanceItem.value]}
                                 </span>
                             </li>
                             })}

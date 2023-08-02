@@ -16,7 +16,14 @@ export const banlance_card = {
 }
 
 
-export const banlance_list:Array<CardItem> = [
+export const banlance_list: Array<CardItem> = [
+    {
+    label:'Accept',
+    value: 'accept',
+    render: (text:string) => { 
+        return '--'
+    }
+    },
     {
     label:'You will receive',
     value: 'receive',
