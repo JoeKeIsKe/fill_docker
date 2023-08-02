@@ -31,7 +31,7 @@ class contract {
   getBalance(acc: string) {
     this.account = acc;
     //fil
-    web3.eth.getBalance(this.account).then((res: any) => {
+    web3.eth.getBalance(this.account).then((res) => {
       const balance = getValueDivide(Number(res), 18, 4);
       console.log("----FILBalance", balance);
       store.dispatch({
@@ -50,25 +50,6 @@ class contract {
           store.dispatch({
             type: "contract/change",
             payload: { FIT: FITBalance },
-          });
-        }
-      });
-  }
-
-  // get  current rate
-  getCurrentRate() {
-    //get current rate
-    this.myContract.methods
-      .exchangeRate()
-      .call()
-      .then((res: any) => {
-        console.log("----3", res);
-        if (res) {
-          store.dispatch({
-            type: "contract/change",
-            payload: {
-              currentRate: getValueDivide(Number(res), 6),
-            },
           });
         }
       });
