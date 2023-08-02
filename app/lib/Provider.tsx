@@ -1,15 +1,15 @@
 "use client";
 
-import '../custom.scss'
-import { ReactNode,useState, useEffect } from 'react'
-import Header from '@/components/header';
+import { ReactNode, useState, useEffect } from "react";
+import Header from "@/components/header";
 import { Provider, useDispatch } from "react-redux";
 import store from "@/store";
 import { ConfigProvider } from "antd";
 import theme from "./ThemeConfig";
 import Loading from "../loading";
 import GlobalLoading from "./GlobalLoading";
-import { MetaMaskContextProvider } from '@/hooks/useMetaMask';
+import { MetaMaskContextProvider } from "@/hooks/useMetaMask";
+import "../custom.scss";
 
 function CustomProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);

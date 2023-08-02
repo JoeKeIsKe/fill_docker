@@ -1,5 +1,5 @@
 import BigNumber from "bignumber.js";
-import dayjs from 'dayjs'
+import dayjs from "dayjs";
 
 export function formatNumber(v: number | string, len = 4) {
   return Number(v).toLocaleString("en", { maximumFractionDigits: len });
@@ -27,15 +27,20 @@ export function getValueMultiplied(num: number | string, pow: number = 18) {
   return new BigNumber(num).multipliedBy(Math.pow(10, pow)).toFixed(0);
 }
 
-const FILECOIN_GENESIS_UNIX_EPOCH = 1598306400
-const FILECOIN_GENESIS_UNIX_EPOCH_TEST = 1667297580
+const FILECOIN_GENESIS_UNIX_EPOCH = 1598306400;
+const FILECOIN_GENESIS_UNIX_EPOCH_TEST = 1667297580;
 
 // get the time for a given block height
-export function heightToUnix (filEpoch: number, network?:string) {
-  return (filEpoch * 30) + (network === 'test' ? FILECOIN_GENESIS_UNIX_EPOCH_TEST :  FILECOIN_GENESIS_UNIX_EPOCH)
+export function heightToUnix(filEpoch: number, network?: string) {
+  return (
+    filEpoch * 30 +
+    (network === "test"
+      ? FILECOIN_GENESIS_UNIX_EPOCH_TEST
+      : FILECOIN_GENESIS_UNIX_EPOCH)
+  );
 }
 
-export function heightToDate (inputHeight: number, network?:string) {
-  const timestamp = heightToUnix(inputHeight, network) * 1000
-  return dayjs(timestamp).format('YYYY-MM-DD')
+export function heightToDate(inputHeight: number, network?: string) {
+  const timestamp = heightToUnix(inputHeight, network) * 1000;
+  return dayjs(timestamp).format("YYYY-MM-DD");
 }
