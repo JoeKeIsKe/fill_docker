@@ -15,6 +15,9 @@ import Header from './Header'
 
 function Deposit() {
     const account = useSelector((state: rootState) => state?.wallet?.account, shallowEqual);
+        const FIT_banlance = useSelector((state: rootState) => state?.contract?.FIT, shallowEqual);
+        const FIL_banlance = useSelector((state: rootState) => state?.contract?.FIL, shallowEqual);
+
 
     const [active,setActive] = useState('deposit');
 
