@@ -1,4 +1,4 @@
-import { Input, Table } from 'antd';
+import { Collapse, Input, Table } from 'antd';
 import {PlusCircleOutlined } from '@ant-design/icons'
 import type { ColumnsType } from 'antd/es/table';
 import type { TableRowSelection } from 'antd/es/table/interface';
@@ -13,7 +13,7 @@ const data = [
         debt: 1334, 
         threshold: '86%',
         key:'1',
-        childres: [
+        children: [
             {
                 miner: '1244',
                 rate: 0.9,
@@ -33,7 +33,7 @@ const data = [
          debt: 1334, 
          key:'2',
         threshold: '86%',
-        childres: [
+        children: [
             {
                 miner: '1244',
                 rate: 0.9,
@@ -71,16 +71,93 @@ const familyList = [
          dataIndex: 'threshold',
     }
 ]
+const minerList = [
+    {
+        title: 'miner',
+        dataIndex: 'miner',
+    },
+     {
+        title: 'Rate',
+        dataIndex: 'rate',
+    },
+    
+]
+const creditList = [
+    {
+        title: 'Credit',
+        dataIndex: 'credit',
+        width:'20%',
+    },
+    {
+        title: 'Repay',
+         width:'20%',
+        dataIndex: 'repay',
+    },
 
+]
 
 export default () => { 
 
     const [showPlus, setShowPlus] = useState<Record<string, false | undefined>>({});
 
 
-    const renderCard = (dataItem:any) => { 
+    const renderCard = (dataItem: any) => { 
+        if (dataItem?.children?.length > 0) { 
+            return <div className='bg-white px-5 pb-5 rounded-b-md'>
+                {dataItem?.children?.map((item:any)=>{
+                    return  <Collapse
+                            defaultActiveKey={['1']}
+                            accordion
+                            items={[
+                                {
+                                key: '1',
+                                    label: <div className='flex gap-x-5'>
+                                        {minerList.map(minerItem => { 
+                                            return <span className='flex gap-x-2'>
+                                                    <label className='text-gary-500'>{minerItem.title}:</label>
+                                                    <span className='font-meduim text-active'>{ item[minerItem.dataIndex]}</span>
+                                            </span>
+                                        }) }
+                                    
+                                </div>,
+                                    children: <div>
+                                        {renderCredit(item)}
+                                    </div>
+                                },
+                            ]}
+                        />
+                })}
+            </div>
+             
+        }
 
     }
+
+
+    const renderCredit = (creditData: any) => {
+        if (creditData?.children?.length > 0) { 
+             return <>
+             <ul className='px-4 py-2 w-full flex list-none font-medium'>
+                {creditList.map(item => { 
+                return <li style={{width:item?.width}} > 
+                            { item.title}
+                        </li>
+                    })}
+            </ul>
+              <div className='body flex flex-col gap-y-5'>
+                {creditData?.children.map((record: any) => { 
+                    return  <ul className={`px-4 py-2 w-full  flex list-none rounded-lg cursor-pointer hover:bg-bgHover`}>
+                                {creditList.map(item => { 
+                                        return <li style={{width:item?.width}} >
+                                        {record[item.dataIndex]}
+                                    </li>
+                                })}
+                        </ul>  
+                })}
+             </div>
+            </>
+        }
+     }
     
     return <div className='mt-5 '>
         <ul className='header px-4 py-2 w-full flex list-none font-medium text-xl'>
@@ -94,8 +171,10 @@ export default () => {
         <div className='body flex flex-col gap-y-5'>
                 {data.map((record: any) => { 
                     return <div>
-                            <ul className='header px-4 py-4 w-full flex  list-none rounded-lg bg-bgColor hover:bg-white'>
-                            <span className='flex items-center w-8 cursor-pointer' onClick={() => {setShowPlus({...showPlus,[record.key]:true}) } }><PlusCircleOutlined /></span>
+                        <ul className={`header px-4 py-4 w-full flex cursor-pointer  list-none rounded-lg bg-bgColor hover:bg-white ${showPlus[record.key] ? 'bg-white rounded-t-md rounded-b-none' : ''}`}
+                             onClick={() => {setShowPlus({...showPlus,[record.key]:true}) } }
+                        >
+                            <span className='flex items-center w-8 '><PlusCircleOutlined /></span>
                                 {familyList.map(item => { 
                                         return <li style={{width:item?.width}} >
                                         { record[item.dataIndex]}
