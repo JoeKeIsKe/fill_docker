@@ -43,6 +43,7 @@ export default function DefaultModal() {
         <>
             <Button onClick={()=>setConnect(true)}>Connect Wallet</Button>
             <Modal
+                onCancel={()=>setConnect(false)}
                 show={isConnect}
                 title='Connect Wallet'
                // footer={[{ label: 'Connect', value: 'confirm', className: 'w-full mt-5', onClick={handleChange} }]}

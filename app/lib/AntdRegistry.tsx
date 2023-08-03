@@ -9,7 +9,7 @@ const StyledComponentsRegistry = ({ children }: { children: React.ReactNode }) =
   useServerInsertedHTML(() => (
     <style id="antd" dangerouslySetInnerHTML={{ __html: extractStyle(cache, true) }} />
   ));
-  return <StyleProvider cache={cache}>{children}</StyleProvider>;
+  return <StyleProvider  cache={cache}>{children}</StyleProvider>;
 };
 
 export default StyledComponentsRegistry;

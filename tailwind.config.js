@@ -12,9 +12,11 @@ module.exports = {
   theme: {    
     extend: {
       colors: {
+        "border":'#e5e7eb',
         'parmas': '#1e40af',
         'hover': '#0093E9',
-        'active':'#0273b5'
+        'active': '#0273b5',
+        bgColor:'rgba(255,255,255,0.6)'
         },
       backgroundImage: {
         'header_bg': "url('/assets/bg1.jpg')",

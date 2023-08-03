@@ -15,13 +15,16 @@ interface Props{
     title: string,
     btn?:JSX.Element,
     onChange?: (type: boolean) => void,
+    onCancel:()=>void,
     footer?: JSX.Element | Array<footerItem>,
-    show:boolean
+    show: boolean
+    className?: string
+    width?:string |number
     
 }
 
 export default function DefaultModal(props: Props) {
-    const { show, children, title, onChange, footer } = props;    
+    const { show,width, children,className='', title, onCancel, footer } = props;    
     const renderFooter = () => { 
         if (Array.isArray(footer)) { 
         return <div>
@@ -39,9 +42,17 @@ export default function DefaultModal(props: Props) {
         </div>
 
     }
+    console.log('---3',show)
     
     return (
-        <Modal title={title} open={show} footer={footer ? renderFooter() : null} onCancel={() => {onChange}}>
+        <Modal width={width}
+            className={className}
+            title={title}
+            open={show}
+            destroyOnClose
+            footer={footer ? renderFooter() : null}
+            onCancel={onCancel}
+        >
         { children}
       </Modal>
   )

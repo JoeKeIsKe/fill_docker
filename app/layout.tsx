@@ -1,5 +1,4 @@
 import './globals.css'
-import './custom.css'
 import type { Metadata } from 'next'
 import bg from '@/assets/bg1.jpg';
 import StyledComponentsRegistry from './lib/AntdRegistry';

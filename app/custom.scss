@@ -50,3 +50,18 @@
     border: none;
     color: #fff;
   }
+  
+ .custom_steps{
+     .ant-steps-item{
+         margin-right: 20px;
+     }
+     .ant-steps-item-container{
+         display: flex !important;
+         align-items: center;
+     }
+ }
+ .custom_input{
+     .ant-input{
+         background-color: transparent !important;
+     }
+ }
