@@ -60,7 +60,7 @@ export const default_opt = {
 };
 
 export const STAKE_MONTH_OPTIONS = [
-  { value: 1/86400, label: "for test: 1 block" },
+  { value: 1 / 86400, label: "for test: 1 block" },
   { value: 1, label: "1" },
   { value: 2, label: "2" },
   { value: 3, label: "3" },

@@ -1,18 +1,16 @@
 import { ColumnsType } from "antd/es/table";
 
 export const market_title = {
-    title:''
-}
- 
+  title: "",
+};
+
 export const market_tabs = [
-     {
-    label: 'Borrow',
-    value:'borrow',
+  {
+    label: "Borrow",
+    value: "borrow",
   },
-   {
-    label: 'Repay',
-    value:'repay',
+  {
+    label: "Repay",
+    value: "repay",
   },
-]
-
-
+];
