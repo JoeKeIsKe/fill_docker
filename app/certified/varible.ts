@@ -16,11 +16,3 @@ export const market_tabs = [
 ]
 
 
-export interface DataType {
-  key: React.ReactNode;
-  name: string;
-  age: number;
-  address: string;
-  children?: DataType[];
-}
-

@@ -1,9 +1,6 @@
-import { Collapse, Input, Table } from 'antd';
-import {PlusCircleOutlined } from '@ant-design/icons'
-import type { ColumnsType } from 'antd/es/table';
-import type { TableRowSelection } from 'antd/es/table/interface';
+import { Collapse, } from 'antd';
+import {PlusCircleOutlined ,MinusCircleOutlined} from '@ant-design/icons'
 import { useState } from 'react';
-import { DataType } from "./varible";
 
 
 const data = [
@@ -99,8 +96,6 @@ const creditList = [
 export default () => { 
 
     const [showPlus, setShowPlus] = useState<Record<string, false | undefined>>({});
-
-
     const renderCard = (dataItem: any) => { 
         if (dataItem?.children?.length > 0) { 
             return <div className='bg-white px-5 pb-5 rounded-b-md'>
@@ -172,9 +167,12 @@ export default () => {
                 {data.map((record: any) => { 
                     return <div>
                         <ul className={`header px-4 py-4 w-full flex cursor-pointer  list-none rounded-lg bg-bgColor hover:bg-white ${showPlus[record.key] ? 'bg-white rounded-t-md rounded-b-none' : ''}`}
-                             onClick={() => {setShowPlus({...showPlus,[record.key]:true}) } }
+                             onClick={() => {setShowPlus({...showPlus,[record.key]:!showPlus[record.key]}) } }
                         >
-                            <span className='flex items-center w-8 '><PlusCircleOutlined /></span>
+                            <span className='flex items-center w-8 '>
+                                { showPlus[record.key] ?<MinusCircleOutlined />:<PlusCircleOutlined />}
+                                
+                            </span>
                                 {familyList.map(item => { 
                                         return <li style={{width:item?.width}} >
                                         { record[item.dataIndex]}
@@ -185,12 +183,5 @@ export default () => {
                     </div>                 
                 })}
         </div>
-     
-        {/* <Table
-        className='mt-5'
-        columns={columns}
-        rowSelection={{ ...rowSelection, checkStrictly }}
-        dataSource={[]}
-      /> */}
     </div>
 }
