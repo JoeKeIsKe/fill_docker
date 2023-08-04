@@ -8,7 +8,6 @@ import {
 import { StakeInfoType } from "@/utils/type";
 import web3 from "@/utils/web3";
 
-
 interface StakeType {
   canWithdraw: boolean;
   stake: StakeInfoType;
@@ -51,10 +50,11 @@ class contract {
           }
         )
         .then((res: any) => {
-          resolve(true)
-        }).catch((err: any) => {
-          resolve(err)
+          resolve(true);
         })
+        .catch((err: any) => {
+          resolve(err);
+        });
     });
   }
 
@@ -68,8 +68,9 @@ class contract {
         .then((res: any) => {
           console.log("onUnstake res ==> ", res);
           resolve(res);
-        }).catch((err:any) => {
-          resolve(err)
+        })
+        .catch((err: any) => {
+          resolve(err);
         });
     });
   }

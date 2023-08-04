@@ -18,5 +18,17 @@ if (!window?.ethereum) {
     }
 }
 
-export { loginMarck }
+const getChainId = () => { 
+  if (window?.ethereum) {
+    return new Promise((resove, reject) => {
+        window?.ethereum
+        .request({ method: 'eth_chainId' })
+          .then((res: any) => {  
+            resove(res)   
+        });
+      })
+  }
+}
+
+export { loginMarck, getChainId }
 

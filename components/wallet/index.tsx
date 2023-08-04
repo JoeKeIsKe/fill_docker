@@ -4,7 +4,7 @@ import { walletList } from '@/constants';
 import { getSvg } from '@/svgTypes';
 import Modal from '@/packages/modal';
 import { IWalletItem } from '@/utils/type';
-import { loginMarck } from '@/server/wallet';
+import { loginMarck, getChainId } from '@/server/wallet';
 import Button from "@/packages/button";
 import { useState } from "react";
 
@@ -15,6 +15,13 @@ export default function DefaultModal() {
     
     const connectWallet = async (wallet:IWalletItem) => { 
         console.log('connectWallet');
+        const chainId = await getChainId()
+        dispath({
+            type: "wallet/change",
+            payload: {
+                chainId
+            },
+        }); 
         loginMarck()?.then(res => { 
         if (res && Array.isArray(res)) {
             dispath({

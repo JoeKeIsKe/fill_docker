@@ -6,7 +6,6 @@ import StakingTable from "./components/stakingTable";
 import notification from "antd/es/notification";
 import store from "@/store";
 
-
 function Staking() {
   const [api, contextHolder] = notification.useNotification();
 
@@ -19,7 +18,7 @@ function Staking() {
         api.error({
           message: reason.message,
           description: reason?.data?.message,
-          placement: 'bottomRight',
+          placement: "bottomRight",
         });
       }
       store.dispatch({

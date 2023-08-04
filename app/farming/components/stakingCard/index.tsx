@@ -44,7 +44,7 @@ function StakingCard(props: Props) {
 
   const [api, contextHolder] = notification.useNotification();
 
-  const { currentAccount } = useMetaMask()
+  const { currentAccount } = useMetaMask();
 
   const { refreshStakeData } = useSelector(
     (state: rootState) => state?.commonStore
@@ -85,24 +85,26 @@ function StakingCard(props: Props) {
   };
 
   const onFarm = async () => {
-    if (!stakeTime) return api.warning({
-      message: 'Please select the time you want to stake',
-      placement: 'top',
-    })
-    if (!amount) return api.warning({
-      message: 'Please input the number of FIT you want to stake',
-      placement: 'top',
-    })
+    if (!stakeTime)
+      return api.warning({
+        message: "Please select the time you want to stake",
+        placement: "top",
+      });
+    if (!amount)
+      return api.warning({
+        message: "Please input the number of FIT you want to stake",
+        placement: "top",
+      });
     if (amount && stakeTime) {
       const staker = currentAccount;
       setSendLoading(true);
-      const res:any = await stake_contract.onStake(amount, stakeTime, staker);
+      const res: any = await stake_contract.onStake(amount, stakeTime, staker);
       if (res) {
         if (res?.message) {
           api.error({
             message: res?.message,
-            placement: 'bottomRight',
-          })
+            placement: "bottomRight",
+          });
         } else {
           setRewards(res);
           onFeedbackOpen();

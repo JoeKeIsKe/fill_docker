@@ -10,7 +10,7 @@ import stake_contract from "@/server/stake";
 import type { ColumnsType } from "antd/es/table";
 import store from "@/store";
 import ConfirmModal from "../confirmModal";
-import { ReloadOutlined } from '@ant-design/icons'
+import { ReloadOutlined } from "@ant-design/icons";
 import { useMetaMask } from "@/hooks/useMetaMask";
 
 interface Props {}
@@ -37,7 +37,7 @@ function StakingCard(props: Props) {
 
   const [api, contextHolder] = notification.useNotification();
 
-  const { currentAccount, wallet } = useMetaMask()
+  const { currentAccount, wallet } = useMetaMask();
   const nework = wallet?.chainId?.includes("0x1") ? "main" : "test";
 
   const { refreshStakeData, sendLoading } = useSelector(
@@ -47,7 +47,7 @@ function StakingCard(props: Props) {
 
   const getList = async () => {
     const staker = currentAccount;
-    
+
     if (staker) {
       setListLoading(true);
       try {
@@ -88,13 +88,13 @@ function StakingCard(props: Props) {
         if (res?.message) {
           api.error({
             message: res?.message,
-          placement: 'top',
-          })
+            placement: "top",
+          });
         } else {
           setExpectedRewards(res);
           onConfirmClose();
           onFeedbackOpen();
-          refresh()
+          refresh();
         }
       }
     } finally {
@@ -168,7 +168,7 @@ function StakingCard(props: Props) {
       type: "common/change",
       payload: { refreshStakeData: true },
     });
-  }
+  };
 
   useEffect(() => {
     getList();
@@ -177,7 +177,7 @@ function StakingCard(props: Props) {
 
   useEffect(() => {
     if (refreshStakeData) {
-      getList()
+      getList();
       store.dispatch({
         type: "common/change",
         payload: { refreshStakeData: false },
@@ -189,7 +189,10 @@ function StakingCard(props: Props) {
   return (
     <div>
       <div className="flex justify-end mb-2">
-        <Button className="!flex items-center" type="text" onClick={refresh}>Refresh list<ReloadOutlined /></Button>
+        <Button className="!flex items-center" type="text" onClick={refresh}>
+          Refresh list
+          <ReloadOutlined />
+        </Button>
       </div>
       <Table
         columns={columns}
