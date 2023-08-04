@@ -44,7 +44,7 @@ function Header() {
             <Image src={logo} height={40} alt='logo' />
                 <ul className='flex gap-x-5 items-center'>
                 {RouterList.map(item => { 
-                    return <Link href={`/${item.value}`} key={ item.value}>{ item.label}</Link>
+                    return <Link className='text-[#000]' href={`/${item.value}`} key={ item.value}>{ item.label}</Link>
                 })}
                 {account ? <Account account={ account} />: <Wallet /> }
                

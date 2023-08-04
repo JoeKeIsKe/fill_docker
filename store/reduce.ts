@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { walletState,contractState } from "./type";
+import { walletState,contractState, commonState } from "./type";
 
 
 
@@ -8,9 +8,11 @@ import { walletState,contractState } from "./type";
     initialState: {
       wallet: '',
       account:'',
+      chainId: ''
   },
   reducers: {
       change: (state: walletState, action: any) => {
+
       let newState = { ...state, ...action.payload };
         localStorage.setItem('login', JSON.stringify(newState))
         return newState;
@@ -37,12 +39,26 @@ const contractSlice = createSlice({
     }
 })
 
+const commonSlice = createSlice({
+  name: 'common',
+  initialState: {
+    refreshStakeData: false,
+    sendLoading: false
+  },
+  reducers: {
+    change: (state: commonState, action) => {
+          return { ...state, ...action.payload }
+      },
+  }
+})
+
 
 
 
 
  const walletReducer = walletSlice.reducer;
 const contractReducer = contractSlice.reducer;
+const commonReducer = commonSlice.reducer;
 
 
-export  {walletReducer,contractReducer}
+export  {walletReducer,contractReducer, commonReducer}

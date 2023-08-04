@@ -22,13 +22,12 @@ export default function RootLayout({
  
   return (
     <html lang="en">
-      <body className={inter.className} style={{ backgroundImage: `url(${bg.src})`, }}>
+      <body id="root" className={inter.className} style={{ backgroundImage: `url(${bg.src})`, }}>
         <StyledComponentsRegistry>
           <CustomProvider>
-          {children}
-        </CustomProvider>
+            {children}
+          </CustomProvider>
         </StyledComponentsRegistry>
-      
       </body>
     </html>
   )

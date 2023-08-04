@@ -34,11 +34,17 @@ export interface creditState {
 
 export interface walletState {
     wallet?: string;
-    account?:any
+    account?:any;
+    chainId?:string;
+}
+export interface commonState {
+    refreshStakeData: boolean;
+    sendLoading: boolean;
 }
 export interface rootState {
     contract: contractState; 
     user: userState
     wallet: walletState
+    commonStore: commonState
     credit:creditState
 }

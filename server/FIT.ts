@@ -6,8 +6,9 @@ import { BanlanceList } from '@/constants';
 import { getValueDivide } from '@/utils';
 import {  Banlance_type } from '@/utils/type';
 import store from '@/store';
+import web3 from "@/utils/web3";
 
-const web3 = new Web3(window?.ethereum);
+// const web3 = new Web3(window?.ethereum);
 class contract {
     contractAbi: any;
     contractAddress: string;

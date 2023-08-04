@@ -15,3 +15,11 @@ export interface CardItem extends ITEM {
 
 export type Banlance_type = 'FIL' | 'FIT'|'FIG'
 
+export interface StakeInfoType {
+    amount: string | number
+    end: number
+    start: number
+    key: string
+    id: string
+}
+
