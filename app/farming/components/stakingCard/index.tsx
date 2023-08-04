@@ -39,7 +39,7 @@ function StakingCard(props: Props) {
   const [stakerData, setStakerData] =
     useState<StakerDataType>(defaultStakerData);
   const [expectedRewards, setExpectedRewards] = useState<any>(0);
-  const [rewards, setRewards] = useState<any>('');
+  const [rewards, setRewards] = useState<any>("");
 
   const wallet = useSelector((state: rootState) => state?.wallet, shallowEqual);
 
@@ -85,7 +85,7 @@ function StakingCard(props: Props) {
     if (!stakeTime) return;
     if (amount && stakeTime) {
       const staker = wallet?.account;
-      setSendLoading(true)
+      setSendLoading(true);
       const res = await stake_contract.onStake(amount, stakeTime, staker);
       if (res) {
         setRewards(res);
@@ -102,7 +102,7 @@ function StakingCard(props: Props) {
   const onFeedbackClose = () => {
     setIsFeedbackOpen(false);
     if (rewards) {
-      setRewards(null)
+      setRewards(null);
       store.dispatch({
         type: "common/change",
         payload: { refreshStakeData: true },
@@ -125,7 +125,7 @@ function StakingCard(props: Props) {
   }, []);
 
   useEffect(() => {
-    if (refreshStakeData) {      
+    if (refreshStakeData) {
       fetchStakerData();
       setAmount(null);
       setStakeTime(null);
@@ -143,69 +143,69 @@ function StakingCard(props: Props) {
   }, [amount, stakeTime]);
 
   return (
-    <div className="min-w-[450px] bg-white rounded-[10px] p-4 h-full">
-      <div className="flex justify-between mb-2">
-        <div className="flex flex-col">
-          <p className="">Avaliable to stake</p>
-          <p className="font-semibold text-lg">{`${stakerData.filTrustBalance} FIT`}</p>
+    <div className="min-w-[450px] h-full relative">
+      <div className="btn-default p-4 rounded-t-[10px] text-[#fff]">
+        <div className="flex justify-between mb-2">
+          <div className="flex flex-col">
+            <p className="">Avaliable to stake</p>
+            <p className="font-semibold text-lg">{`${stakerData.filTrustBalance} FIT`}</p>
+          </div>
+          <p className="h-full py-1 px-2 rounded-[10px] bg-gray-100 text-gray-500 text-sm">
+            {isClient && wallet?.account && isIndent(wallet.account)}
+          </p>
         </div>
-        <p className="h-full py-1 px-2 rounded-[10px] bg-gray-100 text-gray-500 text-sm">
-          {isClient && wallet?.account && isIndent(wallet.account)}
-        </p>
-      </div>
-      <div className="flex gap-[40px] text-sm">
-        <div className="flex flex-col">
-          <p className="">Fixed-term FIT</p>
-          <p className="font-semibold text-lg">{`${stakerData.filTrustFixed} FIT`}</p>
+        <div className="flex gap-[40px] text-sm">
+          <div className="flex flex-col">
+            <p className="">Fixed-term FIT</p>
+            <p className="font-semibold text-lg">{`${stakerData.filTrustFixed} FIT`}</p>
+          </div>
+          <div className="flex flex-col">
+            <p className="">Variable-term FIT</p>
+            <p className="font-semibold text-lg">{`${stakerData.filTrustVariable} FIT`}</p>
+          </div>
         </div>
-        <div className="flex flex-col">
-          <p className="">Variable-term FIT</p>
-          <p className="font-semibold text-lg">{`${stakerData.filTrustVariable} FIT`}</p>
+        <hr className="my-4 h-0.5 border-t-0 bg-neutral-100 opacity-70 dark:opacity-50" />
+        <div className="flex flex-col text-sm">
+          <p className="">FIG Balance</p>
+          <p className="font-semibold text-lg">{`${stakerData.filGovernanceBalance} FIT`}</p>
         </div>
       </div>
-      <hr className="my-4 h-0.5 border-t-0 bg-neutral-100 opacity-70 dark:opacity-50" />
-      <div className="flex flex-col text-sm">
-        <p className="">FIG Balance</p>
-        <p className="font-semibold text-lg">{`${stakerData.filGovernanceBalance} FIT`}</p>
-      </div>
-      <div className="my-4">
-        <InputNumber
-          className="w-full"
-          defaultValue={defaultAmount}
-          min={1}
-          max={Number(stakerData.filTrustBalance)}
-          size="large"
-          prefix="FIT"
-          addonAfter={
-            <div className="cursor-pointer" onClick={onMaxBtnClick}>
-              Max
-            </div>
-          }
-          value={amount}
-          onChange={onChange}
-        />
-      </div>
-      <div className="flex items-end gap-2">
-        <Select
-          style={{ width: 120 }}
-          value={stakeTime}
-          onChange={onSelectChange}
-          options={STAKE_MONTH_OPTIONS}
-        />
-        <span>mos</span>
-      </div>
-      <div className="mt-12 space-y-3">
-        <p className="text-sm">
-          Expected FIG rewards from Fixed-term staking :{" "}
-          <em>{expectedRewards}</em> FIG
-        </p>
-        <Button
-          className="w-full"
-          type="primary"
-          onClick={onFarm}
-        >
-          Farm
-        </Button>
+      <div className="bg-white p-4 rounded-[10px] mt-[-10px]">
+        <div className="">
+          <InputNumber
+            className="w-full"
+            defaultValue={defaultAmount}
+            min={1}
+            max={Number(stakerData.filTrustBalance)}
+            size="large"
+            prefix="FIT"
+            addonAfter={
+              <div className="cursor-pointer" onClick={onMaxBtnClick}>
+                Max
+              </div>
+            }
+            value={amount}
+            onChange={onChange}
+          />
+        </div>
+        <div className="flex items-end gap-2 mt-4">
+          <Select
+            style={{ width: 120 }}
+            value={stakeTime}
+            onChange={onSelectChange}
+            options={STAKE_MONTH_OPTIONS}
+          />
+          <span>mos</span>
+        </div>
+        <div className="mt-12 space-y-3">
+          <p className="text-sm">
+            Expected FIG rewards from Fixed-term staking :{" "}
+            <em>{expectedRewards}</em> FIG
+          </p>
+          <Button className="w-full" type="primary" onClick={onFarm}>
+            Farm
+          </Button>
+        </div>
       </div>
       {/* feedback modal */}
       <ConfirmModal
