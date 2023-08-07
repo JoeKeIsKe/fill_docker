@@ -3,7 +3,7 @@
 import { isIndent } from "@/utils";
 import { rootState } from "@/store/type";
 import { shallowEqual, useSelector } from "react-redux";
-import { InputNumber, Select, Button } from "antd";
+import { InputNumber, Select, Button, notification } from "antd";
 import { useState, useEffect } from "react";
 import { STAKE_MONTH_OPTIONS } from "@/constants";
 import stake_contract from "@/server/stake";
@@ -40,6 +40,8 @@ function StakingCard(props: Props) {
     useState<StakerDataType>(defaultStakerData);
   const [expectedRewards, setExpectedRewards] = useState<any>(0);
   const [rewards, setRewards] = useState<any>("");
+
+  const [api, contextHolder] = notification.useNotification();
 
   const wallet = useSelector((state: rootState) => state?.wallet, shallowEqual);
 
@@ -82,14 +84,28 @@ function StakingCard(props: Props) {
   };
 
   const onFarm = async () => {
-    if (!stakeTime) return;
+    if (!stakeTime) return api.warning({
+      message: 'Please select the time you want to stake',
+      placement: 'top',
+    })
+    if (!amount) return api.warning({
+      message: 'Please input the number of FIT you want to stake',
+      placement: 'top',
+    })
     if (amount && stakeTime) {
       const staker = wallet?.account;
       setSendLoading(true);
-      const res = await stake_contract.onStake(amount, stakeTime, staker);
+      const res:any = await stake_contract.onStake(amount, stakeTime, staker);
       if (res) {
-        setRewards(res);
-        onFeedbackOpen();
+        if (res?.message) {
+          api.error({
+            message: res?.message,
+            placement: 'bottomRight',
+          })
+        } else {
+          setRewards(res);
+          onFeedbackOpen();
+        }
       }
       setSendLoading(false);
     }
@@ -176,7 +192,7 @@ function StakingCard(props: Props) {
             className="w-full"
             defaultValue={defaultAmount}
             min={1}
-            max={Number(stakerData.filTrustBalance)}
+            max={Number(stakerData.filTrustBalance) || undefined}
             size="large"
             prefix="FIT"
             addonAfter={
@@ -215,6 +231,7 @@ function StakingCard(props: Props) {
         // desc={`You received ${rewards} FIG`}
         onConfirm={onFeedbackClose}
       />
+      {contextHolder}
     </div>
   );
 }

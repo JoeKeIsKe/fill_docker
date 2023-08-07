@@ -3,13 +3,14 @@
 import { heightToDate } from "@/utils";
 import { rootState } from "@/store/type";
 import { shallowEqual, useSelector } from "react-redux";
-import { Table, Space, Button } from "antd";
+import { Table, Space, Button, notification } from "antd";
 import { LoadingOutlined } from "@ant-design/icons";
 import { useState, useEffect } from "react";
 import stake_contract from "@/server/stake";
 import type { ColumnsType } from "antd/es/table";
 import store from "@/store";
 import ConfirmModal from "../confirmModal";
+import { ReloadOutlined } from '@ant-design/icons'
 
 interface Props {}
 
@@ -32,6 +33,8 @@ function StakingCard(props: Props) {
   const [selectedRow, setSelectedRow] = useState<any>();
 
   const [expectedRewards, setExpectedRewards] = useState<any>("");
+
+  const [api, contextHolder] = notification.useNotification();
 
   const wallet = useSelector((state: rootState) => state?.wallet, shallowEqual);
   const nework = wallet?.chainId?.includes("0x1") ? "main" : "test";
@@ -78,15 +81,19 @@ function StakingCard(props: Props) {
     const staker = wallet?.account;
     setSendLoading(true);
     try {
-      const rewards = await stake_contract.onUnstake(selectedRow?.id, staker);
-      if (rewards) {
-        setExpectedRewards(rewards);
-        onConfirmClose();
-        onFeedbackOpen();
-        store.dispatch({
-          type: "common/change",
-          payload: { refreshStakeData: true },
-        });
+      const res: any = await stake_contract.onUnstake(selectedRow?.id, staker);
+      if (res) {
+        if (res?.message) {
+          api.error({
+            message: res?.message,
+          placement: 'top',
+          })
+        } else {
+          setExpectedRewards(res);
+          onConfirmClose();
+          onFeedbackOpen();
+          refresh()
+        }
       }
     } finally {
       setSendLoading(false);
@@ -154,6 +161,13 @@ function StakingCard(props: Props) {
     setCurrentPage(pageNum);
   };
 
+  const refresh = () => {
+    store.dispatch({
+      type: "common/change",
+      payload: { refreshStakeData: true },
+    });
+  }
+
   useEffect(() => {
     getList();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -161,7 +175,7 @@ function StakingCard(props: Props) {
 
   useEffect(() => {
     if (refreshStakeData) {
-      getList();
+      getList()
       store.dispatch({
         type: "common/change",
         payload: { refreshStakeData: false },
@@ -172,9 +186,11 @@ function StakingCard(props: Props) {
 
   return (
     <div className="flex-1">
+      <div className="flex justify-end mb-2">
+        <Button className="!flex items-center" type="text" onClick={refresh}>Refresh list<ReloadOutlined /></Button>
+      </div>
       <Table
         columns={columns}
-        // dataSource={tableList}
         dataSource={list}
         loading={{
           spinning: listLoading,
@@ -209,6 +225,7 @@ function StakingCard(props: Props) {
         // desc={`You received ${expectedRewards} FIG`}
         onConfirm={onFeedbackClose}
       />
+      {contextHolder}
     </div>
   );
 }

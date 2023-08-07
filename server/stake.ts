@@ -51,10 +51,9 @@ class contract {
           }
         )
         .then((res: any) => {
-          // console.log("Staked success then", res);
           resolve(true)
         }).catch((err: any) => {
-          resolve(true)
+          resolve(err)
         })
     });
   }
@@ -70,7 +69,7 @@ class contract {
           console.log("onUnstake res ==> ", res);
           resolve(res);
         }).catch((err:any) => {
-          resolve(true)
+          resolve(err)
         });
     });
   }
