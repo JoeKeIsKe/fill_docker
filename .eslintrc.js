@@ -15,6 +15,9 @@ module.exports = {
     sourceType: 'module',
     parser: 'babel-eslint',
   },
+  plugins: [
+    "react-hooks"
+  ],
   parser: '@typescript-eslint/parser',
 
     settings: {

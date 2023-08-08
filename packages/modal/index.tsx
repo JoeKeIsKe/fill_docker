@@ -42,7 +42,7 @@ export default function DefaultModal(props: Props) {
         </div>
 
     }
-    console.log('---3',show)
+    // console.log('---3',show)
     
     return (
         <Modal width={width}

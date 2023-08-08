@@ -3,19 +3,14 @@
 import Image from 'next/image';
 import logo from '@/assets/logo.svg';
 import Link from 'next/link';
-import Button from '@/packages/button';
-import Wallet from '@/components/wallet';
 import { RouterList } from '@/constants';
-import { useEffect, useMemo, useState } from 'react';
-import { isIndent } from '@/utils';
-import { shallowEqual, useDispatch, useSelector } from 'react-redux';
-import { rootState } from '@/store/type';
-import Account from './account';
+import { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
+import { useMetaMask } from '@/hooks/useMetaMask'
 
 function Header() { 
     const dispath = useDispatch();
-    const [isOpen,setIsOpen] = useState<boolean>(false)
-    const wallet = useSelector((state: rootState) => state?.wallet, shallowEqual);
+    const { connectButton } = useMetaMask()
     
     useEffect(() => {
         const wallet_login = JSON.parse(localStorage?.getItem('login') || '{}');
@@ -30,15 +25,6 @@ function Header() {
         }
     }, [])
     
-
-    const account = useMemo(() => { 
-        return wallet.account
-    },[wallet.account])
-    
-        const handleChange = (isOpen:boolean,data?:any) => { 
-            setIsOpen(isOpen)
-        }
-
     return  <>
         <div className='w-full h-12 flex items-center justify-between'>
             <Image src={logo} height={40} alt='logo' />
@@ -46,8 +32,7 @@ function Header() {
                 {RouterList.map(item => { 
                     return <Link className='text-[#000]' href={`/${item.value}`} key={ item.value}>{ item.label}</Link>
                 })}
-                {account ? <Account account={ account} />: <Wallet /> }
-               
+               { connectButton() }
         </ul> 
         
        

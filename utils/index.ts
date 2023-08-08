@@ -27,12 +27,6 @@ export function getValueMultiplied(num: number | string, pow: number = 18) {
   return new BigNumber(num).multipliedBy(Math.pow(10, pow)).toFixed(0);
 }
 
-// const FILECOIN_GENESIS_UNIX_EPOCH = 1598306400
-const getChainId = async () => {
-  return await window?.ethereum.request({ method: 'eth_chainId' });
-}
-const chainId = getChainId()
-
 const FILECOIN_GENESIS_UNIX_EPOCH = 1598306400
 const FILECOIN_GENESIS_UNIX_EPOCH_TEST = 1667297580
 

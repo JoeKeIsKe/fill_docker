@@ -2,7 +2,7 @@
 
 import { isIndent } from "@/utils";
 import { rootState } from "@/store/type";
-import { shallowEqual, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { InputNumber, Select, Button, notification } from "antd";
 import { useState, useEffect } from "react";
 import { STAKE_MONTH_OPTIONS } from "@/constants";
@@ -10,6 +10,7 @@ import stake_contract from "@/server/stake";
 import data_fetcher_contract from "@/server/data_fetcher";
 import store from "@/store";
 import ConfirmModal from "../confirmModal";
+import { useMetaMask } from "@/hooks/useMetaMask";
 
 interface Props {}
 
@@ -43,14 +44,14 @@ function StakingCard(props: Props) {
 
   const [api, contextHolder] = notification.useNotification();
 
-  const wallet = useSelector((state: rootState) => state?.wallet, shallowEqual);
+  const { currentAccount } = useMetaMask()
 
   const { refreshStakeData } = useSelector(
     (state: rootState) => state?.commonStore
   );
 
   const fetchStakerData = async () => {
-    const staker = wallet?.account;
+    const staker = currentAccount;
     if (staker) {
       const data: any = await data_fetcher_contract.fetchStakerData(staker);
       setStakerData(data);
@@ -93,7 +94,7 @@ function StakingCard(props: Props) {
       placement: 'top',
     })
     if (amount && stakeTime) {
-      const staker = wallet?.account;
+      const staker = currentAccount;
       setSendLoading(true);
       const res:any = await stake_contract.onStake(amount, stakeTime, staker);
       if (res) {
@@ -167,7 +168,7 @@ function StakingCard(props: Props) {
             <p className="font-semibold text-lg">{`${stakerData.filTrustBalance} FIT`}</p>
           </div>
           <p className="h-full py-1 px-2 rounded-[10px] bg-gray-100 text-gray-500 text-sm">
-            {isClient && wallet?.account && isIndent(wallet.account)}
+            {isClient && isIndent(currentAccount)}
           </p>
         </div>
         <div className="flex gap-[40px] text-sm">
