@@ -44,6 +44,11 @@ export const MetaMaskContextProvider = ({ children }: PropsWithChildren) => {
     const [api, contextHolder] = notification.useNotification();
 
     const [wallet, setWallet] = useState(disconnectedState)
+    const [currentAccount, setCurrentAccount] = useState<string>('')
+
+    useEffect(() => {
+        setCurrentAccount(wallet?.accounts[0])
+    }, [wallet])
 
     const _updateWallet = useCallback(async (providedAccounts?: any) => {
         const accounts = providedAccounts || await window?.ethereum.request({ method: 'eth_accounts' })
@@ -83,7 +88,7 @@ export const MetaMaskContextProvider = ({ children }: PropsWithChildren) => {
         }
         
         setHasProvider(Boolean(provider))
-        
+
         if (provider) {
             updateWalletAndAccounts()
             window?.ethereum.on('accountsChanged', updateWallet)
@@ -145,7 +150,7 @@ export const MetaMaskContextProvider = ({ children }: PropsWithChildren) => {
         <MetaMaskContext.Provider
             value={{
                 wallet,
-                currentAccount: wallet?.accounts[0],
+                currentAccount,
                 hasProvider,
                 error: Boolean(errorMsg),
                 errorMsg,

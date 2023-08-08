@@ -11,6 +11,7 @@ import type { ColumnsType } from "antd/es/table";
 import store from "@/store";
 import ConfirmModal from "../confirmModal";
 import { ReloadOutlined } from '@ant-design/icons'
+import { useMetaMask } from "@/hooks/useMetaMask";
 
 interface Props {}
 
@@ -36,7 +37,7 @@ function StakingCard(props: Props) {
 
   const [api, contextHolder] = notification.useNotification();
 
-  const wallet = useSelector((state: rootState) => state?.wallet, shallowEqual);
+  const { currentAccount, wallet } = useMetaMask()
   const nework = wallet?.chainId?.includes("0x1") ? "main" : "test";
 
   const { refreshStakeData, sendLoading } = useSelector(
@@ -45,7 +46,8 @@ function StakingCard(props: Props) {
   );
 
   const getList = async () => {
-    const staker = wallet?.account;
+    const staker = currentAccount;
+    
     if (staker) {
       setListLoading(true);
       try {
@@ -58,7 +60,7 @@ function StakingCard(props: Props) {
   };
 
   const onWithdrawBtnClick = async (row: any) => {
-    const staker = wallet?.account;
+    const staker = currentAccount;
     setSelectedRow(row);
     onConfirmOpen();
     const res = await stake_contract.onExpectedRewardsFromVariableTerm(
@@ -78,7 +80,7 @@ function StakingCard(props: Props) {
   };
 
   const onWithdraw = async () => {
-    const staker = wallet?.account;
+    const staker = currentAccount;
     setSendLoading(true);
     try {
       const res: any = await stake_contract.onUnstake(selectedRow?.id, staker);
@@ -171,7 +173,7 @@ function StakingCard(props: Props) {
   useEffect(() => {
     getList();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [currentAccount]);
 
   useEffect(() => {
     if (refreshStakeData) {

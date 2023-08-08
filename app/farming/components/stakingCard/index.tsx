@@ -139,7 +139,7 @@ function StakingCard(props: Props) {
     setIsClient(true);
     fetchStakerData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [currentAccount]);
 
   useEffect(() => {
     if (refreshStakeData) {
