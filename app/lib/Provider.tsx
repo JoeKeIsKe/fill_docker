@@ -1,8 +1,8 @@
 "use client";
 
-import '../custom.scss'
-import { ReactNode,useState, useEffect } from 'react'
-import Header from '@/components/header';
+import "../custom.scss";
+import { ReactNode, useState, useEffect } from "react";
+import Header from "@/components/header";
 import { Provider, useDispatch } from "react-redux";
 import store from "@/store";
 import { ConfigProvider } from "antd";
