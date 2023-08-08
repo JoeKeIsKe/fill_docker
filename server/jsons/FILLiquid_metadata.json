@@ -51,23 +51,10 @@
 				"inputs": [
 					{
 						"indexed": true,
-						"internalType": "uint64",
-						"name": "minerId",
-						"type": "uint64"
+						"internalType": "uint256",
+						"name": "borrowId",
+						"type": "uint256"
 					},
-					{
-						"indexed": true,
-						"internalType": "address",
-						"name": "user",
-						"type": "address"
-					}
-				],
-				"name": "BindMiner",
-				"type": "event"
-			},
-			{
-				"anonymous": false,
-				"inputs": [
 					{
 						"indexed": true,
 						"internalType": "address",
@@ -100,10 +87,16 @@
 				"anonymous": false,
 				"inputs": [
 					{
-						"indexed": false,
+						"indexed": true,
 						"internalType": "uint64",
 						"name": "minerId",
 						"type": "uint64"
+					},
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "sender",
+						"type": "address"
 					},
 					{
 						"indexed": false,
@@ -156,13 +149,13 @@
 				"anonymous": false,
 				"inputs": [
 					{
-						"indexed": false,
+						"indexed": true,
 						"internalType": "address",
 						"name": "account",
 						"type": "address"
 					},
 					{
-						"indexed": false,
+						"indexed": true,
 						"internalType": "uint64",
 						"name": "minerId",
 						"type": "uint64"
@@ -199,19 +192,19 @@
 				"anonymous": false,
 				"inputs": [
 					{
-						"indexed": false,
+						"indexed": true,
 						"internalType": "address",
 						"name": "account",
 						"type": "address"
 					},
 					{
-						"indexed": false,
+						"indexed": true,
 						"internalType": "uint64",
 						"name": "minerIdPayee",
 						"type": "uint64"
 					},
 					{
-						"indexed": false,
+						"indexed": true,
 						"internalType": "uint64",
 						"name": "minerIdPayer",
 						"type": "uint64"
@@ -287,21 +280,8 @@
 					{
 						"indexed": true,
 						"internalType": "address",
-						"name": "user",
+						"name": "sender",
 						"type": "address"
-					}
-				],
-				"name": "UnbindMiner",
-				"type": "event"
-			},
-			{
-				"anonymous": false,
-				"inputs": [
-					{
-						"indexed": false,
-						"internalType": "uint64",
-						"name": "minerId",
-						"type": "uint64"
 					},
 					{
 						"indexed": false,
@@ -354,9 +334,33 @@
 				"name": "allMinersSubset",
 				"outputs": [
 					{
-						"internalType": "uint64[]",
+						"components": [
+							{
+								"internalType": "uint64",
+								"name": "minerId",
+								"type": "uint64"
+							},
+							{
+								"components": [
+									{
+										"internalType": "bool",
+										"name": "onceBound",
+										"type": "bool"
+									},
+									{
+										"internalType": "bool",
+										"name": "stillBound",
+										"type": "bool"
+									}
+								],
+								"internalType": "struct FILLiquidInterface.BindStatus",
+								"name": "status",
+								"type": "tuple"
+							}
+						],
+						"internalType": "struct FILLiquidInterface.BindStatusInfo[]",
 						"name": "result",
-						"type": "uint64[]"
+						"type": "tuple[]"
 					}
 				],
 				"stateMutability": "view",
@@ -373,24 +377,6 @@
 					}
 				],
 				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "uint64",
-						"name": "minerId",
-						"type": "uint64"
-					},
-					{
-						"internalType": "bytes",
-						"name": "signature",
-						"type": "bytes"
-					}
-				],
-				"name": "bindMiner",
-				"outputs": [],
-				"stateMutability": "nonpayable",
 				"type": "function"
 			},
 			{
@@ -435,7 +421,7 @@
 						"type": "uint256[]"
 					}
 				],
-				"name": "checkBorrowPayBackFactors",
+				"name": "checkGovernanceFactors",
 				"outputs": [],
 				"stateMutability": "view",
 				"type": "function"
@@ -446,6 +432,11 @@
 						"internalType": "uint64",
 						"name": "minerId",
 						"type": "uint64"
+					},
+					{
+						"internalType": "bytes",
+						"name": "signature",
+						"type": "bytes"
 					}
 				],
 				"name": "collateralizingMiner",
@@ -455,11 +446,6 @@
 			},
 			{
 				"inputs": [
-					{
-						"internalType": "uint256",
-						"name": "amountFIL",
-						"type": "uint256"
-					},
 					{
 						"internalType": "uint256",
 						"name": "exchRate",
@@ -547,140 +533,6 @@
 						"internalType": "uint256",
 						"name": "",
 						"type": "uint256"
-					}
-				],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "address",
-						"name": "account",
-						"type": "address"
-					}
-				],
-				"name": "filTrustBalanceOf",
-				"outputs": [
-					{
-						"internalType": "uint256",
-						"name": "",
-						"type": "uint256"
-					}
-				],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"inputs": [],
-				"name": "filliquidInfo",
-				"outputs": [
-					{
-						"components": [
-							{
-								"internalType": "uint256",
-								"name": "totalFIL",
-								"type": "uint256"
-							},
-							{
-								"internalType": "uint256",
-								"name": "availableFIL",
-								"type": "uint256"
-							},
-							{
-								"internalType": "uint256",
-								"name": "utilizedLiquidity",
-								"type": "uint256"
-							},
-							{
-								"internalType": "uint256",
-								"name": "accumulatedDeposit",
-								"type": "uint256"
-							},
-							{
-								"internalType": "uint256",
-								"name": "accumulatedRedeem",
-								"type": "uint256"
-							},
-							{
-								"internalType": "uint256",
-								"name": "accumulatedBurntFILTrust",
-								"type": "uint256"
-							},
-							{
-								"internalType": "uint256",
-								"name": "accumulatedMintFILTrust",
-								"type": "uint256"
-							},
-							{
-								"internalType": "uint256",
-								"name": "accumulatedBorrow",
-								"type": "uint256"
-							},
-							{
-								"internalType": "uint256",
-								"name": "accumulatedPayback",
-								"type": "uint256"
-							},
-							{
-								"internalType": "uint256",
-								"name": "accumulatedInterest",
-								"type": "uint256"
-							},
-							{
-								"internalType": "uint256",
-								"name": "accumulatedRedeemFee",
-								"type": "uint256"
-							},
-							{
-								"internalType": "uint256",
-								"name": "accumulatedBorrowFee",
-								"type": "uint256"
-							},
-							{
-								"internalType": "uint256",
-								"name": "accumulatedLiquidateReward",
-								"type": "uint256"
-							},
-							{
-								"internalType": "uint256",
-								"name": "accumulatedLiquidateFee",
-								"type": "uint256"
-							},
-							{
-								"internalType": "uint256",
-								"name": "accumulatedDeposits",
-								"type": "uint256"
-							},
-							{
-								"internalType": "uint256",
-								"name": "accumulatedBorrows",
-								"type": "uint256"
-							},
-							{
-								"internalType": "uint256",
-								"name": "utilizationRate",
-								"type": "uint256"
-							},
-							{
-								"internalType": "uint256",
-								"name": "exchangeRate",
-								"type": "uint256"
-							},
-							{
-								"internalType": "uint256",
-								"name": "interestRate",
-								"type": "uint256"
-							},
-							{
-								"internalType": "uint256",
-								"name": "collateralizedMiner",
-								"type": "uint256"
-							}
-						],
-						"internalType": "struct FILLiquidInterface.FILLiquidInfo",
-						"name": "",
-						"type": "tuple"
 					}
 				],
 				"stateMutability": "view",
@@ -885,6 +737,30 @@
 				"type": "function"
 			},
 			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "account",
+						"type": "address"
+					}
+				],
+				"name": "getFamilyStatus",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "balanceSum",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "principalAndInterestSum",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
 				"inputs": [],
 				"name": "getLiquidatingFactors",
 				"outputs": [
@@ -917,6 +793,131 @@
 						"internalType": "uint256",
 						"name": "",
 						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "getStatus",
+				"outputs": [
+					{
+						"components": [
+							{
+								"internalType": "uint256",
+								"name": "totalFIL",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "availableFIL",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "utilizedLiquidity",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "accumulatedDeposit",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "accumulatedRedeem",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "accumulatedBurntFILTrust",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "accumulatedMintFILTrust",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "accumulatedBorrow",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "accumulatedPayback",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "accumulatedInterest",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "accumulatedRedeemFee",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "accumulatedBorrowFee",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "accumulatedLiquidateReward",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "accumulatedLiquidateFee",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "accumulatedDeposits",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "accumulatedBorrows",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "utilizationRate",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "exchangeRate",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "interestRate",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "collateralizedMiner",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "minerWithBorrows",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "rateBase",
+								"type": "uint256"
+							}
+						],
+						"internalType": "struct FILLiquidInterface.FILLiquidInfo",
+						"name": "",
+						"type": "tuple"
 					}
 				],
 				"stateMutability": "view",
@@ -1061,6 +1062,25 @@
 			{
 				"inputs": [
 					{
+						"internalType": "address",
+						"name": "account",
+						"type": "address"
+					}
+				],
+				"name": "maxBorrowAllowedFamily",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
 						"internalType": "uint64",
 						"name": "minerId",
 						"type": "uint64"
@@ -1072,6 +1092,11 @@
 						"components": [
 							{
 								"components": [
+									{
+										"internalType": "uint256",
+										"name": "id",
+										"type": "uint256"
+									},
 									{
 										"internalType": "uint256",
 										"name": "borrowAmount",
@@ -1094,7 +1119,12 @@
 									},
 									{
 										"internalType": "uint256",
-										"name": "datedDate",
+										"name": "datedTime",
+										"type": "uint256"
+									},
+									{
+										"internalType": "uint256",
+										"name": "initialTime",
 										"type": "uint256"
 									}
 								],
@@ -1111,6 +1141,37 @@
 						"internalType": "struct FILLiquidInterface.BorrowInterestInfo[]",
 						"name": "result",
 						"type": "tuple[]"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint64",
+						"name": "minerId",
+						"type": "uint64"
+					}
+				],
+				"name": "minerStatus",
+				"outputs": [
+					{
+						"components": [
+							{
+								"internalType": "bool",
+								"name": "onceBound",
+								"type": "bool"
+							},
+							{
+								"internalType": "bool",
+								"name": "stillBound",
+								"type": "bool"
+							}
+						],
+						"internalType": "struct FILLiquidInterface.BindStatus",
+						"name": "",
+						"type": "tuple"
 					}
 				],
 				"stateMutability": "view",
@@ -1190,169 +1251,12 @@
 			{
 				"inputs": [
 					{
-						"internalType": "address",
-						"name": "new_tokenFILTrust",
-						"type": "address"
-					},
-					{
-						"internalType": "address",
-						"name": "new_validation",
-						"type": "address"
-					},
-					{
-						"internalType": "address",
-						"name": "new_calculation",
-						"type": "address"
-					},
-					{
-						"internalType": "address",
-						"name": "new_filecoinAPI",
-						"type": "address"
-					},
-					{
-						"internalType": "address",
-						"name": "new_filStake",
-						"type": "address"
-					},
-					{
-						"internalType": "address",
-						"name": "new_governance",
-						"type": "address"
-					},
-					{
-						"internalType": "address payable",
-						"name": "new_foundation",
-						"type": "address"
-					}
-				],
-				"name": "setAdministrativeFactors",
-				"outputs": [],
-				"stateMutability": "nonpayable",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
 						"internalType": "uint256[]",
 						"name": "values",
 						"type": "uint256[]"
 					}
 				],
-				"name": "setBorrowPayBackFactors",
-				"outputs": [],
-				"stateMutability": "nonpayable",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "uint256",
-						"name": "new_rateBase",
-						"type": "uint256"
-					},
-					{
-						"internalType": "uint256",
-						"name": "new_redeemFeeRate",
-						"type": "uint256"
-					},
-					{
-						"internalType": "uint256",
-						"name": "new_borrowFeeRate",
-						"type": "uint256"
-					},
-					{
-						"internalType": "uint256",
-						"name": "new_collateralRate",
-						"type": "uint256"
-					},
-					{
-						"internalType": "uint256",
-						"name": "new_minDepositAmount",
-						"type": "uint256"
-					},
-					{
-						"internalType": "uint256",
-						"name": "new_minBorrowAmount",
-						"type": "uint256"
-					},
-					{
-						"internalType": "uint256",
-						"name": "new_maxExistingBorrows",
-						"type": "uint256"
-					},
-					{
-						"internalType": "uint256",
-						"name": "new_maxFamilySize",
-						"type": "uint256"
-					},
-					{
-						"internalType": "uint256",
-						"name": "new_requiredQuota",
-						"type": "uint256"
-					},
-					{
-						"internalType": "int64",
-						"name": "new_requiredExpiration",
-						"type": "int64"
-					}
-				],
-				"name": "setComprehensiveFactors",
-				"outputs": [],
-				"stateMutability": "nonpayable",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "uint256",
-						"name": "new_u_m",
-						"type": "uint256"
-					},
-					{
-						"internalType": "uint256",
-						"name": "new_j_n",
-						"type": "uint256"
-					}
-				],
-				"name": "setDepositRedeemFactors",
-				"outputs": [],
-				"stateMutability": "nonpayable",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "uint256",
-						"name": "new_maxLiquidations",
-						"type": "uint256"
-					},
-					{
-						"internalType": "uint256",
-						"name": "new_minLiquidateInterval",
-						"type": "uint256"
-					},
-					{
-						"internalType": "uint256",
-						"name": "new_alertThreshold",
-						"type": "uint256"
-					},
-					{
-						"internalType": "uint256",
-						"name": "new_liquidateThreshold",
-						"type": "uint256"
-					},
-					{
-						"internalType": "uint256",
-						"name": "new_liquidateDiscountRate",
-						"type": "uint256"
-					},
-					{
-						"internalType": "uint256",
-						"name": "new_liquidateFeeRate",
-						"type": "uint256"
-					}
-				],
-				"name": "setLiquidatingFactors",
+				"name": "setGovernanceFactors",
 				"outputs": [],
 				"stateMutability": "nonpayable",
 				"type": "function"
@@ -1381,19 +1285,6 @@
 					}
 				],
 				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "uint64",
-						"name": "minerId",
-						"type": "uint64"
-					}
-				],
-				"name": "unbindMiner",
-				"outputs": [],
-				"stateMutability": "nonpayable",
 				"type": "function"
 			},
 			{
@@ -1434,6 +1325,11 @@
 							{
 								"components": [
 									{
+										"internalType": "uint256",
+										"name": "rate",
+										"type": "uint256"
+									},
+									{
 										"internalType": "bool",
 										"name": "alertable",
 										"type": "bool"
@@ -1452,6 +1348,11 @@
 								"components": [
 									{
 										"components": [
+											{
+												"internalType": "uint256",
+												"name": "id",
+												"type": "uint256"
+											},
 											{
 												"internalType": "uint256",
 												"name": "borrowAmount",
@@ -1474,7 +1375,12 @@
 											},
 											{
 												"internalType": "uint256",
-												"name": "datedDate",
+												"name": "datedTime",
+												"type": "uint256"
+											},
+											{
+												"internalType": "uint256",
+												"name": "initialTime",
 												"type": "uint256"
 											}
 										],
@@ -1640,14 +1546,11 @@
 		],
 		"devdoc": {
 			"events": {
-				"BindMiner(uint64,address)": {
-					"details": "Emitted when `user` binds `minerId`"
-				},
-				"Borrow(address,uint64,uint256,uint256)": {
+				"Borrow(uint256,address,uint64,uint256,uint256)": {
 					"details": "Emitted when user `account` borrows `amountFIL` with `minerId`"
 				},
-				"CollateralizingMiner(uint64,bytes,uint256,uint64)": {
-					"details": "Emitted when collateralizing `minerId` : change beneficiary to `beneficiary` with info `quota`,`expiration`"
+				"CollateralizingMiner(uint64,address,bytes,uint256,uint64)": {
+					"details": "Emitted when collateralizing `minerId` : change beneficiary to `beneficiary` with info `quota`,`expiration` by `sender`"
 				},
 				"Deposit(address,uint256,uint256)": {
 					"details": "Emitted when `account` deposits `amountFIL` and mints `amountFILTrust`"
@@ -1661,26 +1564,33 @@
 				"Redeem(address,uint256,uint256,uint256)": {
 					"details": "Emitted when `account` redeems `amountFILTrust` and withdraws `amountFIL`"
 				},
-				"UnbindMiner(uint64,address)": {
-					"details": "Emitted when `user` unbinds `minerId`"
-				},
-				"UncollateralizingMiner(uint64,bytes,uint256,uint64)": {
-					"details": "Emitted when uncollateralizing `minerId` : change beneficiary to `beneficiary` with info `quota`,`expiration`"
+				"UncollateralizingMiner(uint64,address,bytes,uint256,uint64)": {
+					"details": "Emitted when uncollateralizing `minerId` : change beneficiary to `beneficiary` with info `quota`,`expiration` by `sender`"
 				}
 			},
 			"kind": "dev",
 			"methods": {
-				"bindMiner(uint64,bytes)": {
-					"details": "bind miner with sender address",
+				"allMinersCount()": {
+					"details": "All once bound miners' count",
+					"returns": {
+						"_0": "all once bound miners' count"
+					}
+				},
+				"allMinersSubset(uint256,uint256)": {
+					"details": "Once bound miners' subset",
+					"params": {
+						"end": "end index",
+						"start": "start index"
+					},
+					"returns": {
+						"result": "Once bound miners' subset from `start` to `end` index"
+					}
+				},
+				"collateralizingMiner(uint64,bytes)": {
+					"details": "collateralizing miner : change beneficiary to contract , need owner for miner propose change beneficiary first",
 					"params": {
 						"minerId": "miner id",
 						"signature": "miner signature"
-					}
-				},
-				"collateralizingMiner(uint64)": {
-					"details": "collateralizing miner : change beneficiary to contract , need owner for miner propose change beneficiary first",
-					"params": {
-						"minerId": "miner id"
 					}
 				},
 				"directPayback(uint64)": {
@@ -1696,18 +1606,6 @@
 				"exchangeRate()": {
 					"details": "return FIL/FILTrust exchange rate: total amount of FIL liquidity divided by total amount of FILTrust outstanding"
 				},
-				"filTrustBalanceOf(address)": {
-					"details": "FILTrust balance of a user",
-					"params": {
-						"account": "user account"
-					},
-					"returns": {
-						"_0": "user’s FILTrust account balance"
-					}
-				},
-				"filliquidInfo()": {
-					"details": "return fill contract infos"
-				},
 				"getCollateralizingMinerInfo(uint64)": {
 					"details": "get collateralizing miner info : minerId,quota,borrowCount,paybackCount,expiration",
 					"params": {
@@ -1716,6 +1614,9 @@
 					"returns": {
 						"_0": "info return collateralizing miner info"
 					}
+				},
+				"getStatus()": {
+					"details": "return fill contract infos"
 				},
 				"interestRate()": {
 					"details": "return borrowing interest rate: a mathematical function of utilizatonRate"
@@ -1732,10 +1633,13 @@
 						"_3": "liquidating fee"
 					}
 				},
-				"unbindMiner(uint64)": {
-					"details": "unbind miner with bound address",
+				"minerStatus(uint64)": {
+					"details": "Status of a specified miner",
 					"params": {
-						"minerId": "miner id"
+						"minerId": "miner's actor id"
+					},
+					"returns": {
+						"_0": "Status of a miner with actor id `minerId`"
 					}
 				},
 				"uncollateralizingMiner(uint64)": {
@@ -1751,6 +1655,15 @@
 					},
 					"returns": {
 						"result": "user’s borrowing informations"
+					}
+				},
+				"userMiners(address)": {
+					"details": "user’s bound miners",
+					"params": {
+						"account": "user’s account address"
+					},
+					"returns": {
+						"_0": "user’s bound miners"
 					}
 				},
 				"utilizationRate()": {
@@ -2126,43 +2039,43 @@
 			]
 		},
 		"contracts/FILGovernance.sol": {
-			"keccak256": "0x70b54c68f48e5c17b19e56cb90471376abe3ab3a9bc96d77ba15d5a9e0cab38a",
+			"keccak256": "0xf0e28e69723adaaab0b0b5264fda05588a86763ed8f710a76cbcf2ccf55f8921",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://687cb645cb0bb22c1d1bb6a0f546b98a30d60f7b002afe798e48ff2961483928",
-				"dweb:/ipfs/QmUbcUaYiJj6EhsTKdixrPN92WcS9vAoG2UnK4SQE54YqZ"
+				"bzz-raw://991efcacc1fa83a1cb0a764477cd9a259a88b5ff87b80079b2cef003fb7d8f46",
+				"dweb:/ipfs/QmV7YqpXPmzQmosceej7X3D5yJ8DTtCpmtGVeTciRLFBvi"
 			]
 		},
 		"contracts/FILLiquid.sol": {
-			"keccak256": "0x48da35388e588311431c055bffd1bb33cbe08fab8a592978eaac5cb02ae4119f",
+			"keccak256": "0x2d4c86088db3bf8002b1ffb09ecf65d05317b2ecbaad441356ab0d2ee196e885",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://ff3aba3fac56b91d213709854c73e338ae67ccedf2fa4d1d33517626dec33d78",
-				"dweb:/ipfs/QmRttXgz3Bn2qwdh4ETYo6BRDPs7WKp2h8rXEsqUNPnyQP"
+				"bzz-raw://0b0bd2f71643ead80a9adf258e316a0a376646da43e21a27c2f9f9ef51411e41",
+				"dweb:/ipfs/QmdxJv2sZuadTnSstmsWF3QwWiB4Yih2guahv7WGVub5qu"
 			]
 		},
 		"contracts/FILStake.sol": {
-			"keccak256": "0xe4559400987d127b004f08c071fb9f747604a31b242de65f0096aafce6d09551",
+			"keccak256": "0xbc20bb4ce6a4edaff1fde7d538bf31f454cfc94bd94c00e51ffeb3d04f324a42",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://a490304a3bed64c605086f96592168f74491c4c74783b03ef5d956ba6a8e9014",
-				"dweb:/ipfs/QmYnpCfAXPWegaasz73b7y7y5b4VegyPytzwYAQf4BiBVg"
+				"bzz-raw://49e8832b0b9a8a6daee8f90b012a8b75eb8ec5a08fd36d85751482272254439e",
+				"dweb:/ipfs/QmeCpcx7qXJboAV6EACkqKYDZ1QyzfkgE9QkD62whxaRdZ"
 			]
 		},
 		"contracts/FILTrust.sol": {
-			"keccak256": "0x9d33d2823c34258174b5d297d997aef65c1907a3ebe4c5baf3bfba511f4c0dd4",
+			"keccak256": "0xed716b2134ef9d4a44ed2e302feb567b7d5b23ac5a7c13ebe2eb97b51e273885",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://227b3b7a39e3fb6775ee7faaa41d3cb949dc34f4c669292f011a78a76b83a009",
-				"dweb:/ipfs/QmZemrKebL5h2Y72818DaoD7owFTvkueU8sayHgzu3HgXZ"
+				"bzz-raw://9e390c73e05628a91b4acfd6daf14c14d2bdff7afd6d38858f2037eee643193f",
+				"dweb:/ipfs/QmTJ75sddxtKJktjqLbBZAfDwvHPFLs4bUhGYFgU7X6RAK"
 			]
 		},
 		"contracts/Utils/Calculation.sol": {
-			"keccak256": "0xe78ebba9986257ed4b0f6ba27254250aa44337ee5c0581eaaea7d776e359038e",
+			"keccak256": "0xb9933a668b93dd28c447f3e6c1a6bc65f0880259c634217dcd3cd8bc3436c579",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://27dd245a77ea84279ebbfef57f311125dbee310d2bcfb21eceb8e8321366ffa5",
-				"dweb:/ipfs/QmPCg1vAzHDbeT3zYKZfDH7Y3neaaqf1LmxQiAGMRG8nvG"
+				"bzz-raw://ae6c98d7648fe359cfd874a774c1d3b5dc4d18f33f6d8b5ee831c5c2f6999ab1",
+				"dweb:/ipfs/QmanUqeW1MvYAZ5iJT26zDFXo3Sx3fHTtC8uQnu3YMzFiH"
 			]
 		},
 		"contracts/Utils/Convertion.sol": {

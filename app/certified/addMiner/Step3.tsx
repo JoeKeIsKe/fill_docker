@@ -1,10 +1,11 @@
 import { Input } from "antd"
 
-export default ({ sign='0171a0e402204f54ac7cba299ec1ad708b2b968f6d1917bd74773e4d91a86aa23568af98100d',onChange }: {sign?:string,onChange:(value:string)=>void}) => { 
+export default ({ msg, onChange }: { msg?: string, onChange: (value: string) => void }) => { 
+    console.log('----333',msg)
     return <div className="h-40">
             <div className="flex flex-col mb-5">
             <span className="text-gray-500">Sign</span>
-            <span className=" font-medium	text-gray-600">{sign}</span>
+            <span className=" font-medium	text-gray-600">{msg}</span>
             <span className="text-gray-500">with owner address to propose transfer owner to SPex contract</span>
             </div>
         

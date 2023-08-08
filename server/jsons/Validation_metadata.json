@@ -1,0 +1,365 @@
+{
+	"compiler": {
+		"version": "0.8.19+commit.7dd6d404"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [
+			{
+				"inputs": [
+					{
+						"internalType": "int256",
+						"name": "errorCode",
+						"type": "int256"
+					}
+				],
+				"name": "ActorError",
+				"type": "error"
+			},
+			{
+				"inputs": [],
+				"name": "ActorNotFound",
+				"type": "error"
+			},
+			{
+				"inputs": [],
+				"name": "FailToCallActor",
+				"type": "error"
+			},
+			{
+				"inputs": [],
+				"name": "FailToCallActor",
+				"type": "error"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "CommonTypes.FilActorId",
+						"name": "actorId",
+						"type": "uint64"
+					}
+				],
+				"name": "InvalidActorID",
+				"type": "error"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint64",
+						"name": "",
+						"type": "uint64"
+					}
+				],
+				"name": "InvalidCodec",
+				"type": "error"
+			},
+			{
+				"inputs": [],
+				"name": "InvalidResponseLength",
+				"type": "error"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "balance",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "value",
+						"type": "uint256"
+					}
+				],
+				"name": "NotEnoughBalance",
+				"type": "error"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"internalType": "bytes",
+						"name": "m",
+						"type": "bytes"
+					}
+				],
+				"name": "ShowMsg",
+				"type": "event"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes",
+						"name": "addr",
+						"type": "bytes"
+					}
+				],
+				"name": "getNonce",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint64",
+						"name": "minerID",
+						"type": "uint64"
+					}
+				],
+				"name": "getSigningMsg",
+				"outputs": [
+					{
+						"internalType": "bytes",
+						"name": "m",
+						"type": "bytes"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint64",
+						"name": "minerID",
+						"type": "uint64"
+					},
+					{
+						"internalType": "bytes",
+						"name": "signature",
+						"type": "bytes"
+					},
+					{
+						"internalType": "address",
+						"name": "sender",
+						"type": "address"
+					}
+				],
+				"name": "validateOwner",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			}
+		],
+		"devdoc": {
+			"kind": "dev",
+			"methods": {},
+			"version": 1
+		},
+		"userdoc": {
+			"errors": {
+				"ActorError(int256)": [
+					{
+						"notice": "the called actor returned an error as part of its expected behaviour"
+					}
+				],
+				"ActorNotFound()": [
+					{
+						"notice": "the actor is not found"
+					}
+				],
+				"FailToCallActor()": [
+					{
+						"notice": "an error happened trying to call the actor"
+					},
+					{
+						"notice": "an error happened trying to call the actor"
+					}
+				],
+				"InvalidActorID(uint64)": [
+					{
+						"notice": "the provided actor id is not valid"
+					}
+				],
+				"InvalidCodec(uint64)": [
+					{
+						"notice": "the codec received is not valid"
+					}
+				],
+				"InvalidResponseLength()": [
+					{
+						"notice": "the response received is not correct. In some case no response is expected and we received one, or a response was indeed expected and we received none."
+					}
+				],
+				"NotEnoughBalance(uint256,uint256)": [
+					{
+						"notice": "the smart contract has no enough balance to transfer"
+					}
+				]
+			},
+			"kind": "user",
+			"methods": {},
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"contracts/Utils/Validation.sol": "Validation"
+		},
+		"evmVersion": "paris",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": true,
+			"runs": 0
+		},
+		"remappings": []
+	},
+	"sources": {
+		"@ensdomains/buffer/contracts/Buffer.sol": {
+			"keccak256": "0xd6dd3b0b327288f8e1b711a609f4040fea602e2ad4bba9febdf2f33b4e56eb0c",
+			"license": "BSD-2-Clause",
+			"urls": [
+				"bzz-raw://78a722152d40d778a97595e5224fac1d138f4e659dcb1a926148909ef4c4bdca",
+				"dweb:/ipfs/QmRxScF53x5ywsChLNpMUCdg2TSoCWTfo8G65Mo3sGY55b"
+			]
+		},
+		"@openzeppelin/contracts/utils/Context.sol": {
+			"keccak256": "0xe2e337e6dde9ef6b680e07338c493ebea1b5fd09b43424112868e9cc1706bca7",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://6df0ddf21ce9f58271bdfaa85cde98b200ef242a05a3f85c2bc10a8294800a92",
+				"dweb:/ipfs/QmRK2Y5Yc6BK7tGKkgsgn3aJEQGi5aakeSPZvS65PV8Xp3"
+			]
+		},
+		"@zondax/filecoin-solidity/contracts/v0.8/AccountAPI.sol": {
+			"keccak256": "0x5b72e97e33f21d4de350e4ac20c136461f8c3052a2d9ec879d8108b01c5ed203",
+			"license": "Apache-2.0",
+			"urls": [
+				"bzz-raw://0301cbbb684a1d497202dcf8e37a00a98460dd2e02e967ae563b8b979e526741",
+				"dweb:/ipfs/QmYkubWmUxcjDHXhjJzhXoxBCeYUZV7xNhCns7kv6rRvKd"
+			]
+		},
+		"@zondax/filecoin-solidity/contracts/v0.8/MinerAPI.sol": {
+			"keccak256": "0x441de61a7d91510848def8bb0c0acbae12a79973ea604dc82d6a18dd9cb796fb",
+			"license": "Apache-2.0",
+			"urls": [
+				"bzz-raw://ba68a166b23bc7b2a3f47ab7f7e2590c3b788d732b022d599cd4f42259d618a0",
+				"dweb:/ipfs/QmRdnf4T1pACiVsYnfrXWqrxSHBvjE56QbrKFuexy2oeQf"
+			]
+		},
+		"@zondax/filecoin-solidity/contracts/v0.8/PrecompilesAPI.sol": {
+			"keccak256": "0xaf2d09961a638c9287b6e68b242670e3ce9b2d2f58e56e36d1f67200905e5b34",
+			"license": "Apache-2.0",
+			"urls": [
+				"bzz-raw://387e62c233a1ef2e21b4f13bed20803ce5a2eb1de57853dc58160d19ff25c77d",
+				"dweb:/ipfs/QmNZTQ2ehCd5so7aSUbQuLm5NcB3diYWc1tEyprGA3Cqa3"
+			]
+		},
+		"@zondax/filecoin-solidity/contracts/v0.8/cbor/AccountCbor.sol": {
+			"keccak256": "0xbc15538954ef494595fa3916532574ba00805ce09d8679d6bcebf59b5dc069cc",
+			"license": "Apache-2.0",
+			"urls": [
+				"bzz-raw://bc46b1dbb7760a7d9a100b0d44a95e4b0a3c68e7c22dda2c8ec9b0442080ed76",
+				"dweb:/ipfs/QmWjdmiD96UsdYNvsSv1W97JLvWE6NRnkZLBB5GUecWxkE"
+			]
+		},
+		"@zondax/filecoin-solidity/contracts/v0.8/cbor/BigIntCbor.sol": {
+			"keccak256": "0xbe9eb7f33f943e12a2ca6d8a02178c30cef91f8c9db1c1b50f88a77e31784ac4",
+			"license": "Apache-2.0",
+			"urls": [
+				"bzz-raw://d4b8aa06f6f6a241531393d43e4439dcf264542312f03b3b1be00a6448d45d5e",
+				"dweb:/ipfs/QmVarAEVBJgLnGqMEZ6XDRokXKR8vWpS3R6fz7QNCMVPT2"
+			]
+		},
+		"@zondax/filecoin-solidity/contracts/v0.8/cbor/BytesCbor.sol": {
+			"keccak256": "0x092be34452eead511a33e8d5c0a0878bf53ac5747ada8788099a81bdf888eccf",
+			"license": "Apache-2.0",
+			"urls": [
+				"bzz-raw://a8adec0719d5ae1d5252169a9987023fae1d07e50f40d1f91c04020d6e0cb783",
+				"dweb:/ipfs/QmWthjuXuaby8XYY5ujLdX9m1Npbd8EdNTjsi6fwqEXeZB"
+			]
+		},
+		"@zondax/filecoin-solidity/contracts/v0.8/cbor/FilecoinCbor.sol": {
+			"keccak256": "0x9c73c2969df5325f1f86c401b05b8983e633e8bd21c1c72b2b9039a731174098",
+			"license": "Apache-2.0",
+			"urls": [
+				"bzz-raw://832c4992387994d42d5b8470cc67eddfe7220719970cc6fe0b17cb2ad0a88716",
+				"dweb:/ipfs/QmYW4WknHH4Rf6Wah3LKT1afcZuPkSBK4fegjpwdT5sRaL"
+			]
+		},
+		"@zondax/filecoin-solidity/contracts/v0.8/cbor/MinerCbor.sol": {
+			"keccak256": "0x8893ec187418e90131eedce500b721c7195d2f7cef24643910c85f9000a211b3",
+			"license": "Apache-2.0",
+			"urls": [
+				"bzz-raw://fd10b8f81ab0dfac6dd15ec1f7c031e3da1c49aba68802b63d379b9ba0c47575",
+				"dweb:/ipfs/QmWZ42EweqVyjEihz7vM5eDLSpvdY5eEmbozu7WXV9SDea"
+			]
+		},
+		"@zondax/filecoin-solidity/contracts/v0.8/types/AccountTypes.sol": {
+			"keccak256": "0x87555cec6962a4b6bd761a2390a24d66e01119d5b761048a27d1df0673a71263",
+			"license": "Apache-2.0",
+			"urls": [
+				"bzz-raw://f42937dc061ce4f2995ad2357a8ebcd030e5744b95665cf24313ed86e1767f4b",
+				"dweb:/ipfs/QmWbN2gozKsNXGYM4yMivTRaicPzjVALUHn2GDcRN7FiHE"
+			]
+		},
+		"@zondax/filecoin-solidity/contracts/v0.8/types/CommonTypes.sol": {
+			"keccak256": "0x1819b8e82cf53f0fadc446d064a380979888b97a0004f1e70c9fa1a6f4f13ed9",
+			"license": "Apache-2.0",
+			"urls": [
+				"bzz-raw://f7346f62e3317f519791256e9ecd70c44b3ed48404d8a15aa28b3490b11adabb",
+				"dweb:/ipfs/QmNQLSdzyHLDN9a76XANJzkGVVdyYwYzZSRRiwv6CqwZRr"
+			]
+		},
+		"@zondax/filecoin-solidity/contracts/v0.8/types/MinerTypes.sol": {
+			"keccak256": "0x6d7839a173dc3b84142cb3ea3a834148e57a89ad3d15383c26b6036461145e72",
+			"license": "Apache-2.0",
+			"urls": [
+				"bzz-raw://9e42b9189be593b1511e3a172d70061ff1ed8bd95403385dcac546608146f2ae",
+				"dweb:/ipfs/QmVhSwCqTFDUMK35YiRuhWDKLQaaFfU2Wv1gs2DbVqw6EW"
+			]
+		},
+		"@zondax/filecoin-solidity/contracts/v0.8/utils/Actor.sol": {
+			"keccak256": "0xa4b9eb4d84491477a3c11336a431c4f3a0796977efb92779bd062f273824c67a",
+			"license": "Apache-2.0",
+			"urls": [
+				"bzz-raw://c9c42c1ca5c39551cc0c0032e3b3d602fcaed66bc67c21b2b46a770b6c7009aa",
+				"dweb:/ipfs/QmWiqHWieDPscnC21LjhgMrjE5UmzrRfEAVfXPNRTuZStw"
+			]
+		},
+		"@zondax/filecoin-solidity/contracts/v0.8/utils/CborDecode.sol": {
+			"keccak256": "0x3babe3c71558c21f0bef9de09088c42b8b148d16d856f84a350b9c43b4da6018",
+			"license": "Apache-2.0",
+			"urls": [
+				"bzz-raw://1d6a4b4341714cbc99db90831f1a6fa05654c62702badec60701cff701355f9a",
+				"dweb:/ipfs/QmbQfXXmvhBhybcS1kd6B7UaXWTGg8R89xgzPycxeojWo6"
+			]
+		},
+		"@zondax/filecoin-solidity/contracts/v0.8/utils/Misc.sol": {
+			"keccak256": "0x97b02c3ab9cb11169b0b1a143b513017c6bf0f2cba2fc4f81a77345b5dfe96b4",
+			"license": "Apache-2.0",
+			"urls": [
+				"bzz-raw://1b116a3f7af53a2b35316405af74e296550dcfe04798b6c3954e2becda1027c1",
+				"dweb:/ipfs/QmPia4SFULn4EXcE8fiMBcKtf8TX7YfbJRZxywu31e6uQw"
+			]
+		},
+		"contracts/Utils/Validation.sol": {
+			"keccak256": "0xe2f912bc3f3d779fe4499cd4963a3d1bffe8a9847057e131fbb69b1790c8b67a",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://a469cd649600383de7413054c1bcd836e57c2e9d14d9c8bb902e91f71cccb338",
+				"dweb:/ipfs/QmdyXVfMB5fydu3joyKm5ViaA9xfgNbhi1KXaZzQA4Tcxp"
+			]
+		},
+		"solidity-cborutils/contracts/CBOR.sol": {
+			"keccak256": "0xe03d8889bf66e7a30e8010b022b6c86ad0f8c19764cc6c7f50b6bb4ad860cb9b",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://bbcfc16dda4f5785938acce3f6733a2a27fbcc7451da05e46e5493907c1bb790",
+				"dweb:/ipfs/QmTk1okPxoUykGuXPH3zD1LB57FwPuGbgYmViXXJtuYMUQ"
+			]
+		}
+	},
+	"version": 1
+}
