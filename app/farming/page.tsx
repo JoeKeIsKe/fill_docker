@@ -44,7 +44,9 @@ function Staking() {
         {/* Staking Section */}
         <StakingCard />
         {/* Table */}
-        <StakingTable />
+        <div className="mt-[10px] lg:-mt-[40px]">
+          <StakingTable />
+        </div>
       </div>
       {contextHolder}
     </section>
