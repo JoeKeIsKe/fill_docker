@@ -44,7 +44,7 @@ function Staking() {
         {/* Staking Section */}
         <StakingCard />
         {/* Table */}
-        <div className="mt-[10px] lg:-mt-[40px]">
+        <div className="mt-[10px] lg:-mt-[40px] flex-1">
           <StakingTable />
         </div>
       </div>

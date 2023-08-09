@@ -187,7 +187,7 @@ function StakingCard(props: Props) {
   }, [refreshStakeData]);
 
   return (
-    <div className="flex-1">
+    <div>
       <div className="flex justify-end mb-2">
         <Button className="!flex items-center" type="text" onClick={refresh}>Refresh list<ReloadOutlined /></Button>
       </div>
