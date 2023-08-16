@@ -1,18 +1,19 @@
-interface Porps { 
-    title?: string,
-    children: JSX.Element,
-    className?: string
+import { PropsWithChildren } from "react";
+
+interface Props {
+  title?: string;
+  children: React.ReactNode;
+  className?: string;
 }
 
+function Card(props: Props) {
+  const { title, children, className } = props;
 
-
-function Card(props: Porps) { 
-    const {title,children ,className} = props
-
-    return <div className={`bg-white rounded-lg p-5 ${className}`}>
-        {title && <h3 className="text-3xl">{title}</h3>}
-        { children}
+  return (
+    <div className={`card-default ${className}`}>
+      {title && <h3 className="title">{title}</h3>}
+      {children}
     </div>
-
+  );
 }
-export default Card 
+export default Card;

@@ -622,6 +622,30 @@
 						"type": "uint64"
 					}
 				],
+				"name": "getBorrowable",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					},
+					{
+						"internalType": "string",
+						"name": "",
+						"type": "string"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint64",
+						"name": "minerId",
+						"type": "uint64"
+					}
+				],
 				"name": "getCollateralizingMinerInfo",
 				"outputs": [
 					{
@@ -1134,13 +1158,113 @@
 							},
 							{
 								"internalType": "uint256",
-								"name": "interest",
+								"name": "debtOutStanding",
 								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "balance",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "borrowSum",
+								"type": "uint256"
+							},
+							{
+								"internalType": "bool",
+								"name": "haveCollateralizing",
+								"type": "bool"
+							},
+							{
+								"components": [
+									{
+										"components": [
+											{
+												"internalType": "uint256",
+												"name": "id",
+												"type": "uint256"
+											},
+											{
+												"internalType": "uint256",
+												"name": "borrowAmount",
+												"type": "uint256"
+											},
+											{
+												"internalType": "uint256",
+												"name": "liquidatedAmount",
+												"type": "uint256"
+											},
+											{
+												"internalType": "uint256",
+												"name": "remainingOriginalAmount",
+												"type": "uint256"
+											},
+											{
+												"internalType": "uint256",
+												"name": "interestRate",
+												"type": "uint256"
+											},
+											{
+												"internalType": "uint256",
+												"name": "datedTime",
+												"type": "uint256"
+											},
+											{
+												"internalType": "uint256",
+												"name": "initialTime",
+												"type": "uint256"
+											}
+										],
+										"internalType": "struct FILLiquidInterface.BorrowInfo",
+										"name": "borrow",
+										"type": "tuple"
+									},
+									{
+										"internalType": "uint256",
+										"name": "interest",
+										"type": "uint256"
+									}
+								],
+								"internalType": "struct FILLiquidInterface.BorrowInterestInfo[]",
+								"name": "borrows",
+								"type": "tuple[]"
 							}
 						],
-						"internalType": "struct FILLiquidInterface.BorrowInterestInfo[]",
+						"internalType": "struct FILLiquidInterface.MinerBorrowInfo",
 						"name": "result",
-						"type": "tuple[]"
+						"type": "tuple"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint64",
+						"name": "minerId",
+						"type": "uint64"
+					}
+				],
+				"name": "minerStatus",
+				"outputs": [
+					{
+						"components": [
+							{
+								"internalType": "bool",
+								"name": "onceBound",
+								"type": "bool"
+							},
+							{
+								"internalType": "bool",
+								"name": "stillBound",
+								"type": "bool"
+							}
+						],
+						"internalType": "struct FILLiquidInterface.BindStatus",
+						"name": "",
+						"type": "tuple"
 					}
 				],
 				"stateMutability": "view",
@@ -1313,14 +1437,29 @@
 					{
 						"components": [
 							{
-								"internalType": "uint64",
-								"name": "minerId",
-								"type": "uint64"
+								"internalType": "address",
+								"name": "user",
+								"type": "address"
 							},
 							{
-								"internalType": "bool",
-								"name": "haveCollateralizing",
-								"type": "bool"
+								"internalType": "uint256",
+								"name": "debtOutStanding",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "availableCredit",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "balanceSum",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "borrowSum",
+								"type": "uint256"
 							},
 							{
 								"components": [
@@ -1341,7 +1480,7 @@
 									}
 								],
 								"internalType": "struct FILLiquidInterface.LiquidateConditionInfo",
-								"name": "info",
+								"name": "liquidateConditionInfo",
 								"type": "tuple"
 							},
 							{
@@ -1390,21 +1529,90 @@
 									},
 									{
 										"internalType": "uint256",
-										"name": "interest",
+										"name": "debtOutStanding",
 										"type": "uint256"
+									},
+									{
+										"internalType": "uint256",
+										"name": "balance",
+										"type": "uint256"
+									},
+									{
+										"internalType": "uint256",
+										"name": "borrowSum",
+										"type": "uint256"
+									},
+									{
+										"internalType": "bool",
+										"name": "haveCollateralizing",
+										"type": "bool"
+									},
+									{
+										"components": [
+											{
+												"components": [
+													{
+														"internalType": "uint256",
+														"name": "id",
+														"type": "uint256"
+													},
+													{
+														"internalType": "uint256",
+														"name": "borrowAmount",
+														"type": "uint256"
+													},
+													{
+														"internalType": "uint256",
+														"name": "liquidatedAmount",
+														"type": "uint256"
+													},
+													{
+														"internalType": "uint256",
+														"name": "remainingOriginalAmount",
+														"type": "uint256"
+													},
+													{
+														"internalType": "uint256",
+														"name": "interestRate",
+														"type": "uint256"
+													},
+													{
+														"internalType": "uint256",
+														"name": "datedTime",
+														"type": "uint256"
+													},
+													{
+														"internalType": "uint256",
+														"name": "initialTime",
+														"type": "uint256"
+													}
+												],
+												"internalType": "struct FILLiquidInterface.BorrowInfo",
+												"name": "borrow",
+												"type": "tuple"
+											},
+											{
+												"internalType": "uint256",
+												"name": "interest",
+												"type": "uint256"
+											}
+										],
+										"internalType": "struct FILLiquidInterface.BorrowInterestInfo[]",
+										"name": "borrows",
+										"type": "tuple[]"
 									}
 								],
-								"internalType": "struct FILLiquidInterface.BorrowInterestInfo[]",
-								"name": "borrows",
+								"internalType": "struct FILLiquidInterface.MinerBorrowInfo[]",
+								"name": "minerBorrowInfo",
 								"type": "tuple[]"
 							}
 						],
-						"internalType": "struct FILLiquidInterface.MinerBorrowInfo[]",
+						"internalType": "struct FILLiquidInterface.UserInfo",
 						"name": "result",
-						"type": "tuple[]"
+						"type": "tuple"
 					}
 				],
-				"stateMutability": "view",
+				"stateMutability": "nonpayable",
 				"type": "function"
 			},
 			{

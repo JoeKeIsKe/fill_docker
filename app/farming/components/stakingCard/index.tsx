@@ -9,7 +9,7 @@ import { STAKE_MONTH_OPTIONS } from "@/constants";
 import stake_contract from "@/server/stake";
 import data_fetcher_contract from "@/server/data_fetcher";
 import store from "@/store";
-import ConfirmModal from "../confirmModal";
+import ConfirmModal from "@/components/confirmModal";
 import { useMetaMask } from "@/hooks/useMetaMask";
 
 interface Props {}
@@ -231,7 +231,6 @@ function StakingCard(props: Props) {
         type="success"
         isOpen={isFeedbackOpen}
         title="Successfully Staked"
-        // desc={`You received ${rewards} FIG`}
         onConfirm={onFeedbackClose}
       />
       {contextHolder}

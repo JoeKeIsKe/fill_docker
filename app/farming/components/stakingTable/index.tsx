@@ -9,7 +9,7 @@ import { useState, useEffect } from "react";
 import stake_contract from "@/server/stake";
 import type { ColumnsType } from "antd/es/table";
 import store from "@/store";
-import ConfirmModal from "../confirmModal";
+import ConfirmModal from "@/components/confirmModal";
 import { ReloadOutlined } from "@ant-design/icons";
 import { useMetaMask } from "@/hooks/useMetaMask";
 

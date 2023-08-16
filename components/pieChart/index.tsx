@@ -1,5 +1,5 @@
 import * as echarts from "echarts/core";
-import { BarChart, LineChart } from "echarts/charts";
+import { BarChart, LineChart, PieChart } from "echarts/charts";
 import {
   TitleComponent,
   TooltipComponent,
@@ -43,8 +43,7 @@ echarts.use([
   GridComponent,
   DatasetComponent,
   TransformComponent,
-  //   BarChart,
-  LineChart,
+  PieChart,
   LabelLayout,
   UniversalTransition,
   CanvasRenderer,
@@ -55,7 +54,7 @@ interface Props {
   option: Record<string, any>;
 }
 
-function Chart(props: Props) {
+function PieChartComponent(props: Props) {
   // 1. get DOM
   const chartRef = useRef(null);
 
@@ -63,23 +62,19 @@ function Chart(props: Props) {
   useEffect(() => {
     // 2. 实例化表格对象
     const chart = echarts.init(chartRef.current as unknown as HTMLDivElement);
-    // const chart =  echarts.init(document.getElementById('main'));
     // 3. 定义数据
     const defaultOption = {
       backgroundColor: "transparent",
-      color: "#31D2FA",
       tooltip: {},
-      grid: {
-        top: 15,
-        left: "5%",
-        right: "5%",
-        bottom: 0,
-        containLabel: true,
-      },
-      yAxis: {
-        type: "value",
-        min: 0,
-      },
+      // grid: {
+      //   top: 15,
+      //   left: "5%",
+      //   right: "5%",
+      //   bottom: 0,
+      //   containLabel: true,
+      // },
+      // xAxis: {},
+      // yAxis: {},
     };
     // 4. 调用表格数据
     chart.setOption({ ...defaultOption, ...option });
@@ -95,11 +90,11 @@ function Chart(props: Props) {
 
   return (
     <div
-      id="chart"
-      style={{ width: "100%", height: "90%", minHeight: "260px" }}
+      id="pie_chart"
+      style={{ width: "100%", height: "90%", minHeight: "100px" }}
       ref={chartRef}
     />
   );
 }
 
-export default Chart;
+export default PieChartComponent;

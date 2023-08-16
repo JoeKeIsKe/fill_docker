@@ -16,21 +16,24 @@ export const walletList: Array<IWalletItem> = [
 
 export const RouterList: Array<ITEM> = [
   {
-    label: "Overview",
-    value: "analytic",
+    label: "Stake",
+    value: "staking",
   },
-
+  // {
+  //   label: "Deposit/WidthDraw",
+  //   value: "banlance",
+  // },
   {
-    label: "Deposit/WidthDraw",
-    value: "banlance",
-  },
-  {
-    label: "Borrow/Reply",
-    value: "cried",
+    label: "Borrow",
+    value: "borrow",
   },
   {
     label: "Farming",
     value: "farming",
+  },
+  {
+    label: "Analytics",
+    value: "analytic",
   },
 ];
 
