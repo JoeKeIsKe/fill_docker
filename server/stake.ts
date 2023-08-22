@@ -29,6 +29,11 @@ class contract {
       this.contractAbi,
       this.contractAddress
     );
+    // this.myContract = new ethers.Contract(
+    //   this.contractAddress,
+    //   this.contractAbi,
+    //   signer
+    // );
   }
 
   onStake(amount: number, duration: number, address: string) {
@@ -78,12 +83,12 @@ class contract {
   onExpectedRewardsFromVariableTerm(id: string, address: string) {
     return new Promise((resolve, reject) => {
       this.myContract.methods
-        .unStakeFilTrust(id)
-        .call({
+        .unStakeFilTrust(id)({
           from: address,
           gasPrice: 200,
           gas: 200000000,
         })
+        .call()
         .then((res: any) => {
           resolve(getValueDivide(res, 18, 2));
         });

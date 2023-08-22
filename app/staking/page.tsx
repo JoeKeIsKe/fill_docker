@@ -7,12 +7,18 @@ import NumberInput from "@/packages/NumberInput";
 import DescRow from "@/packages/DescRow";
 import Chart from "@/components/charts";
 import notification from "antd/es/notification";
-import store from "@/store";
 import { rootState } from "@/store/type";
-import { isIndent } from "@/utils";
+import { isIndent, getValueToFixed } from "@/utils";
 import { useMetaMask } from "@/hooks/useMetaMask";
 import { Button, Divider } from "antd";
 import { useSelector } from "react-redux";
+import data_fetcher_contract from "@/server/data_fetcher";
+import FIL_contract from "@/server/FILLiquid_contract";
+import BigNumber from "bignumber.js";
+import { DEFAULT_EMPTY } from "../borrow/components/constans";
+import { useDebounce } from "use-debounce";
+import { ExpectedStake } from "@/utils/type";
+import useLoading from "@/hooks/useLoading";
 
 const TAB_KEYS = ["stake", "unstake"];
 
@@ -20,11 +26,20 @@ function Staking() {
   const [api, contextHolder] = notification.useNotification();
   const { currentAccount } = useMetaMask();
 
-  const [amount, setAmount] = useState();
+  const [amount, setAmount] = useState<number | null>();
+  const [debouncedAmount] = useDebounce(amount, 600);
   const [slippage, setSlippage] = useState();
-  const [tabKey, setTabKey] = useState<string | null>(TAB_KEYS[0]);
+  const [expected, setExpected] = useState<ExpectedStake>({
+    expectedAmount: 0,
+    expectedRate: 0,
+  });
+  const [tabKey, setTabKey] = useState<string>(TAB_KEYS[0]);
 
-  const { sendLoading } = useSelector((state: rootState) => state?.commonStore);
+  const { filInfo, stakeOverview, balance } = useSelector(
+    (state: rootState) => state?.contract
+  );
+
+  const { sendLoading, setSendLoading } = useLoading();
 
   const default_opt = {
     backgroundColor: "transparent",
@@ -61,13 +76,6 @@ function Staking() {
     setSlippage(undefined);
   };
 
-  const setSendLoading = (status: boolean) => {
-    store.dispatch({
-      type: "common/change",
-      payload: { sendLoading: status },
-    });
-  };
-
   const onConfirm = async () => {
     if (!amount)
       return api.warning({
@@ -80,51 +88,63 @@ function Staking() {
         placement: "top",
       });
     if (amount && slippage) {
-      const staker = currentAccount;
       setSendLoading(true);
-      // const res:any = await stake_contract.onStake(amount, stakeTime, staker);
-      const res: any = {};
-      if (res) {
-        if (res?.message) {
-          api.error({
-            message: res?.message,
-            placement: "bottomRight",
-          });
-        } else {
-          // setRewards(res);
-          // onFeedbackOpen();
+      try {
+        const res: any = await FIL_contract.onStakeOrUnstake(
+          amount,
+          slippage,
+          tabKey,
+          currentAccount
+        );
+        if (res) {
+          console.log("res promise ==> ", res);
+
+          if (res?.message) {
+            api.error({
+              message: res?.message,
+              placement: "bottomRight",
+            });
+          } else {
+            api.success({
+              message: `successfully ${tabKey}d`,
+            });
+            clear();
+            if (currentAccount) {
+              data_fetcher_contract.fetchPersonalData(currentAccount);
+            }
+          }
         }
+      } finally {
+        setSendLoading(false);
       }
-      setSendLoading(false);
     }
   };
 
+  const onMaxButtonClick = () => {
+    const num =
+      tabKey === TAB_KEYS[0]
+        ? getValueToFixed(balance.FIL)
+        : getValueToFixed(balance.FIT);
+    setAmount(num);
+  };
+
+  const onExpectedRewards = async () => {
+    const res: any = await data_fetcher_contract.getStakeOrUnstakeExpecting(
+      debouncedAmount || 0,
+      tabKey
+    );
+    setExpected(res);
+  };
+
   useEffect(() => {
-    // catch the errors from MetaMask
-    const handleRejectionError = (event: PromiseRejectionEvent) => {
-      const { reason } = event;
+    if (currentAccount) {
+      data_fetcher_contract.fetchPersonalData(currentAccount);
+    }
+  }, [currentAccount]);
 
-      if (reason.message) {
-        api.error({
-          message: reason.message,
-          description: reason?.data?.message,
-          placement: "bottomRight",
-        });
-      }
-      store.dispatch({
-        type: "common/change",
-        payload: { sendLoading: false },
-      });
-      // prevent event from being printed in console
-      event.preventDefault();
-    };
-
-    window?.addEventListener("unhandledrejection", handleRejectionError);
-    return () => {
-      window.removeEventListener("unhandledrejection", handleRejectionError);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  useEffect(() => {
+    onExpectedRewards();
+  }, [debouncedAmount]);
 
   return (
     <section>
@@ -136,15 +156,21 @@ function Staking() {
           <div className="flex justify-between px-10 gap-x-3">
             <div className="flex flex-col items-center">
               <p className="text-gray-400">Total Supply</p>
-              <p className="text-[20px] font-semibold">26,000 FIT</p>
+              <p className="text-[20px] font-semibold">{`${
+                filInfo?.availableFIL || DEFAULT_EMPTY
+              } FIL`}</p>
             </div>
             <div className="flex flex-col items-center">
-              <p className="text-gray-400">Utilization Ration</p>
-              <p className="text-[20px] font-semibold">26,000 FIT</p>
+              <p className="text-gray-400">Utilization Ratio</p>
+              <p className="text-[20px] font-semibold">
+                {filInfo?.utilizationRate}%
+              </p>
             </div>
             <div className="flex flex-col items-center">
               <p className="text-gray-400">FIL / FIT</p>
-              <p className="text-[20px] font-semibold">2.5</p>
+              <p className="text-[20px] font-semibold">
+                {filInfo?.exchangeRate}
+              </p>
             </div>
           </div>
           <div className="my-10">
@@ -162,12 +188,16 @@ function Staking() {
             </div>
             <div className="flex flex-col mb-3">
               <p className="text-sm">FIL Balance</p>
-              <p className="text-xl">300.08 FIL</p>
+              <p className="text-xl">{`${new BigNumber(
+                Number(balance.FIL)
+              ).toFixed(2, 1)} FIL`}</p>
             </div>
             <div className="flex">
               <div className="flex flex-col">
                 <p className="text-sm">FIT Balance</p>
-                <p className="text-xl">30.08 FIT</p>
+                <p className="text-xl">{`${Number(balance.FIT).toFixed(
+                  2
+                )} FIT`}</p>
               </div>
               <Button className="bg-gray-400 text-[#fff] text-sm rounded-[24px] border-none hover:!text-[#fff] h-[28px] ml-2">
                 Add to wallet
@@ -182,12 +212,20 @@ function Staking() {
                 value={amount}
                 prefix={tabKey === TAB_KEYS[0] ? "FIL" : "FIT"}
                 maxButton
+                min={1}
+                max={
+                  tabKey === TAB_KEYS[0]
+                    ? getValueToFixed(balance.FIL)
+                    : getValueToFixed(balance.FIT)
+                }
+                onMaxButtonClick={onMaxButtonClick}
                 onChange={(val) => setAmount(val)}
               />
               <NumberInput
                 label="Slippage tolerance"
                 className="w-[100px]"
                 value={slippage}
+                max={60}
                 onChange={(val) => setSlippage(val)}
               />
             </div>
@@ -195,19 +233,27 @@ function Staking() {
             {tabKey === TAB_KEYS[0] ? (
               <div>
                 <DescRow
+                  title="Expected exchange rate"
+                  desc={`${expected.expectedRate}%`}
+                />
+                <DescRow
                   title="Expected to receive"
-                  desc="200.00 FIT"
+                  desc={`${expected.expectedAmount} FIT`}
                   color="#01A781"
                 />
               </div>
             ) : (
               <div>
                 <DescRow
+                  title="Expected exchange rate"
+                  desc={`${expected.expectedRate}%`}
+                />
+                <DescRow
                   title="Expected to receive"
-                  desc="200.00 FIL"
+                  desc={`${expected.expectedAmount} FIL`}
                   color="#01A781"
                 />
-                <DescRow title="Staking fee" desc="1%" />
+                <DescRow title="Staking fee" desc="0.5%" />
               </div>
             )}
             <Button

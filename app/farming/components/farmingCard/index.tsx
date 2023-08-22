@@ -30,7 +30,7 @@ const defaultStakerData = {
   filGovernanceBalance: 0,
 };
 
-function StakingCard(props: Props) {
+function FarmingCard(props: Props) {
   const {} = props;
 
   const [amount, setAmount] = useState<number | null>(defaultAmount);
@@ -166,7 +166,7 @@ function StakingCard(props: Props) {
       <div className="btn-default p-4 rounded-t-[10px] text-[#fff]">
         <div className="flex justify-between mb-2">
           <div className="flex flex-col">
-            <p className="">Avaliable to stake</p>
+            <p className="">Available to farm</p>
             <p className="font-semibold text-lg">{`${stakerData.filTrustBalance} FIT`}</p>
           </div>
           <p className="h-full py-1 px-2 rounded-[10px] bg-gray-100 text-gray-500 text-sm">
@@ -218,7 +218,7 @@ function StakingCard(props: Props) {
         </div>
         <div className="mt-12 space-y-3">
           <p className="text-sm">
-            Expected FIG rewards from Fixed-term staking :{" "}
+            Expected FIG rewards from Fixed-term farming :{" "}
             <em>{expectedRewards}</em> FIG
           </p>
           <Button className="w-full" type="primary" onClick={onFarm}>
@@ -238,4 +238,4 @@ function StakingCard(props: Props) {
   );
 }
 
-export default StakingCard;
+export default FarmingCard;

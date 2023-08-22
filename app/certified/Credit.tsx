@@ -171,9 +171,9 @@ export default () => {
     <div className="mt-5 ">
       <ul className="header px-4 py-2 w-full flex list-none font-medium text-xl">
         <span className="flex items-center w-8"></span>
-        {familyList.map((item) => {
+        {/* {familyList.map((item) => {
           return <li style={{ width: item?.width }}>{item.title}</li>;
-        })}
+        })} */}
       </ul>
       <div className="body flex flex-col gap-y-5">
         {data.map((record: any) => {
@@ -199,13 +199,13 @@ export default () => {
                     <PlusCircleOutlined />
                   )}
                 </span>
-                {familyList.map((item) => {
+                {/* {familyList.map((item) => {
                   return (
                     <li style={{ width: item?.width }}>
                       {record[item.dataIndex]}
                     </li>
                   );
-                })}
+                })} */}
               </ul>
               {showPlus[record.key] && renderCard(record)}
             </div>

@@ -2,10 +2,28 @@ import DataFetcher from "@/server/jsons/DataFetcher_metadata.json";
 import fa from "@glif/filecoin-address";
 import { data_fetcher_contract } from "@/contract";
 import { BanlanceList } from "@/constants";
-import { getValueDivide, getBlockHeightByDuration } from "@/utils";
-import { Banlance_type } from "@/utils/type";
+import {
+  getValueDivide,
+  getBlockHeightByDuration,
+  convertToStruct,
+  formatUnits,
+  getValueMultiplied,
+} from "@/utils";
+import {
+  Banlance_type,
+  MinerListItem,
+  FilLiquidInfo,
+  StakeOverview,
+  BalanceType,
+  ExpectedStake,
+  ExpectedBorrow,
+} from "@/utils/type";
 import store from "@/store";
 import web3 from "@/utils/web3";
+import { ethers } from "ethers";
+
+const provider = new ethers.providers.Web3Provider(window.ethereum);
+const signer = provider.getSigner();
 
 class contract {
   contractAbi: any;
@@ -23,6 +41,70 @@ class contract {
       this.contractAbi,
       this.contractAddress
     );
+    // this.myContract = new ethers.Contract(
+    //   this.contractAddress,
+    //   this.contractAbi,
+    //   signer
+    // );
+  }
+
+  fetchAllData() {
+    return new Promise((resolve, reject) => {
+      this.myContract.methods
+        .fetchData()
+        .call()
+        .then((res: any) => {
+          if (res) {
+            // data for Stake
+            console.log("fetchAll Data 1111 ==>", res);
+            const { fitTotalSupply }: StakeOverview = res;
+            const stakeOverview: StakeOverview = {
+              fitTotalSupply: formatUnits(fitTotalSupply),
+            };
+            // data for Borrow
+            const {
+              totalFIL,
+              availableFIL,
+              interestRate,
+              utilizationRate,
+              utilizedLiquidity,
+              exchangeRate,
+            }: FilLiquidInfo = res.filLiquidInfo;
+            const filInfo: FilLiquidInfo = {
+              totalFIL: getValueDivide(Number(totalFIL), 18, 2),
+              availableFIL: getValueDivide(Number(availableFIL), 18, 2),
+              interestRate: getValueDivide(Number(interestRate), 6, 2),
+              utilizationRate: getValueDivide(Number(utilizationRate), 6, 2),
+              utilizedLiquidity: formatUnits(utilizedLiquidity),
+              exchangeRate: getValueDivide(Number(exchangeRate), 6, 0),
+            };
+            store.dispatch({
+              type: "contract/change",
+              payload: { stakeOverview, filInfo },
+            });
+          }
+        });
+    });
+  }
+
+  fetchPersonalData(account: string) {
+    this.myContract.methods
+      .fetchPersonalData(account)
+      .call()
+      .then((res: any) => {
+        if (res) {
+          console.log("fetchPersonalData ==> ", res);
+          const { filBalance, filTrustBalance }: BalanceType = res;
+          const balance = {
+            FIL: formatUnits(filBalance),
+            FIT: formatUnits(filTrustBalance),
+          };
+          store.dispatch({
+            type: "contract/change",
+            payload: { balance },
+          });
+        }
+      });
   }
 
   fetchStakerData(address: string) {
@@ -31,7 +113,6 @@ class contract {
         .fetchStakerData(address)
         .call()
         .then((res: any) => {
-          // console.log("fetchStakerData res ==> ", res);
           if (res) {
             const {
               filGovernanceBalance,
@@ -54,32 +135,60 @@ class contract {
     });
   }
 
-  // following methods are not used
-
-  // get banlance
-  getBalance(acc: string, type: Banlance_type) {
-    this.account = acc;
-    //fil
-    web3.eth.getBalance(this.account).then((res) => {
-      const balance = getValueDivide(Number(res), 18, 4);
-      store.dispatch({
-        type: "contract/change",
-        payload: { FIL: balance },
-      });
+  getStakeOrUnstakeExpecting(amount: number | string, tabKey: string) {
+    const isStake = tabKey === "stake";
+    const type = isStake ? "getDepositExpecting" : "getRedeemExpecting";
+    return new Promise((resolve, reject) => {
+      this.myContract.methods[type](getValueMultiplied(amount))
+        .call()
+        .then((res: any) => {
+          if (res) {
+            const {
+              expectedExchangeRate,
+              expectedAmountFILTrust,
+              expectedAmountFIL,
+            } = res;
+            const data: ExpectedStake = {
+              expectedRate: getValueDivide(Number(expectedExchangeRate), 6, 1),
+              expectedAmount: isStake
+                ? formatUnits(expectedAmountFILTrust)
+                : formatUnits(expectedAmountFIL),
+            };
+            resolve(data);
+          }
+        })
+        .catch((err: any) => {
+          console.log("err ==> ", err);
+        });
     });
-    //fit
-    this.myContract.methods
-      .stakeFilTrust(this.account)
-      .call((err: any, res: any) => {
-        if (!err) {
-          const FITBalance = getValueDivide(Number(res), 18);
-          store.dispatch({
-            type: "contract/change",
-            payload: { FIT: FITBalance },
-          });
-        }
-      });
   }
+
+  getBorrowExpecting(amount: number | string) {
+    return new Promise((resolve, reject) => {
+      this.myContract.methods
+        .getBorrowExpecting(getValueMultiplied(amount))
+        .call()
+        .then((res: any) => {
+          if (res) {
+            const { expectedInterestRate, sixMonthInterest } = res;
+            const data: ExpectedBorrow = {
+              expectedInterestRate: getValueDivide(
+                Number(expectedInterestRate),
+                6,
+                2
+              ),
+              expected6monthInterest: getValueDivide(sixMonthInterest),
+            };
+            resolve(data);
+          }
+        })
+        .catch((err: any) => {
+          console.log("err ==> ", err);
+        });
+    });
+  }
+
+  // following methods are not used
 
   contractBalance() {
     web3.eth.getBalance(this.contractAddress).then((res: any) => {

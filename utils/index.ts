@@ -17,6 +17,7 @@ export function getValueDivide(
   let res = new BigNumber(num || 0).dividedBy(Math.pow(10, pow));
   return res.toFixed(unit);
 }
+
 export function getBlockHeightByDuration(duration: number) {
   // 30 secs equal 1 block height
   // 1 mon queals 86400 block height
@@ -25,6 +26,10 @@ export function getBlockHeightByDuration(duration: number) {
 
 export function getValueMultiplied(num: number | string, pow: number = 18) {
   return new BigNumber(num).multipliedBy(Math.pow(10, pow)).toFixed(0);
+}
+
+export function getValueToFixed(num: string | number, unit: number = 2) {
+  return Number(new BigNumber(Number(num || 0)).toFixed(unit, 1));
 }
 
 const FILECOIN_GENESIS_UNIX_EPOCH = 1598306400;
@@ -44,3 +49,34 @@ export function heightToDate(inputHeight: number, network?: string) {
   const timestamp = heightToUnix(inputHeight, network) * 1000;
   return dayjs(timestamp).format("YYYY-MM-DD");
 }
+
+// convertToStruct takes an array type eg. Inventory.ItemStructOutput and converts it to an object type.
+export const convertToStruct = <A extends Array<unknown>>(
+  arr: A
+): ExtractPropsFromArray<A> => {
+  const keys = Object.keys(arr).filter((key) => isNaN(Number(key)));
+  const result: any = {};
+  // @ts-ignore
+  arr.forEach((item, index) => (result[keys[index]] = item));
+  return result as A;
+};
+
+// This is to remove unnecessary properties from the output type. Use it eg. `ExtractPropsFromArray<Inventory.ItemStructOutput>`
+export type ExtractPropsFromArray<T> = Omit<
+  T,
+  keyof Array<unknown> | `${number}`
+>;
+
+export const formatUnits = (val: any) => {
+  // return ethers.utils.formatUnits(val);
+  return getValueDivide(Number(val), 18, 2);
+};
+
+export const formatResult = (res: any) => {
+  const r = convertToStruct(res);
+};
+
+export const formatBalance = (rawBalance: string) => {
+  const balance = (parseInt(rawBalance) / 1000000000000000000).toFixed(2);
+  return balance;
+};

@@ -12,6 +12,7 @@ import store from "@/store";
 import ConfirmModal from "@/components/confirmModal";
 import { ReloadOutlined } from "@ant-design/icons";
 import { useMetaMask } from "@/hooks/useMetaMask";
+import useLoading from "@/hooks/useLoading";
 
 interface Props {}
 
@@ -40,7 +41,9 @@ function StakingCard(props: Props) {
   const { currentAccount, wallet } = useMetaMask();
   const nework = wallet?.chainId?.includes("0x1") ? "main" : "test";
 
-  const { refreshStakeData, sendLoading } = useSelector(
+  const { sendLoading, setSendLoading } = useLoading();
+
+  const { refreshStakeData } = useSelector(
     (state: rootState) => state?.commonStore,
     shallowEqual
   );
@@ -70,13 +73,6 @@ function StakingCard(props: Props) {
     if (res) {
       setExpectedRewards(res);
     }
-  };
-
-  const setSendLoading = (status: boolean) => {
-    store.dispatch({
-      type: "common/change",
-      payload: { sendLoading: status },
-    });
   };
 
   const onWithdraw = async () => {

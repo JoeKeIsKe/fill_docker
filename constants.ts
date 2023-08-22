@@ -19,10 +19,6 @@ export const RouterList: Array<ITEM> = [
     label: "Stake",
     value: "staking",
   },
-  // {
-  //   label: "Deposit/WidthDraw",
-  //   value: "banlance",
-  // },
   {
     label: "Borrow",
     value: "borrow",
@@ -31,10 +27,10 @@ export const RouterList: Array<ITEM> = [
     label: "Farming",
     value: "farming",
   },
-  {
-    label: "Analytics",
-    value: "analytic",
-  },
+  // {
+  //   label: "Analytics",
+  //   value: "analytic",
+  // },
 ];
 
 export const default_opt = {

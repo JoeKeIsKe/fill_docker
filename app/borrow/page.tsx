@@ -10,43 +10,46 @@ import PieChart from "@/components/pieChart";
 import notification from "antd/es/notification";
 import store from "@/store";
 import { rootState } from "@/store/type";
-import { isIndent } from "@/utils";
+import { isIndent, heightToDate } from "@/utils";
 import { useMetaMask } from "@/hooks/useMetaMask";
 import { Button, Divider, Input } from "antd";
 import { useSelector } from "react-redux";
 import BorrowsTable from "./components/borrowsTable";
-
-const TAB_KEYS = ["stake", "unstake"];
+import AddMiner from "../certified/addMiner";
+import FIT_contract from "@/server/FILLiquid_contract";
+import data_fetcher_contract from "@/server/data_fetcher";
+import { DEFAULT_EMPTY, Fake_chart_data } from "./components/constans";
+import { getChartData } from "../api/modules/index";
 
 function Borrow() {
   const [api, contextHolder] = notification.useNotification();
-  const { currentAccount } = useMetaMask();
+  const { currentAccount, wallet } = useMetaMask();
 
-  const [amount, setAmount] = useState();
-  const [slippage, setSlippage] = useState();
-  const [tabKey, setTabKey] = useState<string | null>(TAB_KEYS[0]);
+  const nework = wallet?.chainId?.includes("0x1") ? "main" : "test";
 
-  const { sendLoading } = useSelector((state: rootState) => state?.commonStore);
+  const { userBorrow, filInfo } = useSelector(
+    (state: rootState) => state?.contract
+  );
+
+  console.log("filInfo ==> ", filInfo);
+
+  const date = Fake_chart_data.map((item: any) =>
+    heightToDate(item.BlockTimeStamp / 10000, nework)
+  );
+
+  const chartData = Fake_chart_data.map((item: any) => item.InterestRate);
+  console.log("date ==> ", date, "chartData ==> ", chartData);
 
   const default_opt = {
     backgroundColor: "transparent",
     xAxis: {
       type: "category",
       boundaryGap: false,
-      data: [
-        "2022-08",
-        "2022-09",
-        "2022-10",
-        "2022-11",
-        "2022-12",
-        "2023-01",
-        "2023-02",
-      ],
+      data: date,
     },
-
     series: [
       {
-        data: [10, 30, 20, 60, 40, 65, 70],
+        data: chartData,
         type: "line",
         areaStyle: undefined,
       },
@@ -56,7 +59,6 @@ function Borrow() {
   const pie_option = {
     series: [
       {
-        name: "Pie",
         type: "pie",
         radius: ["60%", "80%"],
         label: {
@@ -68,90 +70,24 @@ function Borrow() {
         },
         data: [
           {
-            value: 1048,
-            name: "Available",
+            value: filInfo?.utilizedLiquidity,
+            name: "Supplied",
             itemStyle: { color: "rgb(156, 163, 175, 0.3)" },
           },
-          { value: 735, name: "Total", itemStyle: { color: "#0093E9" } },
+          {
+            value: userBorrow?.availableCredit,
+            name: "Available",
+            itemStyle: { color: "#0093E9" },
+          },
         ],
       },
     ],
   };
 
-  const onTabChange = (tabKey: string) => {
-    setTabKey(tabKey);
-    clear();
+  const fetchChartData = async () => {
+    const res = await getChartData();
+    console.log("res ==> ", res);
   };
-
-  const clear = () => {
-    setAmount(undefined);
-    setSlippage(undefined);
-  };
-
-  const setSendLoading = (status: boolean) => {
-    store.dispatch({
-      type: "common/change",
-      payload: { sendLoading: status },
-    });
-  };
-
-  const onConfirm = async () => {
-    if (!amount)
-      return api.warning({
-        message: "Please input the amount",
-        placement: "top",
-      });
-    if (!slippage)
-      return api.warning({
-        message: "Please input the slippage tolerance",
-        placement: "top",
-      });
-    if (amount && slippage) {
-      const staker = currentAccount;
-      setSendLoading(true);
-      // const res:any = await stake_contract.onStake(amount, stakeTime, staker);
-      const res: any = {};
-      if (res) {
-        if (res?.message) {
-          api.error({
-            message: res?.message,
-            placement: "bottomRight",
-          });
-        } else {
-          // setRewards(res);
-          // onFeedbackOpen();
-        }
-      }
-      setSendLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    // catch the errors from MetaMask
-    const handleRejectionError = (event: PromiseRejectionEvent) => {
-      const { reason } = event;
-
-      if (reason.message) {
-        api.error({
-          message: reason.message,
-          description: reason?.data?.message,
-          placement: "bottomRight",
-        });
-      }
-      store.dispatch({
-        type: "common/change",
-        payload: { sendLoading: false },
-      });
-      // prevent event from being printed in console
-      event.preventDefault();
-    };
-
-    window?.addEventListener("unhandledrejection", handleRejectionError);
-    return () => {
-      window.removeEventListener("unhandledrejection", handleRejectionError);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   return (
     <section>
@@ -163,13 +99,17 @@ function Borrow() {
           <div className="w-[500px]">
             <div className="flex justify-between px-10 gap-x-3 w-[400px]">
               <div className="flex flex-col items-center">
-                <p className="text-gray-400">Avaliable</p>
-                <p className="text-[20px] font-semibold">26,000 FIT</p>
+                <p className="text-gray-400">Available</p>
+                <p className="text-[20px] font-semibold">{`${
+                  userBorrow?.availableCredit || DEFAULT_EMPTY
+                } FIL`}</p>
               </div>
 
               <div className="flex flex-col items-center">
                 <p className="text-gray-400">Utilization Ratio</p>
-                <p className="text-[20px] font-semibold">2.5</p>
+                <p className="text-[20px] font-semibold">
+                  {filInfo?.utilizationRate || DEFAULT_EMPTY}
+                </p>
               </div>
             </div>
             <div className="flex">
@@ -178,11 +118,16 @@ function Borrow() {
               </div>
               <div className="flex flex-col items-center mt-[50px]">
                 <p className="text-gray-400">Total supplied</p>
-                <p className="text-[24px] font-semibold">3,000 of 50,000</p>
+                <p className="text-[24px] font-semibold">{`${
+                  filInfo?.utilizedLiquidity || DEFAULT_EMPTY
+                } of ${filInfo?.totalFIL || DEFAULT_EMPTY}`}</p>
               </div>
             </div>
             <div>
-              Current Borrowing APR: <span className="text-[24px]">1.2%</span>
+              Current Borrowing APR:{" "}
+              <span className="text-[24px]">{`${
+                filInfo?.interestRate || DEFAULT_EMPTY
+              }%`}</span>
             </div>
           </div>
           <div className="flex-1">
@@ -194,6 +139,9 @@ function Borrow() {
 
       {/* borrowings */}
       <Card>
+        <div className="flex justify-center">
+          <AddMiner />
+        </div>
         {true ? (
           <div className="mb-8">
             <p className="font-semibold text-xl mb-4">My Family</p>

@@ -12,7 +12,7 @@ import detectEthereumProvider from "@metamask/detect-provider";
 import notification from "antd/es/notification";
 import Modal from "@/packages/modal";
 import Button from "@/packages/button";
-import { isIndent } from "@/utils";
+import { isIndent, formatBalance } from "@/utils";
 import { getSvg } from "@/svgTypes";
 
 interface WalletState {
@@ -77,11 +77,12 @@ export const MetaMaskContextProvider = ({ children }: PropsWithChildren) => {
       setWallet(disconnectedState);
       return;
     }
-
-    const balance = await window?.ethereum.request({
-      method: "eth_getBalance",
-      params: [accounts[0], "latest"],
-    });
+    const balance = formatBalance(
+      await window?.ethereum.request({
+        method: "eth_getBalance",
+        params: [accounts[0], "latest"],
+      })
+    );
     const chainId = await window?.ethereum.request({
       method: "eth_chainId",
     });
@@ -116,6 +117,7 @@ export const MetaMaskContextProvider = ({ children }: PropsWithChildren) => {
     }
 
     setHasProvider(Boolean(provider));
+
     if (provider) {
       updateWalletAndAccounts();
       window?.ethereum.on("accountsChanged", updateWallet);
@@ -163,7 +165,9 @@ export const MetaMaskContextProvider = ({ children }: PropsWithChildren) => {
       return <Button onClick={openModal}>Connect Wallet</Button>;
     }
     return (
-      <div className="btn-default p-2 rounded">{isIndent(accounts[0])}</div>
+      <div className="btn-default p-2 rounded-lg text-[#fff]">
+        {isIndent(accounts[0])}
+      </div>
     );
   };
 
