@@ -12,12 +12,14 @@ import { useSelector } from "react-redux";
 import { rootState } from "@/store/type";
 import notification from "antd/es/notification";
 import store from "@/store";
+import { usePathname } from "next/navigation";
 
 function Header() {
   const dispath = useDispatch();
   const { connectButton, currentAccount } = useMetaMask();
 
   const [api, contextHolder] = notification.useNotification();
+  const pathname = usePathname();
 
   const { filInfo } = useSelector((state: rootState) => state?.contract);
   const { refreshAllData } = useSelector(
@@ -51,12 +53,10 @@ function Header() {
     // catch the errors from MetaMask
     const handleRejectionError = (event: PromiseRejectionEvent) => {
       const { reason } = event;
-
       if (reason.message) {
         api.error({
           message: reason.message,
           description: reason?.data?.message,
-          placement: "bottomRight",
         });
       }
       store.dispatch({
@@ -83,6 +83,13 @@ function Header() {
             return (
               <Link
                 className="text-[#000]"
+                style={
+                  pathname.includes(item.value)
+                    ? {
+                        color: "#0093E9",
+                      }
+                    : {}
+                }
                 href={`/${item.value}`}
                 key={item.value}
               >
@@ -90,7 +97,7 @@ function Header() {
               </Link>
             );
           })}
-          {connectButton()}
+          <div className="hidden md:block">{connectButton()}</div>
         </ul>
       </div>
       {contextHolder}

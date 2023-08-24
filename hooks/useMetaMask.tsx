@@ -8,10 +8,11 @@ import {
   useContext,
   useCallback,
 } from "react";
+import { Button } from "antd";
 import detectEthereumProvider from "@metamask/detect-provider";
 import notification from "antd/es/notification";
 import Modal from "@/packages/modal";
-import Button from "@/packages/button";
+// import Button from "@/packages/button";
 import { isIndent, formatBalance } from "@/utils";
 import { getSvg } from "@/svgTypes";
 
@@ -162,7 +163,11 @@ export const MetaMaskContextProvider = ({ children }: PropsWithChildren) => {
     const { accounts = [] } = wallet;
     const len = accounts.length;
     if (len < 1) {
-      return <Button onClick={openModal}>Connect Wallet</Button>;
+      return (
+        <Button type="primary" size="large" onClick={openModal}>
+          Connect Wallet
+        </Button>
+      );
     }
     return (
       <div className="btn-default p-2 rounded-lg text-[#fff]">
@@ -175,7 +180,6 @@ export const MetaMaskContextProvider = ({ children }: PropsWithChildren) => {
     if (Boolean(errorMsg)) {
       api.error({
         message: errorMsg,
-        placement: "bottomRight",
       });
       clearError();
     }

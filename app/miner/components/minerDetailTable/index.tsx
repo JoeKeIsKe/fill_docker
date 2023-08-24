@@ -5,6 +5,8 @@ import { Table, Button } from "antd";
 import { ReloadOutlined } from "@ant-design/icons";
 import { getValueDivide } from "@/utils";
 import { UserBorrow, MinerBorrows, MinerDetailItem } from "@/utils/type";
+import BigNumber from "bignumber.js";
+import { useMetaMask } from "@/hooks/useMetaMask";
 
 interface ExpandedDataType extends MinerDetailItem {}
 
@@ -15,7 +17,8 @@ interface IProps {
 
 function MinerDetailTable(props: IProps) {
   const { rawData, refresh } = props;
-  // console.log("rawData ==> ", rawData, rawData?.borrows);
+  const { wallet } = useMetaMask();
+  const network = wallet?.chainId?.includes("0x1") ? "f0" : "t0";
 
   const handleRefreshList = () => {
     if (refresh) [refresh()];
@@ -51,7 +54,10 @@ function MinerDetailTable(props: IProps) {
         title: "Total",
         dataIndex: "borrowAmount",
         key: "borrowAmount",
-        render: (val) => `${val} FIL`,
+        render: (val, row) =>
+          `${BigNumber(val).plus(
+            BigNumber(row.interest).toNumber().toFixed(6)
+          )} FIL`,
       },
     ];
 
@@ -79,16 +85,11 @@ function MinerDetailTable(props: IProps) {
   };
 
   const columns: TableColumnsType<UserBorrow> = [
-    // {
-    //   title: "Miner",
-    //   dataIndex: "miner",
-    //   key: "miner",
-    // },
     {
       title: "Miner ID",
       dataIndex: "minerId",
       key: "minerId",
-      render: (val, row) => `t0${val}`, // to do: change the netwrok
+      render: (val, row) => `${network}${val}`,
     },
     {
       title: "Debt Outstanding",

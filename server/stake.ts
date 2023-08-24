@@ -71,7 +71,6 @@ class contract {
           from: address,
         })
         .then((res: any) => {
-          console.log("onUnstake res ==> ", res);
           resolve(res);
         })
         .catch((err: any) => {

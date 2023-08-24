@@ -1,25 +1,9 @@
-import Web3 from "web3";
 import FILLiquid from "@/server/jsons/FILLiquid_metadata.json";
-import fa from "@glif/filecoin-address";
 import { Fill_liquid_contract } from "@/contract";
-import { BanlanceList } from "@/constants";
-import {
-  getValueDivide,
-  getValueMultiplied,
-  convertToStruct,
-  formatUnits,
-} from "@/utils";
-import {
-  Banlance_type,
-  MinerListItem,
-  UserBorrow,
-  MinerBorrows,
-} from "@/utils/type";
+import { getValueDivide, getValueMultiplied, formatUnits } from "@/utils";
+import { MinerListItem, UserBorrow, MinerBorrows } from "@/utils/type";
 import store from "@/store";
 import web3 from "@/utils/web3";
-import { ethers } from "ethers";
-import { notification } from "antd";
-import BigNumber from "bignumber.js";
 
 class contract {
   contractAbi: any;
@@ -159,8 +143,6 @@ class contract {
       getValueMultiplied(amount),
       getValueMultiplied(expectInterestRate, 6),
     ];
-    console.log("borrow params ==> ", params);
-
     return new Promise((resolve, reject) => {
       this.myContract.methods
         .borrow(...params)
@@ -188,8 +170,6 @@ class contract {
     amount: number | string
   ) {
     const params = [minerIdPayer, minerIdPayee, getValueMultiplied(amount)];
-    console.log("onRepay params ==> ", params);
-
     return new Promise((resolve, reject) => {
       this.myContract.methods
         .withdraw4Payback(...params)
@@ -210,8 +190,15 @@ class contract {
     });
   }
 
-  // repay - from wallet
-  async onRepayFromWallet(minerId: string, amount: string | number) {
+  // repay - from wallet / repay - for others
+  async onRepayFromWallet(
+    minerId: string,
+    amount: string | number,
+    account?: string
+  ) {
+    if (account) {
+      this.account = account;
+    }
     return new Promise((resolve, reject) => {
       this.myContract.methods
         .directPayback(minerId)
@@ -237,9 +224,8 @@ class contract {
     minerIdPayer: number | string,
     minerIdPayee: number | string
   ) {
-    const params = [minerIdPayer, minerIdPayee];
-    console.log("liquidate params ==> ", params);
-
+    const params = [minerIdPayee, minerIdPayer];
+    // console.log("liquidate params ==> ", params);
     return new Promise((resolve, reject) => {
       this.myContract.methods
         .liquidate(...params)
@@ -256,6 +242,20 @@ class contract {
         )
         .on("receipt", () => {
           resolve(true);
+        });
+    });
+  }
+
+  getFamilyByMiner(minerId: number | string) {
+    return new Promise((resolve, reject) => {
+      this.myContract.methods
+        .minerUser(minerId)
+        .call()
+        .then((res: any) => {
+          if (res) {
+            const addressList = res;
+            resolve(addressList);
+          }
         });
     });
   }
@@ -322,7 +322,6 @@ class contract {
           },
           (err: any, res: any) => {
             if (err) {
-              console.log(err);
               // resolve(true);
               throw new Error(err);
             }
@@ -330,7 +329,7 @@ class contract {
         )
         .on("receipt", (data: any) => {
           resolve(true);
-          console.log("receipt success", data);
+          // console.log("receipt success", data);
         })
         .on("error", (err: any, res: any) => {
           throw new Error(err);
@@ -339,18 +338,17 @@ class contract {
   }
 
   //unbind miner
-  unBindMiner(account: string) {
+  unBindMiner(minerId: string, account: string) {
     this.account = account;
     return new Promise((resolve) => {
       this.myContract.methods
-        .uncollateralizingMiner("29299")
+        .uncollateralizingMiner(minerId)
         .send(
           {
             from: this.account,
           },
           (err: any, res: any) => {
             if (err) {
-              console.log(err);
               // resolve(true);
               throw new Error(err);
             }
@@ -358,7 +356,7 @@ class contract {
         )
         .on("receipt", (data: any) => {
           resolve(true);
-          console.log("receipt success", data);
+          // console.log("receipt success", data);
         })
         .on("error", (err: any, res: any) => {
           throw new Error(err);

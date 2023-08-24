@@ -12,8 +12,6 @@ export interface CardItem extends ITEM {
   unit?: string;
 }
 
-export type Banlance_type = "FIL" | "FIT" | "FIG";
-
 export interface StakeInfoType {
   amount: string | number;
   end: number;
@@ -103,10 +101,15 @@ export interface BorrowModalData {
 }
 
 export interface RepayModalData {
-  miner: MinerListItem | null;
-  familyInfo: {
+  miner?: MinerListItem | null;
+  familyInfo?: {
     user: string;
     availableCredit: number | string;
+    liquidateConditionInfo?: {
+      rate: string | number;
+      alertable: boolean;
+      liquidatable: boolean;
+    };
   };
   minerList: MinerListItem[];
 }

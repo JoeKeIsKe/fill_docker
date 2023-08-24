@@ -24,7 +24,7 @@ import type {
   DatasetComponentOption,
 } from "echarts/components";
 import type { ComposeOption } from "echarts/core";
-import { useEffect, useRef } from "react";
+import React, { useEffect, useRef, memo } from "react";
 
 // 通过 ComposeOption 来组合出一个只有必须组件和图表的 Option 类型
 type ECOption = ComposeOption<
@@ -54,30 +54,26 @@ interface Props {
   option: Record<string, any>;
 }
 
-function PieChartComponent(props: Props) {
+let pieChart: any = null;
+
+const PieChartComponent = memo((props: Props) => {
+  const { option } = props;
   // 1. get DOM
   const chartRef = useRef(null);
 
-  const { option } = props;
   useEffect(() => {
+    if (pieChart != null && pieChart != "" && pieChart != undefined) {
+      pieChart.dispose();
+    }
     // 2. 实例化表格对象
-    const chart = echarts.init(chartRef.current as unknown as HTMLDivElement);
+    pieChart = echarts.init(chartRef.current as unknown as HTMLDivElement);
     // 3. 定义数据
     const defaultOption = {
       backgroundColor: "transparent",
       tooltip: {},
-      // grid: {
-      //   top: 15,
-      //   left: "5%",
-      //   right: "5%",
-      //   bottom: 0,
-      //   containLabel: true,
-      // },
-      // xAxis: {},
-      // yAxis: {},
     };
     // 4. 调用表格数据
-    chart.setOption({ ...defaultOption, ...option });
+    pieChart.setOption({ ...defaultOption, ...option });
   }, [option]);
 
   useEffect(() => {
@@ -95,6 +91,6 @@ function PieChartComponent(props: Props) {
       ref={chartRef}
     />
   );
-}
+});
 
 export default PieChartComponent;

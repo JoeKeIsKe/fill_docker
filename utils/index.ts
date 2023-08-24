@@ -50,6 +50,15 @@ export function heightToDate(inputHeight: number, network?: string) {
   return dayjs(timestamp).format("YYYY-MM-DD");
 }
 
+export function heightToDateTime(inputHeight: number, network?: string) {
+  const timestamp = heightToUnix(inputHeight, network) * 1000;
+  return dayjs(timestamp).format("YYYY-MM-DD HH:mm:ss");
+}
+
+export function timestampToDateTime(timestamp: number) {
+  return dayjs(timestamp * 1000).format("YYYY-MM-DD HH:mm:ss");
+}
+
 // convertToStruct takes an array type eg. Inventory.ItemStructOutput and converts it to an object type.
 export const convertToStruct = <A extends Array<unknown>>(
   arr: A

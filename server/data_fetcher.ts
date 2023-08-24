@@ -1,29 +1,16 @@
 import DataFetcher from "@/server/jsons/DataFetcher_metadata.json";
-import fa from "@glif/filecoin-address";
 import { data_fetcher_contract } from "@/contract";
-import { BanlanceList } from "@/constants";
+import { getValueDivide, formatUnits, getValueMultiplied } from "@/utils";
 import {
-  getValueDivide,
-  getBlockHeightByDuration,
-  convertToStruct,
-  formatUnits,
-  getValueMultiplied,
-} from "@/utils";
-import {
-  Banlance_type,
-  MinerListItem,
   FilLiquidInfo,
   StakeOverview,
   BalanceType,
   ExpectedStake,
   ExpectedBorrow,
+  UserBorrow,
 } from "@/utils/type";
 import store from "@/store";
 import web3 from "@/utils/web3";
-import { ethers } from "ethers";
-
-const provider = new ethers.providers.Web3Provider(window.ethereum);
-const signer = provider.getSigner();
 
 class contract {
   contractAbi: any;
@@ -41,11 +28,6 @@ class contract {
       this.contractAbi,
       this.contractAddress
     );
-    // this.myContract = new ethers.Contract(
-    //   this.contractAddress,
-    //   this.contractAbi,
-    //   signer
-    // );
   }
 
   fetchAllData() {
@@ -56,7 +38,7 @@ class contract {
         .then((res: any) => {
           if (res) {
             // data for Stake
-            console.log("fetchAll Data 1111 ==>", res);
+            // console.log("fetchAll Data ==>", res);
             const { fitTotalSupply }: StakeOverview = res;
             const stakeOverview: StakeOverview = {
               fitTotalSupply: formatUnits(fitTotalSupply),
@@ -93,7 +75,6 @@ class contract {
       .call()
       .then((res: any) => {
         if (res) {
-          console.log("fetchPersonalData ==> ", res);
           const { filBalance, filTrustBalance }: BalanceType = res;
           const balance = {
             FIL: formatUnits(filBalance),
@@ -149,7 +130,7 @@ class contract {
               expectedAmountFIL,
             } = res;
             const data: ExpectedStake = {
-              expectedRate: getValueDivide(Number(expectedExchangeRate), 6, 1),
+              expectedRate: getValueDivide(Number(expectedExchangeRate), 6, 2),
               expectedAmount: isStake
                 ? formatUnits(expectedAmountFILTrust)
                 : formatUnits(expectedAmountFIL),
@@ -188,19 +169,80 @@ class contract {
     });
   }
 
-  // following methods are not used
+  getMaxBorrowable(minerId: string | number) {
+    return new Promise((resolve, reject) => {
+      this.myContract.methods
+        .maxBorrowAllowed(minerId)
+        .call()
+        .then((res: any) => {
+          const num = getValueDivide(res, 18, 6);
+          resolve(num);
+        })
+        .catch((err: any) => {
+          console.log("err ==> ", err);
+        });
+    });
+  }
 
-  contractBalance() {
-    web3.eth.getBalance(this.contractAddress).then((res: any) => {
-      if (res) {
-        // store.dispatch({
-        //     type: 'contract/change',
-        //     payload: {
-        //         contractBalanceRes:res,
-        //         contractBalance: getValueDivide(Number(res), 18)
-        //     }
-        // })
-      }
+  getBatchedFamily(accounts: string[]) {
+    return new Promise((resolve, reject) => {
+      this.myContract.methods
+        .getBatchedUserBorrows(accounts)
+        .call()
+        .then((res: any) => {
+          if (res) {
+            const l = res?.map((r: UserBorrow) => {
+              const list = r.minerBorrowInfo?.map((item: any) => ({
+                availableBalance: getValueDivide(
+                  item?.availableBalance?.neg
+                    ? 0
+                    : item?.availableBalance?.value,
+                  18,
+                  2
+                ),
+                balance: formatUnits(item.balance),
+                borrowSum: formatUnits(item.borrowSum),
+                debtOutStanding: getValueDivide(
+                  Number(item.debtOutStanding),
+                  18,
+                  2
+                ),
+                haveCollateralizing: item.haveCollateralizing,
+                minerId: item.minerId.toString(),
+                borrows: item?.borrows?.length,
+              }));
+              return {
+                user: r.user,
+                availableCredit: getValueDivide(
+                  Number(r.availableCredit),
+                  18,
+                  2
+                ),
+                balanceSum: formatUnits(r.balanceSum),
+                borrowSum: formatUnits(r.borrowSum),
+                debtOutStanding: getValueDivide(
+                  Number(r.debtOutStanding),
+                  18,
+                  2
+                ),
+                liquidateConditionInfo: {
+                  rate: getValueDivide(
+                    Number(r.liquidateConditionInfo?.rate),
+                    6,
+                    2
+                  ),
+                  alertable: r.liquidateConditionInfo?.alertable,
+                  liquidatable: r.liquidateConditionInfo?.liquidatable,
+                },
+                minerBorrowInfo: list,
+              };
+            });
+            resolve(l);
+          }
+        })
+        .catch((err: any) => {
+          console.log("err ==> ", err);
+        });
     });
   }
 }

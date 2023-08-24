@@ -70,6 +70,9 @@
     .ant-input-number-affix-wrapper .ant-input-number-prefix {
         margin-inline-end: 12px;
     }
+    .ant-table-container {
+        overflow: auto;
+    }
     .ant-table-thead > tr > th,
     .ant-table-thead > tr > td {
         padding-top: 10px;

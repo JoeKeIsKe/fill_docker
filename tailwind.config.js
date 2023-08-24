@@ -20,7 +20,7 @@ module.exports = {
         bgHover:'rgba(0,232,146,0.2)',
         },
       backgroundImage: {
-        'header_bg': "url('/assets/bg1.jpg')",
+        // 'header_bg': "url('/assets/bg1.jpg')",
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
         'gradient-conic':
           'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',

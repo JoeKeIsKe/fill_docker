@@ -3,7 +3,7 @@
 import { heightToDate } from "@/utils";
 import { rootState } from "@/store/type";
 import { shallowEqual, useSelector } from "react-redux";
-import { Table, Space, Button, notification } from "antd";
+import { Table, Space, Button, notification, Tag } from "antd";
 import { LoadingOutlined } from "@ant-design/icons";
 import { useState, useEffect } from "react";
 import stake_contract from "@/server/stake";
@@ -13,6 +13,7 @@ import ConfirmModal from "@/components/confirmModal";
 import { ReloadOutlined } from "@ant-design/icons";
 import { useMetaMask } from "@/hooks/useMetaMask";
 import useLoading from "@/hooks/useLoading";
+import Card from "@/packages/card";
 
 interface Props {}
 
@@ -39,9 +40,9 @@ function StakingCard(props: Props) {
   const [api, contextHolder] = notification.useNotification();
 
   const { currentAccount, wallet } = useMetaMask();
-  const nework = wallet?.chainId?.includes("0x1") ? "main" : "test";
+  const network = wallet?.chainId?.includes("0x1") ? "main" : "test";
 
-  const { sendLoading, setSendLoading } = useLoading();
+  const { loading, setLoading } = useLoading();
 
   const { refreshStakeData } = useSelector(
     (state: rootState) => state?.commonStore,
@@ -77,7 +78,7 @@ function StakingCard(props: Props) {
 
   const onWithdraw = async () => {
     const staker = currentAccount;
-    setSendLoading(true);
+    setLoading(true);
     try {
       const res: any = await stake_contract.onUnstake(selectedRow?.id, staker);
       if (res) {
@@ -94,7 +95,7 @@ function StakingCard(props: Props) {
         }
       }
     } finally {
-      setSendLoading(false);
+      setLoading(false);
     }
   };
 
@@ -113,13 +114,13 @@ function StakingCard(props: Props) {
       title: "Start Date",
       dataIndex: "start",
       key: "start",
-      render: (val, row) => heightToDate(Number(val), nework),
+      render: (val, row) => heightToDate(Number(val), network),
     },
     {
       title: "Maturity Date",
       key: "end",
       dataIndex: "end",
-      render: (val, row) => heightToDate(Number(val), nework),
+      render: (val, row) => heightToDate(Number(val), network),
     },
     {
       title: "Status",
@@ -132,7 +133,9 @@ function StakingCard(props: Props) {
             </Button>
           </Space>
         ) : (
-          "locked"
+          <Tag bordered={false} color="volcano">
+            Locked
+          </Tag>
         ),
     },
   ];
@@ -151,7 +154,7 @@ function StakingCard(props: Props) {
 
   const onConfirmClose = () => {
     setIsConfirmOpen(false);
-    setSendLoading(false);
+    setLoading(false);
     setExpectedRewards("");
   };
 
@@ -184,26 +187,29 @@ function StakingCard(props: Props) {
 
   return (
     <div>
-      <div className="flex justify-end mb-2">
-        <Button className="!flex items-center" type="text" onClick={refresh}>
-          Refresh list
-          <ReloadOutlined />
-        </Button>
-      </div>
-      <Table
-        columns={columns}
-        dataSource={list}
-        loading={{
-          spinning: listLoading,
-          indicator: <LoadingOutlined />,
-        }}
-        pagination={{
-          pageSize: defaultPageNum,
-          current: currentPage,
-          total: list?.length,
-          onChange: onTableChange,
-        }}
-      />
+      <Card>
+        <div className="flex justify-end mb-2">
+          <Button className="!flex items-center" type="text" onClick={refresh}>
+            Refresh list
+            <ReloadOutlined />
+          </Button>
+        </div>
+        <Table
+          columns={columns}
+          dataSource={list}
+          loading={{
+            spinning: listLoading,
+            indicator: <LoadingOutlined />,
+          }}
+          pagination={{
+            pageSize: defaultPageNum,
+            current: currentPage,
+            total: list?.length,
+            onChange: onTableChange,
+          }}
+        />
+      </Card>
+
       {/* confirm modal */}
       <ConfirmModal
         isOpen={isConfirmOpen}
@@ -214,7 +220,7 @@ function StakingCard(props: Props) {
             <p>{`${expectedRewards || "calculating..."} FIG`}</p>
           </>
         }
-        loading={sendLoading}
+        loading={loading}
         onCancel={onConfirmClose}
         onConfirm={onWithdraw}
       />

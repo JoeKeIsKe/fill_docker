@@ -24,7 +24,7 @@ import type {
   DatasetComponentOption,
 } from "echarts/components";
 import type { ComposeOption } from "echarts/core";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, memo } from "react";
 
 // 通过 ComposeOption 来组合出一个只有必须组件和图表的 Option 类型
 type ECOption = ComposeOption<
@@ -43,27 +43,31 @@ echarts.use([
   GridComponent,
   DatasetComponent,
   TransformComponent,
-  //   BarChart,
   LineChart,
   LabelLayout,
   UniversalTransition,
   CanvasRenderer,
 ]);
 
+let chart: any = null;
+
 //ECOption
 interface Props {
   option: Record<string, any>;
 }
 
-function Chart(props: Props) {
+const Chart = memo((props: Props) => {
   // 1. get DOM
   const chartRef = useRef(null);
 
   const { option } = props;
   useEffect(() => {
     // 2. 实例化表格对象
-    const chart = echarts.init(chartRef.current as unknown as HTMLDivElement);
-    // const chart =  echarts.init(document.getElementById('main'));
+    if (chart != null && chart != "" && chart != undefined) {
+      chart.dispose();
+    }
+    chart = echarts.init(chartRef.current as unknown as HTMLDivElement);
+    // chart = echarts.init(document.getElementById("chart"));
     // 3. 定义数据
     const defaultOption = {
       backgroundColor: "transparent",
@@ -82,11 +86,13 @@ function Chart(props: Props) {
       },
     };
     // 4. 调用表格数据
-    chart.setOption({ ...defaultOption, ...option });
+    chart?.setOption({ ...defaultOption, ...option });
   }, [option]);
 
   useEffect(() => {
-    const handleSize = () => {};
+    const handleSize = () => {
+      chart?.resize();
+    };
     window?.addEventListener("resize", handleSize);
     return () => {
       window?.removeEventListener("resize", handleSize);
@@ -100,6 +106,6 @@ function Chart(props: Props) {
       ref={chartRef}
     />
   );
-}
+});
 
 export default Chart;

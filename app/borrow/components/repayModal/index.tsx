@@ -1,7 +1,7 @@
 "use client";
 
-import { Modal, Divider, Table, Select, notification } from "antd";
-import { ReactNode, useEffect, useState } from "react";
+import { Modal, Table, Select, notification } from "antd";
+import { useEffect, useState } from "react";
 import NumberInput from "@/packages/NumberInput";
 import Tabs from "@/packages/Tabs";
 import type { ColumnsType } from "antd/es/table";
@@ -40,14 +40,14 @@ function RepayModal(props: IProps) {
   const [repayAll, setRepayAll] = useState<boolean>(false);
 
   const [api, contextHolder] = notification.useNotification();
-  const { sendLoading, setSendLoading } = useLoading();
-  const { wallet } = useMetaMask();
+  const { loading, setLoading } = useLoading();
+  const { currentAccount, wallet } = useMetaMask();
+  const network = wallet?.chainId?.includes("0x1") ? "f0" : "t0";
 
-  console.log("rawData ==> ", rawData);
   const list = rawData?.minerList || [];
   const options = list?.map((item) => ({
     value: item.minerId,
-    label: `t0${item.minerId}`,
+    label: `${network}${item.minerId}`,
   }));
   let maxNum = Number(wallet.balance);
 
@@ -63,7 +63,7 @@ function RepayModal(props: IProps) {
           className="text-[#0093E9]"
           href={`/miner/detail/${val}`}
           target="_blank"
-        >{`t0${val}`}</Link>
+        >{`${network}${val}`}</Link>
       ),
     },
     {
@@ -93,54 +93,82 @@ function RepayModal(props: IProps) {
         message: "Please select the miner",
         placement: "top",
       });
-    if (!repayAll && !amount)
+    if (!repayAll && !hideTabs && !amount)
       return api.warning({
         message: "Please input the amount",
         placement: "top",
       });
-    setSendLoading(true);
+    setLoading(true);
     try {
       let res;
-      if (tabKey === REPAY_TAB_KEYS[0]) {
-        if (minerFrom && minerTo) {
-          res = await FIL_contract.onRepayFromMiner(
-            minerFrom,
-            minerTo,
-            repayAll ? maxNum : amount || 0
-          );
-        }
-      } else {
-        if (currentMinerId) {
-          res = await FIL_contract.onRepayFromWallet(
-            currentMinerId,
-            repayAll ? maxNum : amount || 0
-          );
-        }
+      switch (title) {
+        case REPAY_MODAL_TITLE[1]:
+          // repay - from miner
+          if (tabKey === REPAY_TAB_KEYS[0] && minerFrom && minerTo) {
+            res = await FIL_contract.onRepayFromMiner(
+              minerFrom,
+              minerTo,
+              repayAll ? maxNum : amount || 0
+            );
+          }
+          // repay - from wallet
+          if (tabKey === REPAY_TAB_KEYS[1] && currentMinerId) {
+            res = await FIL_contract.onRepayFromWallet(
+              currentMinerId,
+              repayAll ? maxNum : amount || 0
+            );
+          }
+          break;
+        case REPAY_MODAL_TITLE[2]:
+          // liquidate
+          if (minerFrom && minerTo) {
+            res = await FIL_contract.onLiquidate(minerFrom, minerTo);
+          }
+          break;
+        case REPAY_MODAL_TITLE[3]:
+          // repay - for others
+          if (currentMinerId && amount) {
+            res = await FIL_contract.onRepayFromWallet(
+              currentMinerId,
+              amount,
+              currentAccount
+            );
+          }
+          break;
+        default:
+          break;
       }
+
       if (res) {
         handleCancel();
         api.success({
-          message: "successfully repayed",
-          placement: "bottomRight",
+          message: `successfully ${
+            title === REPAY_MODAL_TITLE[2] ? "liquidated" : "repayed"
+          }`,
         });
       }
     } finally {
-      setSendLoading(false);
+      setLoading(false);
     }
   };
 
   const onTabChange = (tabKey: string) => {
     setTabKey(tabKey);
-    clear();
+    setAmount(undefined);
   };
 
   const clear = () => {
     setAmount(undefined);
     setMinerFrom(undefined);
+    setMinerTo(undefined);
   };
 
-  const handleChange = (value: string) => {
+  const handleChangeFrom = (value: string) => {
     setMinerFrom(value);
+  };
+
+  const handleChangeTo = (value: string) => {
+    setMinerTo(value);
   };
 
   // const onMaxButtonClick = () => {
@@ -183,7 +211,7 @@ function RepayModal(props: IProps) {
     if (!hideTabs && currentMinerId) {
       setMinerTo(currentMinerId);
     }
-  }, [hideTabs, currentMinerId]);
+  }, [hideTabs, currentMinerId, isOpen]);
 
   return (
     <Modal
@@ -199,7 +227,7 @@ function RepayModal(props: IProps) {
       okText={title === "Liquidate" ? "Confirm" : "Repay"}
       okButtonProps={{
         size: "large",
-        loading: sendLoading,
+        loading: loading,
       }}
     >
       <div className="text-xl font-bold my-4">{title}</div>
@@ -225,36 +253,36 @@ function RepayModal(props: IProps) {
                 className="mr-12"
                 style={{ width: 250 }}
                 value={minerFrom}
-                onChange={handleChange}
+                onChange={handleChangeFrom}
                 options={options}
               />
             </div>
             <div>
               <label className="block">To</label>
               <Select
-                disabled
-                defaultValue={currentMinerId}
+                disabled={title === REPAY_MODAL_TITLE[1]}
                 style={{ width: 250 }}
+                value={minerTo}
+                onChange={handleChangeTo}
                 options={options}
               />
             </div>
           </div>
-          <NumberInput
-            label="Amount"
-            value={amount}
-            prefix="FIL"
-            min={1}
-            max={maxNum}
-            // maxButton
-            // onMaxButtonClick={onMaxButtonClick}
-            repayAll
-            onChange={handleNumberInputChange}
-          />
+          {!hideTabs && (
+            <NumberInput
+              label="Amount"
+              value={amount}
+              prefix="FIL"
+              min={1}
+              max={maxNum}
+              repayAll
+              onChange={handleNumberInputChange}
+            />
+          )}
         </>
       ) : (
         <>
-          {/* to do: network */}
-          <p className="text-lg font-semibold my-2">{`Miner ID: t0${currentMinerId}`}</p>
+          <p className="text-lg font-semibold my-2">{`Miner ID: ${network}${currentMinerId}`}</p>
           <div className="flex flex-wrap">
             {/* <div className="w-1/2">{`Family Available Credit: ${
               rawData?.familyInfo.availableCredit || DEFAULT_EMPTY

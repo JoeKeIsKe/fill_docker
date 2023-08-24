@@ -45,7 +45,7 @@ const commonSlice = createSlice({
   initialState: {
     refreshStakeData: false,
     refreshAllData: false,
-    sendLoading: false,
+    sendLoading: {},
   },
   reducers: {
     change: (state: commonState, action) => {

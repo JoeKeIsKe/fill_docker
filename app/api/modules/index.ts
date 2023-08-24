@@ -11,9 +11,16 @@ import { postReq, putReq, getReq, delReq, patchReq } from "../abstract";
 //   });
 // }
 
-export function getChartData(params?: {}, account?: string): Promise<any> {
+export function getChartData(params?: {}): Promise<any> {
   return getReq({
-    url: "getdata",
+    url: "api/getdata",
+    params,
+  });
+}
+
+export function getBorrowingsFamily(params?: {}): Promise<any> {
+  return getReq({
+    url: "api/getFamilyCount",
     params,
   });
 }

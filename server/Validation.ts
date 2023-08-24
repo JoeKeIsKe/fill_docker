@@ -1,9 +1,7 @@
 import Valid from "@/server/jsons/Validation_metadata.json";
 import { Validation_contract } from "@/contract";
 import { ethers } from "ethers";
-import Web3 from "web3";
 
-// const web3 = new Web3(window.ethereum);
 const provider = new ethers.providers.Web3Provider(window.ethereum);
 const signer = provider.getSigner();
 
@@ -25,8 +23,6 @@ class Validation {
 
   async getSigningMsg(type: string) {
     const result = await this.myContract.callStatic.getSigningMsg(type);
-
-    console.log("00044", result);
     return result;
   }
 }

@@ -1,10 +1,4 @@
-import { Banlance_type, ITEM, IWalletItem } from "./utils/type";
-
-export const BanlanceList: Record<Banlance_type, Array<Banlance_type>> = {
-  FIT: ["FIL", "FIT"],
-  FIG: ["FIT", "FIG"],
-  FIL: ["FIL", "FIT"],
-};
+import { ITEM, IWalletItem } from "./utils/type";
 
 export const walletList: Array<IWalletItem> = [
   {

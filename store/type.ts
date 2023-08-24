@@ -46,7 +46,9 @@ export interface walletState {
 export interface commonState {
   refreshStakeData: boolean;
   refreshAllData: boolean;
-  sendLoading: boolean;
+  sendLoading: {
+    [key in string]: boolean;
+  };
 }
 export interface rootState {
   contract: contractState;

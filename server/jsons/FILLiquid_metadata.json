@@ -84,6 +84,12 @@
 						"internalType": "uint256",
 						"name": "interestRate",
 						"type": "uint256"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "initialTime",
+						"type": "uint256"
 					}
 				],
 				"name": "Borrow",
@@ -108,7 +114,7 @@
 					{
 						"indexed": true,
 						"internalType": "uint256",
-						"name": "id",
+						"name": "borrowId",
 						"type": "uint256"
 					},
 					{
@@ -1304,6 +1310,25 @@
 				"type": "function"
 			},
 			{
+				"inputs": [
+					{
+						"internalType": "uint64",
+						"name": "minerId",
+						"type": "uint64"
+					}
+				],
+				"name": "minerUser",
+				"outputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
 				"inputs": [],
 				"name": "owner",
 				"outputs": [
@@ -1731,7 +1756,7 @@
 		],
 		"devdoc": {
 			"events": {
-				"Borrow(uint256,address,uint64,uint256,uint256,uint256)": {
+				"Borrow(uint256,address,uint64,uint256,uint256,uint256,uint256)": {
 					"details": "Emitted when user `account` borrows `amountFIL` with `minerId`"
 				},
 				"BorrowDropped(uint256)": {
@@ -1878,7 +1903,7 @@
 		},
 		"optimizer": {
 			"enabled": true,
-			"runs": 5
+			"runs": 10
 		},
 		"remappings": []
 	},
@@ -2236,11 +2261,11 @@
 			]
 		},
 		"contracts/FILLiquid.sol": {
-			"keccak256": "0x30d200ff63511090a18586e28084343c58a459800edc8a5376cac5011b578200",
+			"keccak256": "0x9cb9efa10a8a34b5c057027e2528f3cc0cdeab36238940f4ef14b53b3bffa028",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://d5be5a127ad257dcbb81c1491175bb50a11ba0d420822e53ebad8ac5be890aed",
-				"dweb:/ipfs/QmdVsXox64a8t2QXv6fY7cevACsMRUmAdEPoRxNNGNnnoF"
+				"bzz-raw://89de1549666fef2266f4b1ae9ade6b898d493baa13932d897823179ce7c6e267",
+				"dweb:/ipfs/QmZoryPoWHvux8GbHmJnZZuQzHWXmjc3TnboKMM2qFhmKh"
 			]
 		},
 		"contracts/FILStake.sol": {

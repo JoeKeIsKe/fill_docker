@@ -11,7 +11,7 @@ function Farming() {
         {/* Staking Section */}
         <FarmingCard />
         {/* Table */}
-        <div className="mt-[10px] lg:-mt-[40px] flex-1">
+        <div className="flex-1">
           <FarmingTable />
         </div>
       </div>

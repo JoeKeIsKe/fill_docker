@@ -1,6 +1,5 @@
 import { getSvg } from "@/svgTypes";
 import AddMiner from "./addMiner";
-import Button from "@/packages/button";
 
 export default () => {
   return (

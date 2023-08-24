@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Card from "@/packages/card";
 import Tabs from "@/packages/Tabs";
 import NumberInput from "@/packages/NumberInput";
@@ -8,7 +8,7 @@ import DescRow from "@/packages/DescRow";
 import Chart from "@/components/charts";
 import notification from "antd/es/notification";
 import { rootState } from "@/store/type";
-import { isIndent, getValueToFixed } from "@/utils";
+import { isIndent, getValueToFixed, timestampToDateTime } from "@/utils";
 import { useMetaMask } from "@/hooks/useMetaMask";
 import { Button, Divider } from "antd";
 import { useSelector } from "react-redux";
@@ -19,6 +19,8 @@ import { DEFAULT_EMPTY } from "../borrow/components/constans";
 import { useDebounce } from "use-debounce";
 import { ExpectedStake } from "@/utils/type";
 import useLoading from "@/hooks/useLoading";
+import { getChartData } from "../api/modules/index";
+import { ReloadOutlined } from "@ant-design/icons";
 
 const TAB_KEYS = ["stake", "unstake"];
 
@@ -34,32 +36,27 @@ function Staking() {
     expectedRate: 0,
   });
   const [tabKey, setTabKey] = useState<string>(TAB_KEYS[0]);
+  const [chartData, setChartData] = useState([]);
+  const [chartDate, setChartDate] = useState([]);
+  const [currentAPY, setCurrentAPY] = useState();
 
-  const { filInfo, stakeOverview, balance } = useSelector(
+  const { filInfo, balance } = useSelector(
     (state: rootState) => state?.contract
   );
 
-  const { sendLoading, setSendLoading } = useLoading();
+  const { loading, setLoading } = useLoading();
 
   const default_opt = {
     backgroundColor: "transparent",
     xAxis: {
       type: "category",
       boundaryGap: false,
-      data: [
-        "2022-08",
-        "2022-09",
-        "2022-10",
-        "2022-11",
-        "2022-12",
-        "2023-01",
-        "2023-02",
-      ],
+      data: chartDate,
     },
 
     series: [
       {
-        data: [10, 30, 20, 60, 40, 65, 70],
+        data: chartData,
         type: "line",
         areaStyle: undefined,
       },
@@ -88,7 +85,7 @@ function Staking() {
         placement: "top",
       });
     if (amount && slippage) {
-      setSendLoading(true);
+      setLoading(true);
       try {
         const res: any = await FIL_contract.onStakeOrUnstake(
           amount,
@@ -97,12 +94,9 @@ function Staking() {
           currentAccount
         );
         if (res) {
-          console.log("res promise ==> ", res);
-
           if (res?.message) {
             api.error({
               message: res?.message,
-              placement: "bottomRight",
             });
           } else {
             api.success({
@@ -115,7 +109,7 @@ function Staking() {
           }
         }
       } finally {
-        setSendLoading(false);
+        setLoading(false);
       }
     }
   };
@@ -136,10 +130,57 @@ function Staking() {
     setExpected(res);
   };
 
-  useEffect(() => {
+  const fetchChartData = async () => {
+    const res = await getChartData();
+    if (res) {
+      const { Senior } = res;
+      const target = Senior?.slice(-8) || [];
+      const currentTarget = Senior?.slice(-1) || [];
+      const APY = currentTarget[0]?.APY;
+      setCurrentAPY(APY);
+
+      const dataList = target.map((item: any) => item.APY);
+      const dateList = target.map((item: any) =>
+        timestampToDateTime(item.BlockTimeStamp)
+      );
+      setChartData(dataList);
+      setChartDate(dateList);
+    }
+  };
+
+  const fetchPersonalData = () => {
     if (currentAccount) {
       data_fetcher_contract.fetchPersonalData(currentAccount);
     }
+  };
+
+  const fetchData = () => {
+    fetchPersonalData();
+    fetchChartData();
+  };
+
+  const handleAddToWallet = async () => {
+    const res = await window.ethereum.request({
+      method: "wallet_watchAsset",
+      params: {
+        type: "ERC20",
+        options: {
+          address: "0x950443bc72109FC09211fA478de9D5495205a9C0",
+          symbol: "FIT",
+          decimals: 18,
+          // image: "https://foo.io/token-image.svg",
+        },
+      },
+    });
+    if (res) {
+      api.success({
+        message: "Successfully added",
+      });
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
   }, [currentAccount]);
 
   useEffect(() => {
@@ -150,7 +191,7 @@ function Staking() {
     <section>
       <div className="text-2xl font-bold my-8">Stake</div>
 
-      <div className="flex gap-x-[24px]">
+      <div className="flex gap-[24px] flex-col md:flex-row">
         {/* overview */}
         <Card title="Overview" className="flex-1">
           <div className="flex justify-between px-10 gap-x-3">
@@ -173,24 +214,31 @@ function Staking() {
               </p>
             </div>
           </div>
-          <div className="my-10">
+          <div className="my-10 text-right">
             APY:
-            <span className="font-semibold text-3xl ml-2">2.93%</span>
+            <span className="font-semibold text-3xl ml-2">{`${
+              currentAPY || DEFAULT_EMPTY
+            }%`}</span>
           </div>
           <Chart option={default_opt} />
         </Card>
 
         {/* staking operation card */}
-        <div className="w-[415px]">
+        <div className="w-[330px] md:w-[415px]">
           <Card className="relative mb-4 btn-default text-white">
             <div className="absolute top-[14px] right-[14px] px-2 py-1 rounded-[24px] bg-gray-100 text-sm text-gray-500">
               {isIndent(currentAccount)}
             </div>
-            <div className="flex flex-col mb-3">
-              <p className="text-sm">FIL Balance</p>
-              <p className="text-xl">{`${new BigNumber(
-                Number(balance.FIL)
-              ).toFixed(2, 1)} FIL`}</p>
+            <div className="flex flex-row mb-3">
+              <div>
+                <div className="text-sm">
+                  FIL Balance
+                  <ReloadOutlined className="ml-3" onClick={fetchData} />
+                </div>
+                <p className="text-xl">{`${new BigNumber(
+                  Number(balance.FIL)
+                ).toFixed(2, 1)} FIL`}</p>
+              </div>
             </div>
             <div className="flex">
               <div className="flex flex-col">
@@ -199,7 +247,10 @@ function Staking() {
                   2
                 )} FIT`}</p>
               </div>
-              <Button className="bg-gray-400 text-[#fff] text-sm rounded-[24px] border-none hover:!text-[#fff] h-[28px] ml-2">
+              <Button
+                className="bg-gray-400 text-[#fff] text-sm rounded-[24px] border-none hover:!text-[#fff] h-[28px] ml-2"
+                onClick={handleAddToWallet}
+              >
                 Add to wallet
               </Button>
             </div>
@@ -259,7 +310,7 @@ function Staking() {
             <Button
               type="primary"
               className="w-full h-[45px] rounded-[24px] mt-8"
-              loading={sendLoading}
+              loading={loading}
               onClick={onConfirm}
             >
               Confirm

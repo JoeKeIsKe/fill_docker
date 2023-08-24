@@ -12,10 +12,10 @@ export default ({
     <div className="h-40">
       <div className="flex flex-col mb-5">
         <span className="text-gray-500">Sign</span>
-        <span className=" font-medium	text-gray-600">{msg}</span>
-        <span className="text-gray-500">
+        <span className=" font-medium	text-gray-600">{msg?.slice(2)}</span>
+        {/* <span className="text-gray-500">
           with owner address to propose transfer owner to SPex contract
-        </span>
+        </span> */}
       </div>
 
       <div>

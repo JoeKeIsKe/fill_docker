@@ -1,13 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import type { TableColumnsType } from "antd";
+import { useEffect, useMemo, useState } from "react";
+import type { TableColumnsType, TablePaginationConfig } from "antd";
 import { Space, Table, Button } from "antd";
 import { ReloadOutlined } from "@ant-design/icons";
 import BorrowModal from "../borrowModal";
 import RepayModal from "../repayModal";
 import { DEFAULT_EMPTY, REPAY_MODAL_TITLE } from "../constans";
 import FIL_contract from "@/server/FILLiquid_contract";
+import data_fetcher_contract from "@/server/data_fetcher";
 import { useMetaMask } from "@/hooks/useMetaMask";
 import { useSelector } from "react-redux";
 import { rootState } from "@/store/type";
@@ -20,41 +21,54 @@ import {
   RepayModalData,
 } from "@/utils/type";
 import Link from "next/link";
+import UnbindMiner from "../../../certified/unbindMiner";
+import { getBorrowingsFamily } from "../../../api/modules/index";
+import ActionButton from "@/packages/ActionButton";
+import { useDebounce } from "use-debounce";
 
 interface ExpandedDataType extends MinerListItem {}
 
 interface IProps {
   type?: string;
+  searchText?: string | null;
 }
 
-function BorrowsTable(props: IProps) {
-  const { type } = props;
-  const isMyFamily = type === "my";
+const PAGE_SIZE = 10;
 
-  const { currentAccount } = useMetaMask();
+function BorrowsTable(props: IProps) {
+  const { type, searchText } = props;
+  const isMyFamily = type === "my";
+  const [debouncedSearchText] = useDebounce(searchText, 600);
+
+  const { currentAccount, wallet } = useMetaMask();
+  const network = wallet?.chainId?.includes("0x1") ? "f0" : "t0";
 
   const [isBorrowModalOpen, setIsBorrowModalOpen] = useState<boolean>(false);
   const [isRepayModalOpen, setIsRepayModalOpen] = useState<boolean>(false);
+  const [pageIndex, setPageIndex] = useState(1);
+  const [familyCountRaw, setFamilyCountRaw] = useState<string[] | []>([]);
+  const familyCount = useMemo(() => {
+    return familyCountRaw.slice(
+      (pageIndex - 1) * PAGE_SIZE,
+      pageIndex * PAGE_SIZE
+    );
+  }, [familyCountRaw, pageIndex]);
+
+  const [familyBorrows, setFamilyBorrows] = useState<UserBorrow[] | []>([]);
   const [selectedMiner, setSelectedMiner] = useState<MinerListItem | null>(
     null
   );
+  const [selectedFamily, setSelectedFamily] = useState<UserBorrow | null>(null);
   const [repayModalTitle, setRepayModalTitle] = useState<string>(
-    REPAY_MODAL_TITLE[2]
+    REPAY_MODAL_TITLE[1]
   );
 
   const userBorrow = useSelector(
     (state: rootState) => state?.contract?.userBorrow
   );
 
-  console.log("userBorrow ==> ", userBorrow);
-
-  const expandedRowRender = () => {
+  const expandedRowRender = (record: UserBorrow) => {
     const columns: TableColumnsType<ExpandedDataType> = [
-      // {
-      //   title: "Miner",
-      //   dataIndex: "miner",
-      //   key: "miner",
-      // },
       {
         title: "Miner ID",
         dataIndex: "minerId",
@@ -64,8 +78,8 @@ function BorrowsTable(props: IProps) {
             className="text-[#0093E9]"
             href={`/miner/detail/${val}`}
             target="_blank"
-          >{`t0${val}`}</Link>
-        ), // to do: change the netwrok
+          >{`${network}${val}`}</Link>
+        ),
       },
       {
         title: "Debt Outstanding",
@@ -84,27 +98,41 @@ function BorrowsTable(props: IProps) {
         render: (val, row) =>
           isMyFamily ? (
             <Space size="middle" className="text-[#0093E9]">
-              <a onClick={() => onBorrowClick(row)}>Borrow</a>
-              {row.haveCollateralizing && (
-                <a onClick={() => onRepayOrLiquidateClick(row, 1)}>Repay</a>
-              )}
-              <a>Unbind</a>
+              <ActionButton
+                name="Borrow"
+                disabled={
+                  Number(row?.borrows) >= 5 ||
+                  Number(record.availableCredit) <= 0
+                }
+                onClick={() => onBorrowClick(row)}
+              />
+              {row.borrows ? (
+                <ActionButton
+                  name="Repay"
+                  onClick={() => {
+                    setRepayModalTitle(REPAY_MODAL_TITLE[1]);
+                    onRepayClick(row, 1);
+                  }}
+                />
+              ) : null}
+              <UnbindMiner
+                minerId={row.minerId}
+                disabled={Boolean(row.borrows)}
+              />
             </Space>
           ) : (
-            <a
-              className="text-[#0093E9]"
-              onClick={() => onRepayOrLiquidateClick(row, 3)}
-            >
-              Repay for others
-            </a>
+            <ActionButton
+              name="Repay for others"
+              onClick={() => onRepayClick(row, 3)}
+            />
           ),
       },
     ];
 
     const data: MinerListItem[] = isMyFamily
       ? userBorrow?.minerBorrowInfo || []
-      : [];
-    console.log("expanded data  ==> ", data);
+      : familyBorrows.find((item) => item.user === record.user)
+          ?.minerBorrowInfo || [];
 
     return (
       <Table
@@ -117,7 +145,6 @@ function BorrowsTable(props: IProps) {
   };
 
   const columns: TableColumnsType<UserBorrow> = [
-    // { title: "Family", dataIndex: "family", key: "family" },
     {
       title: "Family Address",
       dataIndex: "user",
@@ -149,17 +176,16 @@ function BorrowsTable(props: IProps) {
       title: "Action",
       key: "action",
       render: (val, row) => (
-        <a
-          className="text-[#0093E9]"
-          onClick={() => onRepayOrLiquidateClick(null, 2)}
-        >
-          Liquidate
-        </a>
+        <ActionButton
+          name="Liquidate"
+          disabled={!row.liquidateConditionInfo.liquidatable}
+          onClick={() => onLiquidateClick(row)}
+        />
       ),
     });
   }
 
-  const data = isMyFamily && userBorrow ? [userBorrow] : [];
+  const data = isMyFamily && userBorrow ? [userBorrow] : familyBorrows;
   const minerBorrowInfo: BorrowModalData = {
     minerId: selectedMiner?.minerId || "",
     familyInfo: {
@@ -169,38 +195,113 @@ function BorrowsTable(props: IProps) {
       ratio: userBorrow?.liquidateConditionInfo?.rate || DEFAULT_EMPTY,
     },
   };
-  const minerRepayInfo: RepayModalData = {
-    familyInfo: {
-      user: userBorrow?.user || "",
-      availableCredit: userBorrow?.availableCredit || DEFAULT_EMPTY,
-    },
-    miner: selectedMiner,
-    minerList: userBorrow?.minerBorrowInfo || [],
-  };
+  const minerRepayInfo: RepayModalData =
+    repayModalTitle === REPAY_MODAL_TITLE[2]
+      ? {
+          familyInfo: {
+            user: selectedFamily?.user || "",
+            availableCredit: selectedFamily?.availableCredit || DEFAULT_EMPTY,
+            liquidateConditionInfo: selectedFamily?.liquidateConditionInfo,
+          },
+          minerList: selectedFamily?.minerBorrowInfo || [],
+        }
+      : {
+          familyInfo: {
+            user: userBorrow?.user || "",
+            availableCredit: userBorrow?.availableCredit || DEFAULT_EMPTY,
+            liquidateConditionInfo: userBorrow?.liquidateConditionInfo,
+          },
+          miner: selectedMiner,
+          minerList: userBorrow?.minerBorrowInfo || [],
+        };
 
-  const hasPagination = isMyFamily ? false : {};
+  const hasPagination = isMyFamily
+    ? false
+    : {
+        current: pageIndex,
+        pageSize: PAGE_SIZE,
+        total: familyCountRaw?.length,
+      };
 
   const onBorrowClick = (miner: MinerListItem) => {
     setSelectedMiner(miner);
     setIsBorrowModalOpen(true);
   };
 
-  const onRepayOrLiquidateClick = (
-    miner: MinerListItem | null,
-    type: 1 | 2 | 3
-  ) => {
+  const onRepayClick = (miner: MinerListItem | null, type: 1 | 3) => {
     setSelectedMiner(miner);
     setRepayModalTitle(REPAY_MODAL_TITLE[type]);
     setIsRepayModalOpen(true);
   };
 
-  const getUserBorrow = () => {
+  const onLiquidateClick = (family: UserBorrow) => {
+    setSelectedFamily(family);
+    setRepayModalTitle(REPAY_MODAL_TITLE[2]); // Liquidate
+    setIsRepayModalOpen(true);
+  };
+
+  const getUserBorrow = (refresh?: boolean) => {
     if (currentAccount) {
       FIL_contract.getUserBorrow(currentAccount);
-      store.dispatch({
-        type: "common/change",
-        payload: { refreshAllData: true },
-      });
+      if (refresh) {
+        store.dispatch({
+          type: "common/change",
+          payload: { refreshAllData: true },
+        });
+      }
+    }
+  };
+
+  const getFamilyCount = async () => {
+    if (!isMyFamily && currentAccount) {
+      const res: any = await getBorrowingsFamily();
+      setFamilyCountRaw(
+        res._data.filter(
+          (item: string) =>
+            item?.toLocaleLowerCase() !== currentAccount.toLocaleLowerCase()
+        ) || []
+      );
+    }
+  };
+
+  const getFamilyBorrows = async () => {
+    if (!isMyFamily) {
+      const list: any = await data_fetcher_contract.getBatchedFamily(
+        familyCount
+      );
+      setFamilyBorrows(list);
+    }
+  };
+
+  const getData = (refresh?: boolean) => {
+    getUserBorrow(refresh);
+    getFamilyBorrows();
+  };
+
+  const handleTableChange = (page: TablePaginationConfig) => {
+    setPageIndex(page.current || 1);
+  };
+
+  const handleSearch = async () => {
+    setPageIndex(1);
+    if (
+      searchText &&
+      (searchText.includes("t0") || searchText.includes("f0"))
+    ) {
+      const address: any = await FIL_contract.getFamilyByMiner(
+        searchText?.trim().replace("t0", "").replace("f0", "")
+      );
+      const list = familyCountRaw.filter((item) =>
+        item.toLocaleLowerCase().includes(address?.toLocaleLowerCase())
+      );
+      return setFamilyCountRaw(list);
+    }
+    if (searchText) {
+      const list = familyCountRaw.filter((item) => item.includes(searchText));
+      setFamilyCountRaw(list);
+    }
+    if (!searchText) {
+      getFamilyCount();
     }
   };
 
@@ -208,17 +309,31 @@ function BorrowsTable(props: IProps) {
     getUserBorrow();
   }, [currentAccount]);
 
+  useEffect(() => {
+    getFamilyBorrows();
+  }, [familyCount]);
+
+  useEffect(() => {
+    getFamilyCount();
+  }, [currentAccount]);
+
+  useEffect(() => {
+    if (!isMyFamily) {
+      handleSearch();
+    }
+  }, [debouncedSearchText]);
+
   return (
-    <div className="relative">
+    <div className="relative mt-[50px] md:mt-0">
       <Button
         className="flex items-center absolute -top-[40px] right-[20px] z-1"
         type="text"
-        onClick={getUserBorrow}
+        onClick={() => getData(true)}
       >
         Refresh list
         <ReloadOutlined />
       </Button>
-      {userBorrow?.user && (
+      {((isMyFamily && userBorrow?.user) || !isMyFamily) && (
         <Table
           columns={columns}
           expandable={{
@@ -228,6 +343,7 @@ function BorrowsTable(props: IProps) {
           dataSource={data}
           pagination={hasPagination}
           rowKey="user"
+          onChange={handleTableChange}
         />
       )}
 
@@ -240,7 +356,7 @@ function BorrowsTable(props: IProps) {
         isOpen={isRepayModalOpen}
         title={repayModalTitle}
         rawData={minerRepayInfo}
-        hideTabs={repayModalTitle !== "Repay"}
+        hideTabs={repayModalTitle !== REPAY_MODAL_TITLE[1]}
         onCancel={() => setIsRepayModalOpen(false)}
       />
     </div>

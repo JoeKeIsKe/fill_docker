@@ -11,6 +11,7 @@ import FIL_contract from "@/server/FILLiquid_contract";
 import { isIndent } from "@/utils";
 import { DEFAULT_EMPTY } from "../constans";
 import useLoading from "@/hooks/useLoading";
+import { useMetaMask } from "@/hooks/useMetaMask";
 
 interface IProps {
   isOpen?: boolean;
@@ -18,22 +19,29 @@ interface IProps {
   onCancel?: () => void;
 }
 
+const defaultExpected = {
+  expected6monthInterest: 0,
+  expectedInterestRate: 0,
+};
+
 function BorrowModal(props: IProps) {
   const { isOpen = false, data, onCancel } = props;
 
   const [amount, setAmount] = useState<number | null>();
   const [debouncedAmount] = useDebounce(amount, 2);
-  const [expected, setExpected] = useState<ExpectedBorrow>({
-    expected6monthInterest: 0,
-    expectedInterestRate: 0,
-  });
+  const [expected, setExpected] = useState<ExpectedBorrow>(defaultExpected);
   const [minerBorrow, setMinerBorrow] = useState<MinerBorrows | null>();
+  const [maxBorrowable, setMaxBorrowable] = useState();
   const [slippage, setSlippage] = useState();
   const [api, contextHolder] = notification.useNotification();
-  const { sendLoading, setSendLoading } = useLoading();
+  const { loading, setLoading } = useLoading();
+
+  const { wallet } = useMetaMask();
+  const network = wallet?.chainId?.includes("0x1") ? "f0" : "t0";
 
   const handleCancel = () => {
     if (onCancel) {
+      clear();
       onCancel();
     }
   };
@@ -49,24 +57,24 @@ function BorrowModal(props: IProps) {
         message: "Please input the slippage tolerance",
         placement: "top",
       });
-    setSendLoading(true);
+    setLoading(true);
     try {
       const res = await FIL_contract.onBorrow(data.minerId, amount, slippage);
       if (res) {
         handleCancel();
         api.success({
           message: "successfully borrowed",
-          placement: "bottomRight",
         });
       }
     } finally {
-      setSendLoading(false);
+      setLoading(false);
     }
   };
 
   const onMaxButtonClick = () => {
-    const num = Number(data?.familyInfo.availableCredit);
-    setAmount(num);
+    if (maxBorrowable) {
+      setAmount(Number(maxBorrowable));
+    }
   };
 
   const onExpectedRewards = async () => {
@@ -83,12 +91,28 @@ function BorrowModal(props: IProps) {
     }
   };
 
+  const getMaxBorrowable = async () => {
+    if (data?.minerId) {
+      const res: any = await data_fetcher_contract.getMaxBorrowable(
+        data.minerId
+      );
+      setMaxBorrowable(res);
+    }
+  };
+
+  const clear = () => {
+    setAmount(undefined);
+    setSlippage(undefined);
+    setExpected(defaultExpected);
+  };
+
   useEffect(() => {
     onExpectedRewards();
   }, [debouncedAmount]);
 
   useEffect(() => {
     onMinerBorrows();
+    getMaxBorrowable();
   }, [data, data?.minerId]);
 
   return (
@@ -104,36 +128,52 @@ function BorrowModal(props: IProps) {
       okText="Borrow"
       okButtonProps={{
         size: "large",
-        loading: sendLoading,
+        loading: loading,
       }}
     >
       <div className="text-xl font-bold my-4">Borrow</div>
       <p className="font-semibold my-2">{isIndent(data?.familyInfo.user)}</p>
       <div className="flex flex-wrap">
-        <div className="w-1/2 text-sm">{`Debt Outstanding: ${
-          data?.familyInfo.debtOutstanding || DEFAULT_EMPTY
-        } FIL`}</div>
-        <div className="w-1/2 text-sm">{`Available Credit: ${
-          data?.familyInfo.availableCredit || DEFAULT_EMPTY
-        } FIL`}</div>
-        <div className="w-1/2 text-sm">{`D/A Ratio: ${data?.familyInfo.ratio}%`}</div>
+        <DescRow
+          title="Debt Outstanding"
+          desc={`${data?.familyInfo.debtOutstanding || DEFAULT_EMPTY} FIL`}
+          noSpace
+        />
+        <DescRow
+          title="Available Credit"
+          desc={`${data?.familyInfo.availableCredit || DEFAULT_EMPTY} FIL`}
+          noSpace
+        />
+        <DescRow
+          title="D/A Ratio"
+          desc={`${data?.familyInfo.ratio || DEFAULT_EMPTY}%`}
+          noSpace
+        />
       </div>
-      {/* to do: network */}
-      <p className="font-semibold my-2">{`Miner ID: t0${minerBorrow?.minerId}`}</p>
+      <p className="font-semibold my-2">{`Miner ID: ${network}${minerBorrow?.minerId}`}</p>
       <div className="flex flex-wrap">
-        <div className="w-1/2 text-sm">{`Available Balance: ${minerBorrow?.availableBalance} FIL`}</div>
-        <div className="w-1/2 text-sm">{`Miner Debt Outstanding: ${
-          minerBorrow?.debtOutStanding || DEFAULT_EMPTY
-        } FIL`}</div>
+        <DescRow
+          title="Available Balance"
+          desc={`${minerBorrow?.availableBalance || DEFAULT_EMPTY} FIL`}
+          noSpace
+        />
+        <DescRow
+          title="Miner Debt Outstanding"
+          desc={`${minerBorrow?.debtOutStanding || DEFAULT_EMPTY} FIL`}
+          noSpace
+        />
         {/* <div className="w-1/2 text-sm">{`Initial Pledge: 23`}</div>
         <div className="w-1/2 text-sm">{`Locked Reward: 23`}</div> */}
-        <div className="w-1/2 text-sm">{`Lines of Credit: ${
-          minerBorrow?.borrows?.length || 0
-        }`}</div>
-        <div className="w-1/2 text-sm">
-          Miner Total Position:
-          <span>{`${minerBorrow?.balance || DEFAULT_EMPTY} FIL`}</span>
-        </div>
+        <DescRow
+          title="Lines of Credit"
+          desc={`${minerBorrow?.borrows?.length || 0}`}
+          noSpace
+        />
+        <DescRow
+          title="Miner Total Position"
+          desc={`${minerBorrow?.balance || DEFAULT_EMPTY} FIL`}
+          noSpace
+        />
       </div>
       <div className="my-5">
         <NumberInput
@@ -141,7 +181,7 @@ function BorrowModal(props: IProps) {
           value={amount}
           prefix="FIL"
           min={10}
-          max={data?.familyInfo.availableCredit}
+          max={maxBorrowable}
           maxButton
           onMaxButtonClick={onMaxButtonClick}
           onChange={(val) => setAmount(val)}

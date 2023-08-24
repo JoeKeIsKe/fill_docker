@@ -3,7 +3,7 @@
 import { isIndent } from "@/utils";
 import { rootState } from "@/store/type";
 import { useSelector } from "react-redux";
-import { InputNumber, Select, Button, notification } from "antd";
+import { Select, Button, notification } from "antd";
 import { useState, useEffect } from "react";
 import { STAKE_MONTH_OPTIONS } from "@/constants";
 import stake_contract from "@/server/stake";
@@ -11,6 +11,8 @@ import data_fetcher_contract from "@/server/data_fetcher";
 import store from "@/store";
 import ConfirmModal from "@/components/confirmModal";
 import { useMetaMask } from "@/hooks/useMetaMask";
+import NumberInput from "@/packages/NumberInput";
+import useLoading from "@/hooks/useLoading";
 
 interface Props {}
 
@@ -45,6 +47,7 @@ function FarmingCard(props: Props) {
   const [api, contextHolder] = notification.useNotification();
 
   const { currentAccount } = useMetaMask();
+  const { loading, setLoading } = useLoading();
 
   const { refreshStakeData } = useSelector(
     (state: rootState) => state?.commonStore
@@ -97,20 +100,19 @@ function FarmingCard(props: Props) {
       });
     if (amount && stakeTime) {
       const staker = currentAccount;
-      setSendLoading(true);
+      setLoading(true);
       const res: any = await stake_contract.onStake(amount, stakeTime, staker);
       if (res) {
         if (res?.message) {
           api.error({
             message: res?.message,
-            placement: "bottomRight",
           });
         } else {
           setRewards(res);
           onFeedbackOpen();
         }
       }
-      setSendLoading(false);
+      setLoading(false);
     }
   };
 
@@ -127,13 +129,6 @@ function FarmingCard(props: Props) {
         payload: { refreshStakeData: true },
       });
     }
-  };
-
-  const setSendLoading = (status: boolean) => {
-    store.dispatch({
-      type: "common/change",
-      payload: { sendLoading: status },
-    });
   };
 
   // hack for text mismatch error in next.js
@@ -162,14 +157,14 @@ function FarmingCard(props: Props) {
   }, [amount, stakeTime]);
 
   return (
-    <div className="min-w-[450px] h-full relative">
-      <div className="btn-default p-4 rounded-t-[10px] text-[#fff]">
+    <div className="lg:min-w-[450px] h-full relative">
+      <div className="btn-default p-4 rounded-t-[24px] text-[#fff]">
         <div className="flex justify-between mb-2">
           <div className="flex flex-col">
             <p className="">Available to farm</p>
             <p className="font-semibold text-lg">{`${stakerData.filTrustBalance} FIT`}</p>
           </div>
-          <p className="h-full py-1 px-2 rounded-[10px] bg-gray-100 text-gray-500 text-sm">
+          <p className="h-full py-1 px-2 rounded-[24px] bg-gray-100 text-gray-500 text-sm">
             {isClient && isIndent(currentAccount)}
           </p>
         </div>
@@ -191,19 +186,14 @@ function FarmingCard(props: Props) {
       </div>
       <div className="bg-white p-4 rounded-[10px] mt-[-10px]">
         <div className="">
-          <InputNumber
-            className="w-full"
-            defaultValue={defaultAmount}
+          <NumberInput
+            label=""
+            value={amount}
+            prefix="FIL"
             min={1}
             max={Number(stakerData.filTrustBalance) || undefined}
-            size="large"
-            prefix="FIT"
-            addonAfter={
-              <div className="cursor-pointer" onClick={onMaxBtnClick}>
-                Max
-              </div>
-            }
-            value={amount}
+            maxButton
+            onMaxButtonClick={onMaxBtnClick}
             onChange={onChange}
           />
         </div>
@@ -221,7 +211,12 @@ function FarmingCard(props: Props) {
             Expected FIG rewards from Fixed-term farming :{" "}
             <em>{expectedRewards}</em> FIG
           </p>
-          <Button className="w-full" type="primary" onClick={onFarm}>
+          <Button
+            className="w-full"
+            type="primary"
+            loading={loading}
+            onClick={onFarm}
+          >
             Farm
           </Button>
         </div>

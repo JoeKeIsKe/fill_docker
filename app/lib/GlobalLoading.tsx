@@ -8,8 +8,9 @@ import { LoadingOutlined } from "@ant-design/icons";
 
 function GlobalLoading({ children }: { children: ReactNode }) {
   const { sendLoading } = useSelector((state: rootState) => state?.commonStore);
+  const isLoading = Object.keys(sendLoading).some((key) => sendLoading[key]);
   return (
-    <Spin spinning={sendLoading} indicator={<LoadingOutlined />}>
+    <Spin spinning={isLoading} indicator={<LoadingOutlined />}>
       {children}
     </Spin>
   );

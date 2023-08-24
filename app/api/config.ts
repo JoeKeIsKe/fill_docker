@@ -1,5 +1,5 @@
 export const config = {
-  baseUrl: "http://106.14.249.226:8002/",
+  baseUrl: "/",
 
   // window.location.protocol + '//' + window.location.host
 };
