@@ -41,7 +41,9 @@ export async function generateStaticParams({
 }: {
   params: { id: string };
 }) {
-  return {
-    id,
-  };
+  return [
+    {
+      id,
+    },
+  ];
 }

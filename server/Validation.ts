@@ -2,8 +2,13 @@ import Valid from "@/server/jsons/Validation_metadata.json";
 import { Validation_contract } from "@/contract";
 import { ethers } from "ethers";
 
-const provider = new ethers.providers.Web3Provider(window.ethereum);
-const signer = provider.getSigner();
+let provider: any = null;
+let signer: any = null;
+
+if (typeof window !== "undefined" && typeof window?.ethereum !== "undefined") {
+  provider = new ethers.providers.Web3Provider(window?.ethereum);
+  signer = provider.getSigner();
+}
 
 class Validation {
   [x: string]: any;

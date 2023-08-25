@@ -140,7 +140,7 @@ export const MetaMaskContextProvider = ({ children }: PropsWithChildren) => {
         placement: "top",
       });
       closeModal();
-      return window.open(
+      return window?.open(
         "https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn?hl=en"
       );
     }

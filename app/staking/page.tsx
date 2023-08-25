@@ -160,7 +160,7 @@ function Staking() {
   };
 
   const handleAddToWallet = async () => {
-    const res = await window.ethereum.request({
+    const res = await window?.ethereum.request({
       method: "wallet_watchAsset",
       params: {
         type: "ERC20",

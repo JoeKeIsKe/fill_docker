@@ -38,8 +38,10 @@ service.interceptors.request.use(
   (request) => {
     removePending(request);
     request.cancelToken = new CancelToken((c) => {
+      // @ts-ignore
       pending.push({
         url: request.url,
+        // @ts-ignore
         method: request.method,
         params: request.params,
         data: request.data,
