@@ -24,8 +24,6 @@ interface DataType {
 const defaultPageNum = 6;
 
 function StakingCard(props: Props) {
-  const {} = props;
-
   const [isFeedbackOpen, setIsFeedbackOpen] = useState<boolean>(false);
   const [isConfirmOpen, setIsConfirmOpen] = useState<boolean>(false);
 

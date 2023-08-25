@@ -12,7 +12,6 @@ import { Button } from "antd";
 import detectEthereumProvider from "@metamask/detect-provider";
 import notification from "antd/es/notification";
 import Modal from "@/packages/modal";
-// import Button from "@/packages/button";
 import { isIndent, formatBalance } from "@/utils";
 import { getSvg } from "@/svgTypes";
 
@@ -66,7 +65,7 @@ export const MetaMaskContextProvider = ({ children }: PropsWithChildren) => {
 
   useEffect(() => {
     setCurrentAccount(wallet?.accounts[0]);
-  }, [wallet]);
+  }, [wallet, wallet?.accounts]);
 
   const _updateWallet = useCallback(async (providedAccounts?: any) => {
     const accounts =
@@ -170,7 +169,7 @@ export const MetaMaskContextProvider = ({ children }: PropsWithChildren) => {
       );
     }
     return (
-      <div className="btn-default p-2 rounded-lg text-[#fff]">
+      <div className="px-2 py-1 btn-default rounded-lg text-[#fff]">
         {isIndent(accounts[0])}
       </div>
     );

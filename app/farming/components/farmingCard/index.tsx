@@ -33,8 +33,6 @@ const defaultStakerData = {
 };
 
 function FarmingCard(props: Props) {
-  const {} = props;
-
   const [amount, setAmount] = useState<number | null>(defaultAmount);
   const [stakeTime, setStakeTime] = useState<number | null>();
   const [isClient, setIsClient] = useState<boolean>(false);
@@ -62,8 +60,8 @@ function FarmingCard(props: Props) {
   };
 
   const fetchExpectedRewardsFromStake = async () => {
-    if (!stakeTime) {
-      return;
+    if (!stakeTime || !amount) {
+      return setExpectedRewards(0);
     }
     if (amount && stakeTime) {
       const data = await stake_contract.onExpectedRewardsFromStake(
@@ -181,7 +179,7 @@ function FarmingCard(props: Props) {
         <hr className="my-4 h-0.5 border-t-0 bg-neutral-100 opacity-70 dark:opacity-50" />
         <div className="flex flex-col text-sm">
           <p className="">FIG Balance</p>
-          <p className="font-semibold text-lg">{`${stakerData.filGovernanceBalance} FIT`}</p>
+          <p className="font-semibold text-lg">{`${stakerData.filGovernanceBalance} FIG`}</p>
         </div>
       </div>
       <div className="bg-white p-4 rounded-[10px] mt-[-10px]">
