@@ -92,7 +92,7 @@ class contract {
           },
           (err: any, res: any) => {
             if (err) {
-              resolve(true);
+              resolve(false);
               throw new Error(err);
             }
           }
@@ -152,7 +152,7 @@ class contract {
           },
           (err: any, res: any) => {
             if (err) {
-              resolve(true);
+              resolve(false);
               throw new Error(err);
             }
           }
@@ -179,7 +179,7 @@ class contract {
           },
           (err: any, res: any) => {
             if (err) {
-              resolve(true);
+              resolve(false);
               throw new Error(err);
             }
           }
@@ -209,7 +209,7 @@ class contract {
           },
           (err: any, res: any) => {
             if (err) {
-              resolve(true);
+              resolve(false);
               throw new Error(err);
             }
           }
@@ -235,7 +235,7 @@ class contract {
           },
           (err: any, res: any) => {
             if (err) {
-              resolve(true);
+              resolve(false);
               throw new Error(err);
             }
           }
@@ -322,7 +322,7 @@ class contract {
           },
           (err: any, res: any) => {
             if (err) {
-              // resolve(true);
+              resolve(false);
               throw new Error(err);
             }
           }
@@ -349,7 +349,7 @@ class contract {
           },
           (err: any, res: any) => {
             if (err) {
-              // resolve(true);
+              resolve(false);
               throw new Error(err);
             }
           }
