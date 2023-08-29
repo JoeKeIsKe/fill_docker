@@ -169,9 +169,9 @@ export const MetaMaskContextProvider = ({ children }: PropsWithChildren) => {
       );
     }
     return (
-      <div className="px-2 py-1 btn-default rounded-lg text-[#fff]">
+      <Button type="primary" size="large">
         {isIndent(accounts[0])}
-      </div>
+      </Button>
     );
   };
 
