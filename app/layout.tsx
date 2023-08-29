@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import StyledComponentsRegistry from "./lib/AntdRegistry";
 import { Inter } from "next/font/google";
 import CustomProvider from "./lib/Provider";
+import ErrorBoundary from "./lib/ErrorBoundary";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -19,9 +20,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body id="root" className={inter.className}>
-        <StyledComponentsRegistry>
-          <CustomProvider>{children}</CustomProvider>
-        </StyledComponentsRegistry>
+        <ErrorBoundary fallback={<p>Something wrong!</p>}>
+          <StyledComponentsRegistry>
+            <CustomProvider>{children}</CustomProvider>
+          </StyledComponentsRegistry>
+        </ErrorBoundary>
       </body>
     </html>
   );

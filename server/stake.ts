@@ -29,11 +29,6 @@ class contract {
       this.contractAbi,
       this.contractAddress
     );
-    // this.myContract = new ethers.Contract(
-    //   this.contractAddress,
-    //   this.contractAbi,
-    //   signer
-    // );
   }
 
   onStake(amount: number, duration: number, address: string) {

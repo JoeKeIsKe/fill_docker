@@ -1,9 +1,7 @@
-import Image from 'next/image';
-
-import React from 'react';
-import Analytic from './analytic/page';
-
+import React from "react";
+import { redirect } from "next/navigation";
 
 export default function Main() {
-  return <Analytic />
+  redirect("/staking");
+  return <></>;
 }

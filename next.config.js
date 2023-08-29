@@ -2,8 +2,10 @@
 
 const rewrites = () => {
     const dev = process.env.NODE_ENV !== 'production'
-    const des_url = dev ? 'http://106.14.249.226:8002/' : '/'
-    const des_url_2 = dev ? 'http://106.14.249.226:8003/' : '/'
+    // const des_url = dev ? 'http://106.14.249.226:8002/' : '/'
+    // const des_url_2 = dev ? 'http://106.14.249.226:8003/' : '/'
+    const des_url = 'http://106.14.249.226:8002/'
+    const des_url_2 = 'http://106.14.249.226:8003/'
     return [
       {
         source: "/api/getdata",

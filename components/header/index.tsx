@@ -69,7 +69,7 @@ function Header() {
 
     window?.addEventListener("unhandledrejection", handleRejectionError);
     return () => {
-      window.removeEventListener("unhandledrejection", handleRejectionError);
+      window?.removeEventListener("unhandledrejection", handleRejectionError);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -78,10 +78,10 @@ function Header() {
     <>
       <div className="w-full h-12 flex items-center justify-between">
         <Image src={logo} height={40} alt="logo" />
-        <ul className="flex gap-x-5 items-center">
+        <div className="flex gap-x-5 items-center">
           {RouterList.map((item) => {
             return (
-              <Link
+              <a
                 className="text-[#000]"
                 style={
                   pathname.includes(item.value)
@@ -94,11 +94,11 @@ function Header() {
                 key={item.value}
               >
                 {item.label}
-              </Link>
+              </a>
             );
           })}
           <div className="hidden md:block">{connectButton()}</div>
-        </ul>
+        </div>
       </div>
       {contextHolder}
     </>
