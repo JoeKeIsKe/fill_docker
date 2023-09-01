@@ -25,6 +25,11 @@ function Borrow() {
     shallowEqual
   );
 
+  const available = BigNumber(filInfo?.totalFIL || 0)
+    .times(0.9)
+    .minus(BigNumber(filInfo?.utilizedLiquidity || 0))
+    .toFixed(2);
+
   const default_opt = useMemo(() => {
     return {
       backgroundColor: "transparent",
@@ -65,12 +70,12 @@ function Borrow() {
         {
           value: filInfo?.utilizedLiquidity,
           name: "Supplied",
-          itemStyle: { color: "rgb(156, 163, 175, 0.3)" },
+          itemStyle: { color: "#0093E9" },
         },
         {
           value: filInfo?.availableFIL,
-          name: "Available",
-          itemStyle: { color: "#0093E9" },
+          name: "",
+          itemStyle: { color: "rgb(156, 163, 175, 0.3)" },
         },
       ];
     }
@@ -128,10 +133,7 @@ function Borrow() {
               <div className="flex flex-col items-center">
                 <p className="text-gray-400">Available</p>
                 <p className="text-[20px] font-semibold">{`${
-                  BigNumber(filInfo?.totalFIL || 0)
-                    .times(0.9)
-                    .minus(BigNumber(filInfo?.utilizedLiquidity || 0))
-                    .toFixed(2) || DEFAULT_EMPTY
+                  Number(available) <= 0 ? DEFAULT_EMPTY : available
                 } FIL`}</p>
               </div>
 

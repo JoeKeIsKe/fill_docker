@@ -66,7 +66,11 @@ function MinerDetailTable(props: IProps) {
         id: item.borrow.id,
         interest: getValueDivide(item.interest, 18, 6),
         borrowAmount: getValueDivide(item.borrow.borrowAmount, 18, 6),
-        interestRate: getValueDivide(item.borrow.interestRate, 6, 2),
+        interestRate: getValueDivide(
+          Number(item.borrow.interestRate) * 100,
+          6,
+          2
+        ),
         remainingOriginalAmount: getValueDivide(
           item.borrow.remainingOriginalAmount,
           18,

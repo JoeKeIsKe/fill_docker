@@ -55,8 +55,12 @@ class contract {
             const filInfo: FilLiquidInfo = {
               totalFIL: getValueDivide(Number(totalFIL), 18, 2),
               availableFIL: getValueDivide(Number(availableFIL), 18, 2),
-              interestRate: getValueDivide(Number(interestRate), 6, 2),
-              utilizationRate: getValueDivide(Number(utilizationRate), 6, 2),
+              interestRate: getValueDivide(Number(interestRate) * 100, 6, 2),
+              utilizationRate: getValueDivide(
+                Number(utilizationRate) * 100,
+                6,
+                2
+              ),
               utilizedLiquidity: formatUnits(utilizedLiquidity),
               exchangeRate: getValueDivide(Number(exchangeRate), 6, 0),
             };
@@ -154,7 +158,7 @@ class contract {
             const { expectedInterestRate, sixMonthInterest } = res;
             const data: ExpectedBorrow = {
               expectedInterestRate: getValueDivide(
-                Number(expectedInterestRate),
+                Number(expectedInterestRate) * 100,
                 6,
                 2
               ),
@@ -227,7 +231,7 @@ class contract {
                 ),
                 liquidateConditionInfo: {
                   rate: getValueDivide(
-                    Number(r.liquidateConditionInfo?.rate),
+                    Number(r.liquidateConditionInfo?.rate) * 100,
                     6,
                     2
                   ),

@@ -57,7 +57,11 @@ class contract {
             borrowSum: formatUnits(r.borrowSum),
             debtOutStanding: getValueDivide(r.debtOutStanding, 18, 2),
             liquidateConditionInfo: {
-              rate: getValueDivide(r.liquidateConditionInfo.rate, 6, 2),
+              rate: getValueDivide(
+                Number(r.liquidateConditionInfo.rate) * 100,
+                6,
+                2
+              ),
               alertable: r.liquidateConditionInfo.alertable,
               liquidatable: r.liquidateConditionInfo.liquidatable,
             },
@@ -141,7 +145,7 @@ class contract {
     const params = [
       minerId,
       getValueMultiplied(amount),
-      getValueMultiplied(expectInterestRate, 6),
+      getValueMultiplied(Number(expectInterestRate) / 100, 6),
     ];
     return new Promise((resolve, reject) => {
       this.myContract.methods

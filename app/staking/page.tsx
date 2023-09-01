@@ -285,7 +285,7 @@ function Staking() {
               <div>
                 <DescRow
                   title="Expected exchange rate"
-                  desc={`${expected.expectedRate}%`}
+                  desc={`${expected.expectedRate}`}
                 />
                 <DescRow
                   title="Expected to receive"
@@ -297,7 +297,7 @@ function Staking() {
               <div>
                 <DescRow
                   title="Expected exchange rate"
-                  desc={`${expected.expectedRate}%`}
+                  desc={`${expected.expectedRate}`}
                 />
                 <DescRow
                   title="Expected to receive"

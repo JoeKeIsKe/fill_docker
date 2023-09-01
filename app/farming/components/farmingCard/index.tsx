@@ -187,7 +187,7 @@ function FarmingCard(props: Props) {
           <NumberInput
             label=""
             value={amount}
-            prefix="FIL"
+            prefix="FIT"
             min={1}
             max={Number(stakerData.filTrustBalance) || undefined}
             maxButton

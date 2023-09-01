@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import logo from "@/assets/logo.svg";
+import FIlLogo from "@/assets/Fil_logo.png";
 import Link from "next/link";
 import { RouterList } from "@/constants";
 import { useEffect, useState } from "react";
@@ -77,7 +78,8 @@ function Header() {
   return (
     <>
       <div className="w-full h-12 flex items-center justify-between">
-        <Image src={logo} height={40} alt="logo" />
+        {/* <Image src={logo} height={40} alt="logo" /> */}
+        <Image src={FIlLogo} height={40} alt="logo" />
         <div className="flex gap-x-5 items-center">
           {RouterList.map((item) => {
             return (
