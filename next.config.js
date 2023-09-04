@@ -30,6 +30,15 @@ const nextConfig = {
         defaultLocale: 'fil',
         localeDetection: false,
     },
+    async redirects() {
+      return [
+        {
+          source: '/',
+          destination: '/staking',
+          permanent: false,
+        },
+      ]
+    },
     rewrites
 }
 
