@@ -1,4 +1,4 @@
-import { ITEM, IWalletItem } from "./utils/type";
+import { ITEM, IWalletItem, NetworkItemType } from "./utils/type";
 
 export const walletList: Array<IWalletItem> = [
   {
@@ -66,4 +66,39 @@ export const STAKE_MONTH_OPTIONS = [
   { value: 10, label: "10" },
   { value: 11, label: "11" },
   { value: 12, label: "12" },
+];
+
+export const NETWORK: NetworkItemType[] = [
+  {
+    name: "MainNet",
+    key: "MainNet",
+    chainId: "0x1",
+    config: {
+      chainId: "0x13a",
+      chainName: "Filecoin",
+      nativeCurrency: {
+        name: "FIL",
+        symbol: "FIL",
+        decimals: 18,
+      },
+      rpcUrls: ["https://api.node.glif.io"],
+      blockExplorerUrls: ["https://filscan.io"],
+    },
+  },
+  {
+    name: "Calibration",
+    key: "Calibration",
+    chainId: "0x4cb2f",
+    config: {
+      chainId: "0x4cb2f",
+      chainName: "Calibration",
+      nativeCurrency: {
+        name: "tFIL",
+        symbol: "tFIL",
+        decimals: 18,
+      },
+      rpcUrls: ["https://filecoin-calibration.chainup.net/rpc/v1"],
+      blockExplorerUrls: ["https://calibration.filfox.info/en"],
+    },
+  },
 ];

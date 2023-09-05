@@ -1,23 +1,25 @@
 "use client";
 
 import Image from "next/image";
-import logo from "@/assets/logo.svg";
 import FIlLogo from "@/assets/Fil_logo.png";
 import Link from "next/link";
-import { RouterList } from "@/constants";
+import { RouterList, NETWORK } from "@/constants";
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useMetaMask } from "@/hooks/useMetaMask";
 import data_fetcher_contract from "@/server/data_fetcher";
 import { useSelector } from "react-redux";
 import { rootState } from "@/store/type";
+import { NetworkItemType } from "@/utils/type";
 import notification from "antd/es/notification";
 import store from "@/store";
 import { usePathname } from "next/navigation";
+import { Dropdown, Space } from "antd";
 
 function Header() {
   const dispath = useDispatch();
-  const { connectButton, currentAccount } = useMetaMask();
+  const { wallet, connectButton, currentAccount, isNetworkCorrect } =
+    useMetaMask();
 
   const [api, contextHolder] = notification.useNotification();
   const pathname = usePathname();
@@ -26,6 +28,47 @@ function Header() {
   const { refreshAllData } = useSelector(
     (state: rootState) => state?.commonStore
   );
+
+  const targetNetwork = NETWORK.find(
+    (item: any) => item.chainId === wallet.chainId
+  );
+
+  const handleNetworkChange = async (item: NetworkItemType) => {
+    let res = null;
+    try {
+      await window?.ethereum.request({
+        method: "wallet_switchEthereumChain",
+        params: [
+          {
+            chainId: item.chainId,
+          },
+        ],
+      });
+      res = true;
+    } catch (error: any) {
+      if (error?.code === 4902) {
+        window?.ethereum.request({
+          method: "wallet_addEthereumChain", // Metamask的api名称
+          params: [item.config],
+        });
+      }
+    }
+    if (res === true) {
+      window.location.reload();
+    }
+  };
+
+  let items: any = [];
+  NETWORK.forEach((item: any) => {
+    items.push({
+      label: (
+        <a className="text-sm" onClick={() => handleNetworkChange(item)}>
+          {item.name}
+        </a>
+      ),
+      key: item.key,
+    });
+  });
 
   useEffect(() => {
     const wallet_login = JSON.parse(localStorage?.getItem("login") || "{}");
@@ -41,6 +84,7 @@ function Header() {
   }, []);
 
   useEffect(() => {
+    if (!isNetworkCorrect) return;
     if (!filInfo || refreshAllData) {
       data_fetcher_contract.fetchAllData();
       store.dispatch({
@@ -54,7 +98,7 @@ function Header() {
     // catch the errors from MetaMask
     const handleRejectionError = (event: PromiseRejectionEvent) => {
       const { reason } = event;
-      if (reason.message) {
+      if (reason.message && isNetworkCorrect) {
         api.error({
           message: reason.message,
           description: reason?.data?.message,
@@ -99,6 +143,22 @@ function Header() {
               </a>
             );
           })}
+          <Space size="middle" className="hidden md:inline-flex">
+            <Dropdown
+              menu={{ items }}
+              trigger={["hover"]}
+              overlayClassName="pb-[5px] rounded-b-[6px]"
+              overlayStyle={{
+                top: "60px",
+              }}
+            >
+              <div className="flex h-[40px] px-2 cursor-pointer items-center rounded-[6px] bg-white text-[rgb(0,147,233)]">
+                {targetNetwork?.name || (
+                  <span className="text-[#d4380d]">Wrong Network</span>
+                )}
+              </div>
+            </Dropdown>
+          </Space>
           <div className="hidden md:block">{connectButton()}</div>
         </div>
       </div>

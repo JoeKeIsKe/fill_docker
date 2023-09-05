@@ -26,7 +26,7 @@ const TAB_KEYS = ["stake", "unstake"];
 
 function Staking() {
   const [api, contextHolder] = notification.useNotification();
-  const { currentAccount } = useMetaMask();
+  const { currentAccount, isNetworkCorrect } = useMetaMask();
 
   const [amount, setAmount] = useState<number | null>();
   const [debouncedAmount] = useDebounce(amount, 600);
@@ -155,6 +155,7 @@ function Staking() {
   };
 
   const fetchData = () => {
+    if (!isNetworkCorrect) return;
     fetchPersonalData();
     fetchChartData();
   };

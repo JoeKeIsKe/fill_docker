@@ -113,3 +113,10 @@ export interface RepayModalData {
   };
   minerList: MinerListItem[];
 }
+
+export interface NetworkItemType {
+  name: string;
+  key: string;
+  chainId: string;
+  config: any;
+}

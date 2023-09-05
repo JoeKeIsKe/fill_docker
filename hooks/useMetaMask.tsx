@@ -7,6 +7,7 @@ import {
   PropsWithChildren,
   useContext,
   useCallback,
+  useMemo,
 } from "react";
 import { Button } from "antd";
 import detectEthereumProvider from "@metamask/detect-provider";
@@ -14,6 +15,7 @@ import notification from "antd/es/notification";
 import Modal from "@/packages/modal";
 import { isIndent, formatBalance } from "@/utils";
 import { getSvg } from "@/svgTypes";
+import { NETWORK } from "@/constants";
 
 interface WalletState {
   accounts: any[];
@@ -28,6 +30,7 @@ interface MetaMaskContextData {
   error: boolean;
   errorMsg: string;
   isConnecting: boolean;
+  isNetworkCorrect: boolean;
   connectButton: () => React.ReactNode;
   connectMetaMask: () => void;
   clearError: () => void;
@@ -89,6 +92,10 @@ export const MetaMaskContextProvider = ({ children }: PropsWithChildren) => {
 
     setWallet({ accounts, balance, chainId });
   }, []);
+
+  const isNetworkCorrect = useMemo(() => {
+    return NETWORK.some((item) => item.chainId === wallet?.chainId);
+  }, [wallet, wallet?.chainId]);
 
   const updateWalletAndAccounts = useCallback(
     () => _updateWallet(),
@@ -193,6 +200,7 @@ export const MetaMaskContextProvider = ({ children }: PropsWithChildren) => {
         error: Boolean(errorMsg),
         errorMsg,
         isConnecting,
+        isNetworkCorrect,
         connectButton,
         connectMetaMask,
         clearError,

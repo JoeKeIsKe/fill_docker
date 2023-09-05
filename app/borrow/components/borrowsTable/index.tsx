@@ -40,7 +40,7 @@ function BorrowsTable(props: IProps) {
   const isMyFamily = type === "my";
   const [debouncedSearchText] = useDebounce(searchText, 600);
 
-  const { currentAccount, wallet } = useMetaMask();
+  const { currentAccount, wallet, isNetworkCorrect } = useMetaMask();
   const network = wallet?.chainId?.includes("0x1") ? "f0" : "t0";
 
   const [isBorrowModalOpen, setIsBorrowModalOpen] = useState<boolean>(false);
@@ -274,6 +274,7 @@ function BorrowsTable(props: IProps) {
   };
 
   const getData = (refresh?: boolean) => {
+    if (!isNetworkCorrect) return;
     getUserBorrow(refresh);
     getFamilyBorrows();
   };

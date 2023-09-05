@@ -37,7 +37,7 @@ function StakingCard(props: Props) {
 
   const [api, contextHolder] = notification.useNotification();
 
-  const { currentAccount, wallet } = useMetaMask();
+  const { currentAccount, wallet, isNetworkCorrect } = useMetaMask();
   const network = wallet?.chainId?.includes("0x1") ? "main" : "test";
 
   const { loading, setLoading } = useLoading();
@@ -48,8 +48,8 @@ function StakingCard(props: Props) {
   );
 
   const getList = async () => {
+    if (!isNetworkCorrect) return;
     const staker = currentAccount;
-
     if (staker) {
       setListLoading(true);
       try {

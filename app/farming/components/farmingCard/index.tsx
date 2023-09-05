@@ -44,7 +44,7 @@ function FarmingCard(props: Props) {
 
   const [api, contextHolder] = notification.useNotification();
 
-  const { currentAccount } = useMetaMask();
+  const { currentAccount, isNetworkCorrect } = useMetaMask();
   const { loading, setLoading } = useLoading();
 
   const { refreshStakeData } = useSelector(
@@ -52,6 +52,7 @@ function FarmingCard(props: Props) {
   );
 
   const fetchStakerData = async () => {
+    if (!isNetworkCorrect) return;
     const staker = currentAccount;
     if (staker) {
       const data: any = await data_fetcher_contract.fetchStakerData(staker);
