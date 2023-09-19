@@ -3,7 +3,7 @@
 import { isIndent } from "@/utils";
 import { rootState } from "@/store/type";
 import { useSelector } from "react-redux";
-import { Select, Button, notification } from "antd";
+import { Select, Button, notification, Space } from "antd";
 import { useState, useEffect } from "react";
 import { STAKE_MONTH_OPTIONS } from "@/constants";
 import stake_contract from "@/server/stake";
@@ -130,6 +130,25 @@ function FarmingCard(props: Props) {
     }
   };
 
+  const handleAddToWallet = async () => {
+    const res = await window?.ethereum.request({
+      method: "wallet_watchAsset",
+      params: {
+        type: "ERC20",
+        options: {
+          address: "0xbc90Ef7544a6ff693cc5316e0D3541090eEfD961",
+          symbol: "FIG",
+          decimals: 18,
+        },
+      },
+    });
+    if (res) {
+      api.success({
+        message: "Successfully added",
+      });
+    }
+  };
+
   // hack for text mismatch error in next.js
   useEffect(() => {
     setIsClient(true);
@@ -179,7 +198,16 @@ function FarmingCard(props: Props) {
         </div>
         <hr className="my-4 h-0.5 border-t-0 bg-neutral-100 opacity-70 dark:opacity-50" />
         <div className="flex flex-col text-sm">
-          <p className="">FIG Balance</p>
+          <Space>
+            <p className="">FIG Balance</p>
+
+            <Button
+              className="bg-gray-400 text-[#fff] text-sm rounded-[24px] border-none hover:!text-[#fff] h-[28px] ml-2"
+              onClick={handleAddToWallet}
+            >
+              Add to wallet
+            </Button>
+          </Space>
           <p className="font-semibold text-lg">{`${stakerData.filGovernanceBalance} FIG`}</p>
         </div>
       </div>

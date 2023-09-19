@@ -62,7 +62,7 @@ class contract {
                 2
               ),
               utilizedLiquidity: formatUnits(utilizedLiquidity),
-              exchangeRate: getValueDivide(Number(exchangeRate), 6, 0),
+              exchangeRate: getValueDivide(Number(exchangeRate), 6, 2),
             };
             store.dispatch({
               type: "contract/change",
