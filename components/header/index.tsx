@@ -143,22 +143,24 @@ function Header() {
               </a>
             );
           })}
-          <Space size="middle" className="hidden md:inline-flex">
-            <Dropdown
-              menu={{ items }}
-              trigger={["hover"]}
-              overlayClassName="pb-[5px] rounded-b-[6px]"
-              overlayStyle={{
-                top: "60px",
-              }}
-            >
-              <div className="flex h-[40px] px-2 cursor-pointer items-center rounded-[6px] bg-white text-[rgb(0,147,233)]">
-                {targetNetwork?.name || (
-                  <span className="text-[#d4380d]">Wrong Network</span>
-                )}
-              </div>
-            </Dropdown>
-          </Space>
+          {currentAccount && (
+            <Space size="middle" className="hidden md:inline-flex">
+              <Dropdown
+                menu={{ items }}
+                trigger={["hover"]}
+                overlayClassName="pb-[5px] rounded-b-[6px]"
+                overlayStyle={{
+                  top: "60px",
+                }}
+              >
+                <div className="flex h-[40px] px-2 cursor-pointer items-center rounded-[6px] bg-white text-[rgb(0,147,233)]">
+                  {targetNetwork?.name || (
+                    <span className="text-[#d4380d]">Wrong Network</span>
+                  )}
+                </div>
+              </Dropdown>
+            </Space>
+          )}
           <div className="hidden md:block">{connectButton()}</div>
         </div>
       </div>

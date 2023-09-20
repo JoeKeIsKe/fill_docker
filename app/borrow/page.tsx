@@ -105,7 +105,7 @@ function Borrow() {
     if (res) {
       const { Basic } = res;
       const target = Basic?.slice(-8) || [];
-      const dataList = target.map((item: any) => item.InterestRate);
+      const dataList = target.map((item: any) => item.InterestRate * 100);
       const dateList = target.map((item: any) =>
         timestampToDateTime(item.BlockTimeStamp)
       );

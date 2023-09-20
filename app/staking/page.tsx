@@ -38,7 +38,7 @@ function Staking() {
   const [tabKey, setTabKey] = useState<string>(TAB_KEYS[0]);
   const [chartData, setChartData] = useState([]);
   const [chartDate, setChartDate] = useState([]);
-  const [currentAPY, setCurrentAPY] = useState();
+  const [currentAPY, setCurrentAPY] = useState<string | number>();
 
   const { filInfo, balance } = useSelector(
     (state: rootState) => state?.contract
@@ -46,22 +46,24 @@ function Staking() {
 
   const { loading, setLoading } = useLoading();
 
-  const default_opt = {
-    backgroundColor: "transparent",
-    xAxis: {
-      type: "category",
-      boundaryGap: false,
-      data: chartDate,
-    },
-
-    series: [
-      {
-        data: chartData,
-        type: "line",
-        areaStyle: undefined,
+  const default_opt = useMemo(() => {
+    return {
+      backgroundColor: "transparent",
+      xAxis: {
+        type: "category",
+        boundaryGap: false,
+        data: chartDate,
       },
-    ],
-  };
+
+      series: [
+        {
+          data: chartData,
+          type: "line",
+          areaStyle: undefined,
+        },
+      ],
+    };
+  }, [chartData]);
 
   const onTabChange = (tabKey: string) => {
     setTabKey(tabKey);
@@ -137,9 +139,11 @@ function Staking() {
       const target = Senior?.slice(-8) || [];
       const currentTarget = Senior?.slice(-1) || [];
       const APY = currentTarget[0]?.APY;
-      setCurrentAPY(APY);
+      setCurrentAPY(getValueToFixed(APY * 100, 6));
 
-      const dataList = target.map((item: any) => item.APY);
+      const dataList = target.map((item: any) =>
+        getValueToFixed(item.APY * 100, 6)
+      );
       const dateList = target.map((item: any) =>
         timestampToDateTime(item.BlockTimeStamp)
       );
@@ -155,9 +159,9 @@ function Staking() {
   };
 
   const fetchData = () => {
+    fetchChartData();
     if (!isNetworkCorrect) return;
     fetchPersonalData();
-    fetchChartData();
   };
 
   const handleAddToWallet = async () => {
