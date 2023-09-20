@@ -159,7 +159,6 @@ function Staking() {
   };
 
   const fetchData = () => {
-    fetchChartData();
     if (!isNetworkCorrect) return;
     fetchPersonalData();
   };
@@ -187,6 +186,10 @@ function Staking() {
   useEffect(() => {
     fetchData();
   }, [currentAccount]);
+
+  useEffect(() => {
+    fetchChartData();
+  }, []);
 
   useEffect(() => {
     onExpectedRewards();
