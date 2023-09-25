@@ -1,9 +1,9 @@
 export const Fill_liquid_contract =
-  "0x85091e87159327b71981d1A3d7a9022108FE104E";
+  "0xEf1F6Bf56E3E75020C3bd501cf85FE25CA0d5045";
 
-export const stake_contract = "0x34D405cd442fd4a9a4c73e26BE790cA677b856D0";
+export const stake_contract = "0x0Fde8eDe278eb722d1773d1038b0e8D3eF3b0Ef1";
 
 export const data_fetcher_contract =
-  "0x08E95F9550a1320BDF8403e97Abd82ded849BCE5";
+  "0x5D8f5b005c9887eF40D036B07928eEA68c7F514f";
 
-export const Validation_contract = "0xCF447BC18612E1C92132F7b79aD4511Bdbc70854";
+export const Validation_contract = "0x8637B90Fe8bDc842cd2A7981D1f861715D815757";

@@ -136,7 +136,7 @@ function FarmingCard(props: Props) {
       params: {
         type: "ERC20",
         options: {
-          address: "0xbc90Ef7544a6ff693cc5316e0D3541090eEfD961",
+          address: "0xB3A88035d3B4039d52EceCdc6519823A6A08a9f5",
           symbol: "FIG",
           decimals: 18,
         },

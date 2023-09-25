@@ -169,7 +169,7 @@ function Staking() {
       params: {
         type: "ERC20",
         options: {
-          address: "0x950443bc72109FC09211fA478de9D5495205a9C0",
+          address: "0x990F4D00589CdAF554421C6146844f42e1F65B2e",
           symbol: "FIT",
           decimals: 18,
           // image: "https://foo.io/token-image.svg",
