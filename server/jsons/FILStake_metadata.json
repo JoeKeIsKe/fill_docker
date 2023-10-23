@@ -921,7 +921,7 @@
 		},
 		"optimizer": {
 			"enabled": true,
-			"runs": 50
+			"runs": 10
 		},
 		"remappings": []
 	},
@@ -1151,11 +1151,11 @@
 			]
 		},
 		"contracts/FILStake.sol": {
-			"keccak256": "0xbc20bb4ce6a4edaff1fde7d538bf31f454cfc94bd94c00e51ffeb3d04f324a42",
+			"keccak256": "0xf930a0fae6879ca3d06b4fe769d291dbe5d891cbfbcfbe04bd4c26d902b79c56",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://49e8832b0b9a8a6daee8f90b012a8b75eb8ec5a08fd36d85751482272254439e",
-				"dweb:/ipfs/QmeCpcx7qXJboAV6EACkqKYDZ1QyzfkgE9QkD62whxaRdZ"
+				"bzz-raw://62e30a564e273cd2b0f93187c67364b09c2faf20947c664acd2bdfb247a22781",
+				"dweb:/ipfs/QmYjAKCjxpVzjWpcyXSKctL6N3t36ca4K618jDn4xe7BRw"
 			]
 		},
 		"contracts/FILTrust.sol": {
@@ -1167,11 +1167,11 @@
 			]
 		},
 		"contracts/Utils/Calculation.sol": {
-			"keccak256": "0xb9933a668b93dd28c447f3e6c1a6bc65f0880259c634217dcd3cd8bc3436c579",
+			"keccak256": "0x0b6e8457314ca01b3c1973bbf10214a6094fdfbeb2d23824bf230f0576c737a0",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://ae6c98d7648fe359cfd874a774c1d3b5dc4d18f33f6d8b5ee831c5c2f6999ab1",
-				"dweb:/ipfs/QmanUqeW1MvYAZ5iJT26zDFXo3Sx3fHTtC8uQnu3YMzFiH"
+				"bzz-raw://4b0ebce38da6cfc043dcf94dbf558a83acef8421c84e750f6167209de2e4ca52",
+				"dweb:/ipfs/QmUVKjYHUrx33KSkC8iZXtg7M9kYEtctMMrY9nBy8bgWtq"
 			]
 		}
 	},

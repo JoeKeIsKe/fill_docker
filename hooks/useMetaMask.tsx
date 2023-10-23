@@ -13,7 +13,7 @@ import { Button } from "antd";
 import detectEthereumProvider from "@metamask/detect-provider";
 import notification from "antd/es/notification";
 import Modal from "@/packages/modal";
-import { isIndent, formatBalance } from "@/utils";
+import { isIndent, formatBalance, setStorage } from "@/utils";
 import { getSvg } from "@/svgTypes";
 import { NETWORK } from "@/constants";
 
@@ -68,6 +68,10 @@ export const MetaMaskContextProvider = ({ children }: PropsWithChildren) => {
 
   useEffect(() => {
     setCurrentAccount(wallet?.accounts[0]);
+    setStorage("network_info", {
+      isNetworkCorrect,
+      chainId: wallet?.chainId,
+    });
   }, [wallet, wallet?.accounts]);
 
   const _updateWallet = useCallback(async (providedAccounts?: any) => {
@@ -170,9 +174,9 @@ export const MetaMaskContextProvider = ({ children }: PropsWithChildren) => {
     const len = accounts.length;
     if (len < 1) {
       return (
-        <Button type="primary" size="large" onClick={openModal}>
+        <button className="connect-btn" onClick={openModal}>
           Connect Wallet
-        </Button>
+        </button>
       );
     }
     return (

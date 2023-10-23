@@ -444,6 +444,25 @@
 			{
 				"inputs": [
 					{
+						"internalType": "address",
+						"name": "account",
+						"type": "address"
+					}
+				],
+				"name": "badDebt",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
 						"internalType": "uint64",
 						"name": "minerId",
 						"type": "uint64"
@@ -510,7 +529,7 @@
 				"inputs": [
 					{
 						"internalType": "uint256",
-						"name": "exchRate",
+						"name": "expectAmountFILTrust",
 						"type": "uint256"
 					}
 				],
@@ -552,44 +571,6 @@
 			{
 				"inputs": [],
 				"name": "exchangeRate",
-				"outputs": [
-					{
-						"internalType": "uint256",
-						"name": "",
-						"type": "uint256"
-					}
-				],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "uint256",
-						"name": "amount",
-						"type": "uint256"
-					}
-				],
-				"name": "exchangeRateDeposit",
-				"outputs": [
-					{
-						"internalType": "uint256",
-						"name": "",
-						"type": "uint256"
-					}
-				],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "uint256",
-						"name": "amount",
-						"type": "uint256"
-					}
-				],
-				"name": "exchangeRateRedeem",
 				"outputs": [
 					{
 						"internalType": "uint256",
@@ -843,6 +824,11 @@
 								"internalType": "uint256",
 								"name": "principalAndInterestSum",
 								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "principleSum",
+								"type": "uint256"
 							}
 						],
 						"internalType": "struct FILLiquidInterface.FamilyStatus",
@@ -851,6 +837,44 @@
 					}
 				],
 				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "amountFit",
+						"type": "uint256"
+					}
+				],
+				"name": "getFilByRedeem",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "amountFil",
+						"type": "uint256"
+					}
+				],
+				"name": "getFitByDeposit",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
 				"type": "function"
 			},
 			{
@@ -955,6 +979,11 @@
 							{
 								"internalType": "uint256",
 								"name": "accumulatedBorrowFee",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "accumulatedBadDebt",
 								"type": "uint256"
 							},
 							{
@@ -1211,14 +1240,9 @@
 										"type": "bool"
 									}
 								],
-								"internalType": "struct Convertion.Integer",
+								"internalType": "struct Conversion.Integer",
 								"name": "availableBalance",
 								"type": "tuple"
-							},
-							{
-								"internalType": "bool",
-								"name": "haveCollateralizing",
-								"type": "bool"
 							},
 							{
 								"components": [
@@ -1379,7 +1403,7 @@
 					},
 					{
 						"internalType": "uint256",
-						"name": "expectExchRate",
+						"name": "expectAmountFIL",
 						"type": "uint256"
 					}
 				],
@@ -1545,14 +1569,9 @@
 												"type": "bool"
 											}
 										],
-										"internalType": "struct Convertion.Integer",
+										"internalType": "struct Conversion.Integer",
 										"name": "availableBalance",
 										"type": "tuple"
-									},
-									{
-										"internalType": "bool",
-										"name": "haveCollateralizing",
-										"type": "bool"
 									},
 									{
 										"components": [
@@ -1658,44 +1677,6 @@
 					}
 				],
 				"name": "utilizationRateBorrow",
-				"outputs": [
-					{
-						"internalType": "uint256",
-						"name": "",
-						"type": "uint256"
-					}
-				],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "uint256",
-						"name": "amount",
-						"type": "uint256"
-					}
-				],
-				"name": "utilizationRateDeposit",
-				"outputs": [
-					{
-						"internalType": "uint256",
-						"name": "",
-						"type": "uint256"
-					}
-				],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "uint256",
-						"name": "amount",
-						"type": "uint256"
-					}
-				],
-				"name": "utilizationRateRedeem",
 				"outputs": [
 					{
 						"internalType": "uint256",
@@ -1823,7 +1804,7 @@
 					"details": "return FIL/FILTrust exchange rate: total amount of FIL liquidity divided by total amount of FILTrust outstanding"
 				},
 				"getCollateralizingMinerInfo(uint64)": {
-					"details": "get collateralizing miner info : minerId,quota,borrowCount,paybackCount,expiration",
+					"details": "get collateralizing miner info: minerId, quota, borrowCount, paybackCount, expiration",
 					"params": {
 						"minerId": "miner id"
 					},
@@ -1903,7 +1884,7 @@
 		},
 		"optimizer": {
 			"enabled": true,
-			"runs": 10
+			"runs": 150
 		},
 		"remappings": []
 	},
@@ -2253,51 +2234,51 @@
 			]
 		},
 		"contracts/FILGovernance.sol": {
-			"keccak256": "0xf0e28e69723adaaab0b0b5264fda05588a86763ed8f710a76cbcf2ccf55f8921",
+			"keccak256": "0x9a368bb936a6148b70850b6fe347174bc735988d95cbc694eea1930c04f88610",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://991efcacc1fa83a1cb0a764477cd9a259a88b5ff87b80079b2cef003fb7d8f46",
-				"dweb:/ipfs/QmV7YqpXPmzQmosceej7X3D5yJ8DTtCpmtGVeTciRLFBvi"
+				"bzz-raw://85546b13ef245d3b461c1fad7310dda61c4471ffe37af959b1aa143b4d06d1af",
+				"dweb:/ipfs/QmZkYW446ECCdV3KLWgVFT5srzmsUEUnfPqwESY6rx7gDo"
 			]
 		},
 		"contracts/FILLiquid.sol": {
-			"keccak256": "0x9cb9efa10a8a34b5c057027e2528f3cc0cdeab36238940f4ef14b53b3bffa028",
+			"keccak256": "0x23ad4b2393809dc24d084e246a38b1b1c66c2b65a07f3fb31a207fb76af8a984",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://89de1549666fef2266f4b1ae9ade6b898d493baa13932d897823179ce7c6e267",
-				"dweb:/ipfs/QmZoryPoWHvux8GbHmJnZZuQzHWXmjc3TnboKMM2qFhmKh"
+				"bzz-raw://fe73c3257aa4a0765aa8a593a10816626173f7362931fa27194bb490f7e1c90b",
+				"dweb:/ipfs/QmReabkUAcPNvHjAVqp8fPRYjTDd4nz7craUNcF8aiZ9v8"
 			]
 		},
 		"contracts/FILStake.sol": {
-			"keccak256": "0xf930a0fae6879ca3d06b4fe769d291dbe5d891cbfbcfbe04bd4c26d902b79c56",
+			"keccak256": "0xdb483ec2ec9e8460df56dd4362cff565a96dc80424f7c172c1a41032ea1afeeb",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://62e30a564e273cd2b0f93187c67364b09c2faf20947c664acd2bdfb247a22781",
-				"dweb:/ipfs/QmYjAKCjxpVzjWpcyXSKctL6N3t36ca4K618jDn4xe7BRw"
+				"bzz-raw://a5642ead89a4c3f4c18b38a2f2b14e63dc25016463dcf90598d8524aa0c902bc",
+				"dweb:/ipfs/QmfCnzc7TM1E5DvmbsAoGQYhbgVPUFWECD4S2BkkVr7iuD"
 			]
 		},
 		"contracts/FILTrust.sol": {
-			"keccak256": "0xed716b2134ef9d4a44ed2e302feb567b7d5b23ac5a7c13ebe2eb97b51e273885",
+			"keccak256": "0x5d8123c4dbce637cf613224af150541739f6ee7a572e59cbb23419d99323db9b",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://9e390c73e05628a91b4acfd6daf14c14d2bdff7afd6d38858f2037eee643193f",
-				"dweb:/ipfs/QmTJ75sddxtKJktjqLbBZAfDwvHPFLs4bUhGYFgU7X6RAK"
+				"bzz-raw://d092034500ed1d8fb19ee6a3441252c5eadb2f32cdf4d54951f202f0dc50f8b8",
+				"dweb:/ipfs/QmUhQAtDiX6TMYRRVYbSLjoZo1bZ16jMVNYvfKcjkGRQSq"
 			]
 		},
 		"contracts/Utils/Calculation.sol": {
-			"keccak256": "0xb9933a668b93dd28c447f3e6c1a6bc65f0880259c634217dcd3cd8bc3436c579",
+			"keccak256": "0xa24fc89f2f98fc486bc4b9e0eb682ec0118bd6f4c348da8360ea81e3f7d4b602",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://ae6c98d7648fe359cfd874a774c1d3b5dc4d18f33f6d8b5ee831c5c2f6999ab1",
-				"dweb:/ipfs/QmanUqeW1MvYAZ5iJT26zDFXo3Sx3fHTtC8uQnu3YMzFiH"
+				"bzz-raw://db88850aac7c16f0313bfe633f3a310d6d82ce02936fd4286d86d04e3f3a292c",
+				"dweb:/ipfs/QmWtbbrTUhcGe7bhEEokMwW97jPYmHM8uB9s36bmrTt3op"
 			]
 		},
-		"contracts/Utils/Convertion.sol": {
-			"keccak256": "0x0d797c85807897f409756e28f5165132a4e10f090130cee35f0f90b57b81a5d0",
+		"contracts/Utils/Conversion.sol": {
+			"keccak256": "0x5f94b8c08c333eddb9476cd0be012b3b4a41eb45e5e2e576babcbb8ac29c6252",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://35bf44900d994f133b38515aecc796927b3bddc81a6cf34cfe4c449af12cc6f8",
-				"dweb:/ipfs/QmNa9wW1upp9nANieJRVst3EwLYRQH3kzbd4Mw7VnLnY6M"
+				"bzz-raw://bbb70169b377891c90b46b8af49abe72ba16580f3b943e3ea3633b30b9581d36",
+				"dweb:/ipfs/Qmct2jiy5zfsCHYSmKqRXiDLaUEjcxBq2WPKb6sS7bLNEM"
 			]
 		},
 		"contracts/Utils/FilAddress.sol": {
@@ -2309,11 +2290,11 @@
 			]
 		},
 		"contracts/Utils/FilecoinAPI.sol": {
-			"keccak256": "0x6a46707448a7ba585abaa4d053eba29f047a0cc0041bd52a8aa7bd1042ca0593",
+			"keccak256": "0xca4e8a61834b5734e99a515c6ee72b889834d27a32bd7cece40202b2367bb1fc",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://1203e6939382d4245912f0e469f8292b9ec5830c3fd4198fee3534e33b8b8f32",
-				"dweb:/ipfs/QmeKrxCi7Zhthy2Zqd6ArYTAGW4Ls23msL3aRCeY7BKbgf"
+				"bzz-raw://6bba1b8dc16fdba479f2da5097546bc1d0b2d008d98d6e4532f1048338777b65",
+				"dweb:/ipfs/QmZjdR36HZGJpCoLZeueVTtkcLz2Vmm7MZ6b4mp4a6qo9E"
 			]
 		},
 		"contracts/Utils/Validation.sol": {

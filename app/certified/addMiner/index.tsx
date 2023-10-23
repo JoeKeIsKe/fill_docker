@@ -90,17 +90,19 @@ export default () => {
   return (
     <>
       {currentAccount ? (
-        <Button
-          type="primary"
-          className="w-1/2 !rounded-[24px]"
-          size="large"
-          onClick={() => {
-            clear();
-            setShow(true);
-          }}
-        >
-          Create a Family
-        </Button>
+        <div className="flex w-full justify-center border border-[rgba(100, 111, 126, 0.2)] py-[40px] border-dashed rounded-[8px] mb-[24px]">
+          <Button
+            type="primary"
+            className="w-1/2 !rounded-[24px] !h-[54px]"
+            size="large"
+            onClick={() => {
+              clear();
+              setShow(true);
+            }}
+          >
+            Create a Family
+          </Button>
+        </div>
       ) : (
         connectButton()
       )}

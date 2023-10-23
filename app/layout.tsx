@@ -1,11 +1,12 @@
 import "./globals.css";
 import type { Metadata } from "next";
 import StyledComponentsRegistry from "./lib/AntdRegistry";
-import { Inter } from "next/font/google";
+import { Inter, Montserrat } from "next/font/google";
 import CustomProvider from "./lib/Provider";
 import ErrorBoundary from "./lib/ErrorBoundary";
 
 const inter = Inter({ subsets: ["latin"] });
+const montserrat = Montserrat({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "FILL",
@@ -19,7 +20,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body id="root" className={inter.className}>
+      <body id="root" className={montserrat.className}>
         <ErrorBoundary fallback={<p>Something wrong!</p>}>
           <StyledComponentsRegistry>
             <CustomProvider>{children}</CustomProvider>

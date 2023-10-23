@@ -87,7 +87,7 @@ const PieChartComponent = memo((props: Props) => {
   return (
     <div
       id="pie_chart"
-      style={{ width: "100%", height: "90%", minHeight: "100px" }}
+      style={{ width: "100%", height: "100%", minHeight: "100px" }}
       ref={chartRef}
     />
   );

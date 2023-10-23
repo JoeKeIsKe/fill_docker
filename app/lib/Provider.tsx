@@ -30,7 +30,7 @@ function CustomProvider({ children }: { children: ReactNode }) {
       <Provider store={store}>
         <ConfigProvider theme={theme}>
           <GlobalLoading>
-            <div className="max-w-screen-xl p-5 m-auto">
+            <div className="max-w-screen-xl p-5 m-auto mt-[80px]">
               <Header />
               {children}
             </div>

@@ -126,7 +126,11 @@ function StakingCard(props: Props) {
       render: (_, row) =>
         row?.canWithdraw ? (
           <Space size="middle">
-            <Button type="primary" onClick={() => onWithdrawBtnClick(row)}>
+            <Button
+              type="primary"
+              className="text-sm"
+              onClick={() => onWithdrawBtnClick(row)}
+            >
               Withdraw
             </Button>
           </Space>

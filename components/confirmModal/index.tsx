@@ -3,6 +3,10 @@
 import { Modal } from "antd";
 import { ReactNode } from "react";
 
+import WarningIcon from "@/assets/warning_icon.png";
+import SuccessIcon from "@/assets/success_icon.png";
+import Image from "next/image";
+
 interface IProps {
   isOpen?: boolean;
   type?: "warning" | "success";
@@ -31,8 +35,10 @@ function ConfirmModal(props: IProps) {
 
   return (
     <Modal
+      className="custom-modal"
       title=""
       open={isOpen}
+      width={560}
       onCancel={handleCancel}
       cancelButtonProps={{
         style: isSuccess
@@ -48,44 +54,15 @@ function ConfirmModal(props: IProps) {
         loading,
       }}
     >
-      <div className="flex flex-col gap-y-[10px] items-center pt-2">
-        {isSuccess ? (
-          <div className="text-[#039855]">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              className="w-20 h-20"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-          </div>
-        ) : (
-          <div className="text-[#faad14]">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth="1.5"
-              stroke="currentColor"
-              className="w-20 h-20"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"
-              />
-            </svg>
-          </div>
-        )}
-        <p className="font-bold text-xl">{title}</p>
-        <div className="text-medium text-gray-500 text-center">{desc}</div>
+      <div className="flex flex-col items-center pt-2">
+        <Image
+          src={isSuccess ? SuccessIcon : WarningIcon}
+          width={88}
+          height={88}
+          alt=""
+        />
+        <p className="font-semibold text-[24px] mt-[24px]">{title}</p>
+        <div className="text-sm opacity-60 text-center mt-1">{desc}</div>
       </div>
     </Modal>
   );

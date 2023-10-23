@@ -215,7 +215,7 @@ function RepayModal(props: IProps) {
 
   return (
     <Modal
-      className="custom-modal"
+      className="custom-modal big-btn"
       title=""
       open={isOpen}
       width={600}
@@ -230,13 +230,13 @@ function RepayModal(props: IProps) {
         loading: loading,
       }}
     >
-      <div className="text-xl font-bold my-4">{title}</div>
+      {/* <div className="text-xl font-bold my-4">{title}</div> */}
       {!hideTabs && (
         <Tabs className="mb-4" tabs={REPAY_TAB_KEYS} onChange={onTabChange} />
       )}
       {tabKey === REPAY_TAB_KEYS[0] ? (
         <>
-          <p className="text-lg font-semibold my-2">
+          <p className="text-lg font-semibold mb-4">
             {isIndent(rawData?.familyInfo?.user || "")}
           </p>
           <Table
@@ -246,7 +246,7 @@ function RepayModal(props: IProps) {
             pagination={false}
             rowKey="minerId"
           />
-          <div className="my-8 flex">
+          <div className="my-4 flex">
             <div>
               <label className="block">From</label>
               <Select
@@ -282,14 +282,16 @@ function RepayModal(props: IProps) {
         </>
       ) : (
         <>
-          <p className="text-lg font-semibold my-2">{`Miner ID: ${network}${currentMinerId}`}</p>
-          <div className="flex flex-wrap">
+          <p className="font-semibold my-2 opacity-60">{`Miner ID: ${network}${currentMinerId}`}</p>
+          <div className="data-card">
             {/* <div className="w-1/2">{`Family Available Credit: ${
               rawData?.familyInfo.availableCredit || DEFAULT_EMPTY
             } FIL`}</div> */}
-            <div className="w-1/2">{`Debt Outstanding: ${
-              rawData?.miner?.debtOutStanding || DEFAULT_EMPTY
-            } FIL`}</div>
+            <p className="text-xs font-semibold mb-4">Debt Outstanding</p>
+            <p className="text-[22px] font-bold">
+              {rawData?.miner?.debtOutStanding || DEFAULT_EMPTY}
+              <span className="text-sm font-normal ml-2">FIL</span>
+            </p>
           </div>
           <div className="mt-5">
             <NumberInput

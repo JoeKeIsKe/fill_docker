@@ -21,6 +21,8 @@ import { ExpectedStake } from "@/utils/type";
 import useLoading from "@/hooks/useLoading";
 import { getChartData } from "../api/modules/index";
 import { ReloadOutlined } from "@ant-design/icons";
+import { FIT_contract } from "@/contract";
+import * as echarts from "echarts/core";
 
 const TAB_KEYS = ["stake", "unstake"];
 
@@ -53,17 +55,72 @@ function Staking() {
         type: "category",
         boundaryGap: false,
         data: chartDate,
+        axisLabel: {
+          textStyle: {
+            color: "rgba(100, 111, 126, 0.6)",
+          },
+        },
       },
-
+      yAxis: {
+        type: "value",
+        name: "APY",
+        axisLabel: {
+          textStyle: {
+            color: "rgba(100, 111, 126, 0.6)",
+          },
+        },
+        splitLine: {
+          lineStyle: {
+            type: "dashed",
+          },
+        },
+      },
       series: [
         {
           data: chartData,
           type: "line",
-          areaStyle: undefined,
+          smooth: true,
+          symbolSize: 0,
+          lineStyle: {
+            color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
+              {
+                offset: 0,
+                color: "#48D3E6",
+              },
+              {
+                offset: 0.5,
+                color: "#4094E0",
+              },
+              {
+                offset: 1,
+                color: "#47CCE5",
+              },
+            ]),
+          },
+          areaStyle: {
+            color: {
+              type: "linear",
+              x: 0,
+              y: 0,
+              x2: 0,
+              y2: 1,
+              colorStops: [
+                {
+                  offset: 0,
+                  color: "rgba(71, 204, 229, 0.2)",
+                },
+                {
+                  offset: 1,
+                  color: "rgba(74, 221, 231, 0)",
+                },
+              ],
+              global: false,
+            },
+          },
         },
       ],
     };
-  }, [chartData]);
+  }, [chartData, chartDate]);
 
   const onTabChange = (tabKey: string) => {
     setTabKey(tabKey);
@@ -136,7 +193,7 @@ function Staking() {
     const res = await getChartData();
     if (res) {
       const { Senior } = res;
-      const target = Senior?.slice(-8) || [];
+      const target = Senior?.slice(-9, -1) || [];
       const currentTarget = Senior?.slice(-1) || [];
       const APY = currentTarget[0]?.APY;
       setCurrentAPY(getValueToFixed(APY * 100, 6));
@@ -145,7 +202,7 @@ function Staking() {
         getValueToFixed(item.APY * 100, 6)
       );
       const dateList = target.map((item: any) =>
-        timestampToDateTime(item.BlockTimeStamp)
+        timestampToDateTime(item.BlockTimeStamp, "MM-DD HH:mm")
       );
       setChartData(dataList);
       setChartDate(dateList);
@@ -169,7 +226,7 @@ function Staking() {
       params: {
         type: "ERC20",
         options: {
-          address: "0x990F4D00589CdAF554421C6146844f42e1F65B2e",
+          address: FIT_contract,
           symbol: "FIT",
           decimals: 18,
           // image: "https://foo.io/token-image.svg",
@@ -195,39 +252,57 @@ function Staking() {
     onExpectedRewards();
   }, [debouncedAmount]);
 
+  const overviewData = useMemo(() => {
+    return [
+      {
+        title: "Total Supply",
+        value: filInfo?.availableFIL || DEFAULT_EMPTY,
+        unit: "FIL",
+      },
+      {
+        title: "Utilization Ratio",
+        value: filInfo?.utilizationRate || DEFAULT_EMPTY,
+        unit: "%",
+      },
+      {
+        title: "FIL / FIT",
+        value: filInfo?.exchangeRate || DEFAULT_EMPTY,
+      },
+      {
+        title: "APY",
+        value: currentAPY || DEFAULT_EMPTY,
+        unit: "%",
+      },
+    ];
+  }, [filInfo, currentAPY]);
+
   return (
     <section>
-      <div className="text-2xl font-bold my-8">Stake</div>
-
+      <label className="inline-block mb-[5px] font-medium text-sm text-[#06081B] hidden opacity-40"></label>
+      <div className="text-[36px] font-semibold my-4">Stake</div>
       <div className="flex gap-[24px] flex-col md:flex-row">
-        {/* overview */}
         <Card title="Overview" className="flex-1">
-          <div className="flex justify-between px-10 gap-x-3">
-            <div className="flex flex-col items-center">
-              <p className="text-gray-400">Total Supply</p>
-              <p className="text-[20px] font-semibold">{`${
-                filInfo?.availableFIL || DEFAULT_EMPTY
-              } FIL`}</p>
-            </div>
-            <div className="flex flex-col items-center">
-              <p className="text-gray-400">Utilization Ratio</p>
-              <p className="text-[20px] font-semibold">
-                {filInfo?.utilizationRate}%
-              </p>
-            </div>
-            <div className="flex flex-col items-center">
-              <p className="text-gray-400">FIL / FIT</p>
-              <p className="text-[20px] font-semibold">
-                {filInfo?.exchangeRate}
-              </p>
-            </div>
+          <div className="grid grid-cols-2 gap-4 mb-[60px]">
+            {overviewData.map((item, index) => (
+              <div
+                className={`data-card ${
+                  index === 0 && "btn-default text-white"
+                }`}
+                key={item.title}
+              >
+                <p className="text-xs font-semibold mb-4">{item.title}</p>
+                <p className="text-[22px] font-bold">
+                  {item.value}
+                  {item.unit && (
+                    <span className="text-sm font-normal ml-2">
+                      {item.unit}
+                    </span>
+                  )}
+                </p>
+              </div>
+            ))}
           </div>
-          <div className="my-10 text-right">
-            APY:
-            <span className="font-semibold text-3xl ml-2">{`${
-              currentAPY || DEFAULT_EMPTY
-            }%`}</span>
-          </div>
+          <div className="text-[18px] font-bold ml-4 mb-4">APY</div>
           <Chart option={default_opt} />
         </Card>
 
@@ -256,7 +331,8 @@ function Staking() {
                 )} FIT`}</p>
               </div>
               <Button
-                className="bg-gray-400 text-[#fff] text-sm rounded-[24px] border-none hover:!text-[#fff] h-[28px] ml-2"
+                className="bg-gray-400 text-[#fff] !text-xs !rounded-[24px] border-none hover:!text-[#fff] h-[28px] ml-2"
+                size="small"
                 onClick={handleAddToWallet}
               >
                 Add to wallet

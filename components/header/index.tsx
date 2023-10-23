@@ -120,22 +120,19 @@ function Header() {
   }, []);
 
   return (
-    <>
-      <div className="w-full h-12 flex items-center justify-between">
-        {/* <Image src={logo} height={40} alt="logo" /> */}
-        <Image src={FIlLogo} height={40} alt="logo" />
-        <div className="flex gap-x-5 items-center">
+    <div
+      className="fixed top-0 left-0 right-0 bg-white"
+      style={{ zIndex: 999 }}
+    >
+      <div className="max-w-screen-xl h-[80px] w-full flex items-center justify-between px-5 m-auto">
+        <Image src={FIlLogo} height={30} alt="logo" />
+        <div className="h-full flex gap-x-5 items-center leading-[80px]">
           {RouterList.map((item) => {
             return (
               <a
-                className="text-[#000]"
-                style={
-                  pathname.includes(item.value)
-                    ? {
-                        color: "#0093E9",
-                      }
-                    : {}
-                }
+                className={`text-[#000] h-full block text-center md:w-[160px] ${
+                  pathname.includes(item.value) && "active"
+                }`}
                 href={`/${item.value}`}
                 key={item.value}
               >
@@ -165,7 +162,7 @@ function Header() {
         </div>
       </div>
       {contextHolder}
-    </>
+    </div>
   );
 }
 

@@ -55,8 +55,8 @@ export function heightToDateTime(inputHeight: number, network?: string) {
   return dayjs(timestamp).format("YYYY-MM-DD HH:mm:ss");
 }
 
-export function timestampToDateTime(timestamp: number) {
-  return dayjs(timestamp * 1000).format("YYYY-MM-DD HH:mm:ss");
+export function timestampToDateTime(timestamp: number, formatStr?: string) {
+  return dayjs(timestamp * 1000).format(formatStr ?? "YYYY-MM-DD HH:mm:ss");
 }
 
 // convertToStruct takes an array type eg. Inventory.ItemStructOutput and converts it to an object type.
@@ -88,4 +88,27 @@ export const formatResult = (res: any) => {
 export const formatBalance = (rawBalance: string) => {
   const balance = (parseInt(rawBalance) / 1000000000000000000).toFixed(2);
   return balance;
+};
+
+export const getStorage = (key: string) => {
+  if (!key) {
+    return;
+  }
+  const isBrowser: boolean = ((): boolean => typeof window !== "undefined")();
+  return isBrowser ? JSON.parse(window["localStorage"][key]) : "";
+};
+export const setStorage = (key: string, value: any) => {
+  if (!key || !value) {
+    return;
+  }
+  const isBrowser: boolean = ((): boolean => typeof window !== "undefined")();
+  if (isBrowser) {
+    window["localStorage"].setItem(key, JSON.stringify(value));
+  }
+};
+export const removeStorage = (key: string) => {
+  const isBrowser: boolean = ((): boolean => typeof window !== "undefined")();
+  if (isBrowser) {
+    window["localStorage"].removeItem(key);
+  }
 };

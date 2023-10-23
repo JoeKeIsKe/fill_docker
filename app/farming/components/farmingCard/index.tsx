@@ -4,7 +4,7 @@ import { isIndent } from "@/utils";
 import { rootState } from "@/store/type";
 import { useSelector } from "react-redux";
 import { Select, Button, notification, Space } from "antd";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { STAKE_MONTH_OPTIONS } from "@/constants";
 import stake_contract from "@/server/stake";
 import data_fetcher_contract from "@/server/data_fetcher";
@@ -13,6 +13,8 @@ import ConfirmModal from "@/components/confirmModal";
 import { useMetaMask } from "@/hooks/useMetaMask";
 import NumberInput from "@/packages/NumberInput";
 import useLoading from "@/hooks/useLoading";
+import { FIG_contract } from "@/contract";
+import Card from "@/packages/card";
 
 interface Props {}
 
@@ -136,7 +138,7 @@ function FarmingCard(props: Props) {
       params: {
         type: "ERC20",
         options: {
-          address: "0xB3A88035d3B4039d52EceCdc6519823A6A08a9f5",
+          address: FIG_contract,
           symbol: "FIG",
           decimals: 18,
         },
@@ -174,47 +176,77 @@ function FarmingCard(props: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [amount, stakeTime]);
 
-  return (
-    <div className="lg:min-w-[450px] h-full relative">
-      <div className="btn-default p-4 rounded-t-[24px] text-[#fff]">
-        <div className="flex justify-between mb-2">
-          <div className="flex flex-col">
-            <p className="">Available to farm</p>
-            <p className="font-semibold text-lg">{`${stakerData.filTrustBalance} FIT`}</p>
-          </div>
-          <p className="h-full py-1 px-2 rounded-[24px] bg-gray-100 text-gray-500 text-sm">
-            {isClient && isIndent(currentAccount)}
-          </p>
-        </div>
-        <div className="flex gap-[40px] text-sm">
-          <div className="flex flex-col">
-            <p className="">Fixed-term FIT</p>
-            <p className="font-semibold text-lg">{`${stakerData.filTrustFixed} FIT`}</p>
-          </div>
-          <div className="flex flex-col">
-            <p className="">Variable-term FIT</p>
-            <p className="font-semibold text-lg">{`${stakerData.filTrustVariable} FIT`}</p>
-          </div>
-        </div>
-        <hr className="my-4 h-0.5 border-t-0 bg-neutral-100 opacity-70 dark:opacity-50" />
-        <div className="flex flex-col text-sm">
-          <Space>
-            <p className="">FIG Balance</p>
+  const overviewData = useMemo(() => {
+    return [
+      {
+        title: "Available to farm",
+        value: stakerData.filTrustBalance,
+        unit: "FIT",
+        span: true,
+      },
+      {
+        title: "Fixed-term FIT",
+        value: stakerData.filTrustFixed,
+        unit: "FIT",
+      },
+      {
+        title: "Variable-term FIT",
+        value: stakerData.filTrustVariable,
+        unit: "FIT",
+      },
+      {
+        title: "FIG Balance",
+        value: stakerData.filGovernanceBalance,
+        unit: "FIG",
+        span: true,
+        action: (
+          <Button
+            className="bg-gray-400 text-[#fff] !text-xs !rounded-[24px] border-none hover:!text-[#fff] h-[28px] ml-2"
+            size="small"
+            onClick={handleAddToWallet}
+          >
+            Add to wallet
+          </Button>
+        ),
+      },
+    ];
+  }, [stakerData]);
 
-            <Button
-              className="bg-gray-400 text-[#fff] text-sm rounded-[24px] border-none hover:!text-[#fff] h-[28px] ml-2"
-              onClick={handleAddToWallet}
-            >
-              Add to wallet
-            </Button>
-          </Space>
-          <p className="font-semibold text-lg">{`${stakerData.filGovernanceBalance} FIG`}</p>
-        </div>
+  return (
+    <Card title="overview" className="lg:min-w-[450px] h-full relative">
+      <p className="absolute top-[24px] right-[20px] py-1 px-2 rounded-[24px] bg-gray-100 text-gray-500 text-sm">
+        {isClient && isIndent(currentAccount)}
+      </p>
+      <div className="grid grid-cols-2 gap-4">
+        {overviewData.map((item, index) => (
+          <div
+            className={`data-card ${index === 0 && "btn-default text-white"} ${
+              item.span ? "col-span-2" : ""
+            }`}
+            key={item.title}
+          >
+            {item.action ? (
+              <Space className="m-0 mb-4" align="center">
+                <p className="text-xs font-semibold">{item.title}</p>
+                {item.action}
+              </Space>
+            ) : (
+              <p className="text-xs font-semibold mb-4">{item.title}</p>
+            )}
+
+            <p className="text-[22px] font-bold">
+              {item.value}
+              {item.unit && (
+                <span className="text-sm font-normal ml-2">{item.unit}</span>
+              )}
+            </p>
+          </div>
+        ))}
       </div>
-      <div className="bg-white p-4 rounded-[10px] mt-[-10px]">
+      <div className="bg-white pt-2 rounded-[10px] mt-[-10px]">
         <div className="">
           <NumberInput
-            label=""
+            label="Amount"
             value={amount}
             prefix="FIT"
             min={1}
@@ -224,22 +256,32 @@ function FarmingCard(props: Props) {
             onChange={onChange}
           />
         </div>
-        <div className="flex items-end gap-2 mt-4">
-          <Select
-            style={{ width: 120 }}
-            value={stakeTime}
-            onChange={onSelectChange}
-            options={STAKE_MONTH_OPTIONS}
-          />
-          <span>mos</span>
+
+        <div className="flex flex-col items-start mt-4">
+          <label className="inline-block mb-[5px] font-medium text-sm text-[#06081B] opacity-40">
+            Staking terms
+          </label>
+          <div className="flex gap-[20px] items-center">
+            <Select
+              style={{ width: 120 }}
+              value={stakeTime}
+              onChange={onSelectChange}
+              options={STAKE_MONTH_OPTIONS}
+              size="large"
+            />
+            <span>mos</span>
+          </div>
         </div>
-        <div className="mt-12 space-y-3">
-          <p className="text-sm">
-            Expected FIG rewards from Fixed-term farming :{" "}
-            <em>{expectedRewards}</em> FIG
+        <div className="mt-[16px] space-y-3">
+          <p className="text-xs font-medium text-[#06081B]">
+            <span className="opacity-40">
+              Expected FIG rewards from Fixed-term farming :{" "}
+            </span>
+            <span className="text-[#4094E0]">{expectedRewards}</span>
+            <span className="opacity-40"> FIG</span>
           </p>
           <Button
-            className="w-full"
+            className="w-full !rounded-[24px] !h-[54px] !mt-[32px]"
             type="primary"
             loading={loading}
             onClick={onFarm}
@@ -256,7 +298,7 @@ function FarmingCard(props: Props) {
         onConfirm={onFeedbackClose}
       />
       {contextHolder}
-    </div>
+    </Card>
   );
 }
 

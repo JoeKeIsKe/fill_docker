@@ -26,12 +26,13 @@ function Tabs(props: Props) {
       <div className="flex gap-x-5">
         {tabs.map((item) => (
           <div
-            className={`uppercase px-4 py-1 text-gray-500 rounded text-lg cursor-pointer ${
+            className={`px-4 py-1 text-gray-500 text-lg cursor-pointer ${
               active === item && "bg-gray-100"
             }`}
             key={item}
             style={{
               textTransform: "uppercase",
+              borderRadius: "8px",
             }}
             onClick={() => onTabClick(item)}
           >

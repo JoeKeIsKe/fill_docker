@@ -154,11 +154,6 @@
 			{
 				"inputs": [
 					{
-						"internalType": "address",
-						"name": "account",
-						"type": "address"
-					},
-					{
 						"internalType": "uint256",
 						"name": "amount",
 						"type": "uint256"
@@ -170,21 +165,16 @@
 				"type": "function"
 			},
 			{
-				"inputs": [
+				"inputs": [],
+				"name": "burner",
+				"outputs": [
 					{
 						"internalType": "address",
-						"name": "account",
+						"name": "",
 						"type": "address"
-					},
-					{
-						"internalType": "uint256",
-						"name": "amount",
-						"type": "uint256"
 					}
 				],
-				"name": "claim",
-				"outputs": [],
-				"stateMutability": "nonpayable",
+				"stateMutability": "view",
 				"type": "function"
 			},
 			{
@@ -335,6 +325,25 @@
 				"inputs": [
 					{
 						"internalType": "address",
+						"name": "new_burner",
+						"type": "address"
+					}
+				],
+				"name": "setBurner",
+				"outputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
 						"name": "new_owner",
 						"type": "address"
 					}
@@ -447,6 +456,24 @@
 				],
 				"stateMutability": "view",
 				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "account",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "amount",
+						"type": "uint256"
+					}
+				],
+				"name": "withdraw",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
 			}
 		],
 		"devdoc": {
@@ -513,7 +540,7 @@
 		},
 		"optimizer": {
 			"enabled": true,
-			"runs": 50
+			"runs": 10
 		},
 		"remappings": []
 	},
@@ -551,11 +578,11 @@
 			]
 		},
 		"contracts/FILGovernance.sol": {
-			"keccak256": "0x70b54c68f48e5c17b19e56cb90471376abe3ab3a9bc96d77ba15d5a9e0cab38a",
+			"keccak256": "0xaa7125900dd9a44e056241d4a5337651e02348514230848863c65710637012b2",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://687cb645cb0bb22c1d1bb6a0f546b98a30d60f7b002afe798e48ff2961483928",
-				"dweb:/ipfs/QmUbcUaYiJj6EhsTKdixrPN92WcS9vAoG2UnK4SQE54YqZ"
+				"bzz-raw://4e262c334880c12a09fe10cbeb8cae991749492b28ac4d0938102a9553256ab8",
+				"dweb:/ipfs/QmYAEro6XbqQSCe8TqQzFQrUcqbubYW39rNLnneujJHXAz"
 			]
 		}
 	},

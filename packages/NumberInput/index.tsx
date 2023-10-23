@@ -46,10 +46,7 @@ function NumberInput(props: Props) {
     <div className="mt-4">
       <div>
         {label && (
-          <label
-            className="text-lg"
-            style={{ display: "inline-block", marginBottom: "3px" }}
-          >
+          <label className="inline-block mb-[5px] font-medium text-sm text-[#06081B] opacity-40">
             {label}
           </label>
         )}
@@ -64,7 +61,7 @@ function NumberInput(props: Props) {
           />
           {maxButton && (
             <div
-              className="absolute cursor-pointer px-2 py-1 bg-gray-100 rounded text-gray-500"
+              className="absolute cursor-pointer px-2 py-1 bg-gray-100 rounded text-gray-500 rounded-[6px]"
               style={{ top: "10px", right: "20px", zIndex: 10 }}
               onClick={handleMaxButtonClick}
             >

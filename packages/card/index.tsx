@@ -10,7 +10,7 @@ function Card(props: Props) {
   const { title, children, className } = props;
 
   return (
-    <div className={`card-default ${className}`}>
+    <div className={`card-default ${className ?? ""}`}>
       {title && <h3 className="title">{title}</h3>}
       {children}
     </div>

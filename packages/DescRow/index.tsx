@@ -13,11 +13,11 @@ function DescRow(props: Props) {
       <span>{desc}</span>
     </div>
   ) : (
-    <div className="mb-3 flex justify-between text-gray-600">
-      <span className="text-gray-400">{title}</span>
-      <span className="font-normal" style={{ color: color ?? "inherit" }}>
-        {desc}
+    <div className="mb-2 flex justify-between text-[#191D23]">
+      <span className="font-medium text-sm text-[#06081B] opacity-40">
+        {title}
       </span>
+      <span className={`text-sm ${color ? "text-linear" : ""}`}>{desc}</span>
     </div>
   );
 }

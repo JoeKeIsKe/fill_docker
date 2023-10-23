@@ -14,6 +14,7 @@ import { DEFAULT_EMPTY } from "./components/constans";
 import { getChartData } from "../api/modules/index";
 import { SearchOutlined } from "@ant-design/icons";
 import BigNumber from "bignumber.js";
+import * as echarts from "echarts/core";
 
 function Borrow() {
   const [chartData, setChartData] = useState([]);
@@ -37,17 +38,70 @@ function Borrow() {
         type: "category",
         boundaryGap: false,
         data: chartDate,
+        axisLabel: {
+          textStyle: {
+            color: "rgba(100, 111, 126, 0.6)",
+          },
+        },
       },
       yAxis: {
         type: "value",
         min: 0,
-        axisLabel: { formatter: "{value} %" },
+        name: "APY",
+        axisLabel: {
+          formatter: "{value}",
+          textStyle: {
+            color: "rgba(100, 111, 126, 0.6)",
+          },
+        },
+        splitLine: {
+          lineStyle: {
+            type: "dashed",
+          },
+        },
       },
       series: [
         {
           data: chartData,
           type: "line",
-          areaStyle: undefined,
+          smooth: true,
+          symbolSize: 0,
+          lineStyle: {
+            color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
+              {
+                offset: 0,
+                color: "#48D3E6",
+              },
+              {
+                offset: 0.5,
+                color: "#4094E0",
+              },
+              {
+                offset: 1,
+                color: "#47CCE5",
+              },
+            ]),
+          },
+          areaStyle: {
+            color: {
+              type: "linear",
+              x: 0,
+              y: 0,
+              x2: 0,
+              y2: 1,
+              colorStops: [
+                {
+                  offset: 0,
+                  color: "rgba(71, 204, 229, 0.2)",
+                },
+                {
+                  offset: 1,
+                  color: "rgba(74, 221, 231, 0)",
+                },
+              ],
+              global: false,
+            },
+          },
         },
       ],
     };
@@ -107,7 +161,7 @@ function Borrow() {
       const target = Basic?.slice(-8) || [];
       const dataList = target.map((item: any) => item.InterestRate * 100);
       const dateList = target.map((item: any) =>
-        timestampToDateTime(item.BlockTimeStamp)
+        timestampToDateTime(item.BlockTimeStamp, "MM-DD HH:mm")
       );
       setChartData(dataList);
       setChartDate(dateList);
@@ -122,49 +176,72 @@ function Borrow() {
     fetchChartData();
   }, []);
 
+  const overviewData = useMemo(() => {
+    return [
+      {
+        title: "Available",
+        value: Number(available) <= 0 ? DEFAULT_EMPTY : available,
+        unit: "FIL",
+      },
+      {
+        title: "Total supplied",
+        value: `${filInfo?.utilizedLiquidity || DEFAULT_EMPTY} of ${
+          filInfo?.totalFIL || DEFAULT_EMPTY
+        }`,
+        unit: "FIL",
+      },
+      {
+        title: "Current Borrowing APR",
+        value: filInfo?.interestRate || DEFAULT_EMPTY,
+        unit: "%",
+      },
+    ];
+  }, [available, filInfo]);
+
   return (
     <section>
-      <div className="text-2xl font-bold my-8">Borrow</div>
+      <div className="text-[30px] font-semibold my-4">Borrow</div>
       {/* overview */}
       <Card title="Overview" className="flex-1 mb-5">
-        <div className="flex flex-col sm:flex-row">
-          <div className="w-[300px] md:w-[500px]">
-            <div className="flex justify-between px-10 gap-x-3 w-[300px] sm:w-[400px]">
-              <div className="flex flex-col items-center">
-                <p className="text-gray-400">Available</p>
-                <p className="text-[20px] font-semibold">{`${
-                  Number(available) <= 0 ? DEFAULT_EMPTY : available
-                } FIL`}</p>
-              </div>
-
-              <div className="flex flex-col items-center">
-                <p className="text-gray-400">Utilization Ratio</p>
-                <p className="text-[20px] font-semibold">
-                  {filInfo?.utilizationRate || DEFAULT_EMPTY}%
-                </p>
-              </div>
+        <div className="grid lg:grid-cols-2">
+          <div className="flex flex-wrap md:flex-nowrap gap-[16px]">
+            <div className="flex-1 flex-wrap lg:flex-nowrap flex flex-col gap-[16px]">
+              {overviewData.map((item, index) => (
+                <div
+                  className={`data-card ${
+                    index === 0 && "btn-default text-white"
+                  }`}
+                  key={item.title}
+                >
+                  <p className="text-xs font-semibold mb-4">{item.title}</p>
+                  <p className="text-[22px] font-bold">
+                    {item.value}
+                    {item.unit && (
+                      <span className="text-sm font-normal ml-2">
+                        {item.unit}
+                      </span>
+                    )}
+                  </p>
+                </div>
+              ))}
             </div>
-            <div className="flex">
-              <div className="w-[250px] h-[220px]">
+            {/* Utilization Ration */}
+            <div className="data-card flex-1">
+              <p className="text-xs font-semibold mb-4">Utilization Ration</p>
+              <p className="text-[22px] font-bold">
+                {filInfo?.utilizationRate || DEFAULT_EMPTY}
+                <span className="text-sm font-normal ml-2">%</span>
+              </p>
+              <div className="w-[250px] h-[220px] m-auto">
                 <PieChart option={pie_option} />
               </div>
-              <div className="flex flex-col items-center mt-[50px]">
-                <p className="text-gray-400">Total supplied</p>
-                <p className="text-[24px] font-semibold">{`${
-                  filInfo?.utilizedLiquidity || DEFAULT_EMPTY
-                } of ${filInfo?.totalFIL || DEFAULT_EMPTY} FIL`}</p>
-              </div>
-            </div>
-            <div>
-              Current Borrowing APR:{" "}
-              <span className="text-[24px]">{`${
-                filInfo?.interestRate || DEFAULT_EMPTY
-              }%`}</span>
             </div>
           </div>
-          <div className="flex-1">
-            <p className="font-semibold ml-10 mb-2">Borrowing APR</p>
-            <Chart option={default_opt} />
+          <div className="lg:ml-[32px] mt-[60px] lg:mt-[0px] relative">
+            <p className="absolute -top-[55px] font-bold my-[18px] text-[18px] mb-2">
+              Borrowing APR
+            </p>
+            <Chart height="100%" option={default_opt} />
           </div>
         </div>
       </Card>

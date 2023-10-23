@@ -1,6 +1,11 @@
 import DataFetcher from "@/server/jsons/DataFetcher_metadata.json";
 import { data_fetcher_contract } from "@/contract";
-import { getValueDivide, formatUnits, getValueMultiplied } from "@/utils";
+import {
+  getValueDivide,
+  formatUnits,
+  getValueMultiplied,
+  getStorage,
+} from "@/utils";
 import {
   FilLiquidInfo,
   StakeOverview,
@@ -52,6 +57,8 @@ class contract {
               utilizedLiquidity,
               exchangeRate,
             }: FilLiquidInfo = res.filLiquidInfo;
+            console.log("exchangeRate ==> ", exchangeRate);
+
             const filInfo: FilLiquidInfo = {
               totalFIL: getValueDivide(Number(totalFIL), 18, 2),
               availableFIL: getValueDivide(Number(availableFIL), 18, 2),

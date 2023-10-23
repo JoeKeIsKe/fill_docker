@@ -1,7 +1,7 @@
 "use client";
 
 import { Modal, Divider, notification } from "antd";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import NumberInput from "@/packages/NumberInput";
 import DescRow from "@/packages/DescRow";
 import { useDebounce } from "use-debounce";
@@ -115,15 +115,59 @@ function BorrowModal(props: IProps) {
     getMaxBorrowable();
   }, [data, data?.minerId]);
 
+  const familyData = useMemo(() => {
+    return [
+      {
+        title: "Debt Outstanding",
+        value: data?.familyInfo.debtOutstanding || DEFAULT_EMPTY,
+        unit: "FIL",
+      },
+      {
+        title: "Available Credit",
+        value: data?.familyInfo.availableCredit || DEFAULT_EMPTY,
+        unit: "FIL",
+      },
+      {
+        title: "D/A Ratio",
+        value: data?.familyInfo.availableCredit || DEFAULT_EMPTY,
+        unit: "%",
+      },
+    ];
+  }, [data?.familyInfo]);
+
+  const minerData = useMemo(() => {
+    return [
+      {
+        title: "Available Balance",
+        value: minerBorrow?.availableBalance || DEFAULT_EMPTY,
+        unit: "FIL",
+      },
+      {
+        title: "Miner Debt Outstanding",
+        value: minerBorrow?.debtOutStanding || DEFAULT_EMPTY,
+        unit: "FIL",
+      },
+      {
+        title: "Lines of Credit",
+        value: minerBorrow?.borrows?.length || 0,
+      },
+      {
+        title: "Miner Total Position",
+        value: minerBorrow?.balance || DEFAULT_EMPTY,
+      },
+    ];
+  }, [minerBorrow]);
+
   return (
     <Modal
-      className="custom-modal"
+      className="custom-modal big-btn"
       title=""
       open={isOpen}
       onCancel={handleCancel}
       cancelButtonProps={{
         size: "large",
       }}
+      width={620}
       onOk={handleConfirm}
       okText="Borrow"
       okButtonProps={{
@@ -131,49 +175,44 @@ function BorrowModal(props: IProps) {
         loading: loading,
       }}
     >
-      <div className="text-xl font-bold my-4">Borrow</div>
-      <p className="font-semibold my-2">{isIndent(data?.familyInfo.user)}</p>
-      <div className="flex flex-wrap">
-        <DescRow
-          title="Debt Outstanding"
-          desc={`${data?.familyInfo.debtOutstanding || DEFAULT_EMPTY} FIL`}
-          noSpace
-        />
-        <DescRow
-          title="Available Credit"
-          desc={`${data?.familyInfo.availableCredit || DEFAULT_EMPTY} FIL`}
-          noSpace
-        />
-        <DescRow
-          title="D/A Ratio"
-          desc={`${data?.familyInfo.ratio || DEFAULT_EMPTY}%`}
-          noSpace
-        />
+      {/* <div className="text-xl font-bold">Borrow</div> */}
+      <p className="font-bold text-[18px] mb-4">
+        {isIndent(data?.familyInfo.user)}
+      </p>
+      <div className="grid grid-cols-3 gap-[16px]">
+        {familyData.map((item, index) => (
+          <div
+            className={`data-card ${index === 0 && "btn-default text-white"}`}
+            key={item.title}
+          >
+            <p className="text-xs font-semibold mb-4">{item.title}</p>
+            <p className="text-[22px] font-bold">
+              {item.value}
+              {item.unit && (
+                <span className="text-sm font-normal ml-2">{item.unit}</span>
+              )}
+            </p>
+          </div>
+        ))}
       </div>
-      <p className="font-semibold my-2">{`Miner ID: ${network}${minerBorrow?.minerId}`}</p>
-      <div className="flex flex-wrap">
-        <DescRow
-          title="Available Balance"
-          desc={`${minerBorrow?.availableBalance || DEFAULT_EMPTY} FIL`}
-          noSpace
-        />
-        <DescRow
-          title="Miner Debt Outstanding"
-          desc={`${minerBorrow?.debtOutStanding || DEFAULT_EMPTY} FIL`}
-          noSpace
-        />
-        {/* <div className="w-1/2 text-sm">{`Initial Pledge: 23`}</div>
-        <div className="w-1/2 text-sm">{`Locked Reward: 23`}</div> */}
-        <DescRow
-          title="Lines of Credit"
-          desc={`${minerBorrow?.borrows?.length || 0}`}
-          noSpace
-        />
-        <DescRow
-          title="Miner Total Position"
-          desc={`${minerBorrow?.balance || DEFAULT_EMPTY} FIL`}
-          noSpace
-        />
+      <p className="font-bold text-[18px] my-4">{`Miner ID: ${network}${minerBorrow?.minerId}`}</p>
+      <div className="grid grid-cols-3 gap-[16px]">
+        {minerData.map((item, index) => (
+          <div
+            className={`data-card ${index === 0 && "btn-default text-white"}`}
+            key={item.title}
+          >
+            <p className="text-xs font-semibold mb-4 whitespace-nowrap">
+              {item.title}
+            </p>
+            <p className="text-[22px] font-bold">
+              {item.value}
+              {item.unit && (
+                <span className="text-sm font-normal ml-2">{item.unit}</span>
+              )}
+            </p>
+          </div>
+        ))}
       </div>
       <div className="my-5">
         <NumberInput
@@ -190,10 +229,10 @@ function BorrowModal(props: IProps) {
           label="Slippage tolerance"
           className="w-[100px]"
           value={slippage}
+          addonAfter="%"
           onChange={(val) => setSlippage(val)}
         />
       </div>
-      <Divider />
       <DescRow
         title="Expected borrowing APR"
         desc={`${expected.expectedInterestRate}%`}

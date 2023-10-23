@@ -14,7 +14,7 @@
 				"anonymous": false,
 				"inputs": [
 					{
-						"indexed": false,
+						"indexed": true,
 						"internalType": "address",
 						"name": "bonder",
 						"type": "address"
@@ -33,7 +33,13 @@
 				"anonymous": false,
 				"inputs": [
 					{
-						"indexed": false,
+						"indexed": true,
+						"internalType": "address",
+						"name": "executor",
+						"type": "address"
+					},
+					{
+						"indexed": true,
 						"internalType": "uint256",
 						"name": "proposalId",
 						"type": "uint256"
@@ -43,12 +49,6 @@
 						"internalType": "enum Governance.voteResult",
 						"name": "result",
 						"type": "uint8"
-					},
-					{
-						"indexed": false,
-						"internalType": "address",
-						"name": "executor",
-						"type": "address"
 					}
 				],
 				"name": "Executed",
@@ -58,9 +58,21 @@
 				"anonymous": false,
 				"inputs": [
 					{
-						"indexed": false,
+						"indexed": true,
+						"internalType": "address",
+						"name": "proposer",
+						"type": "address"
+					},
+					{
+						"indexed": true,
 						"internalType": "uint256",
 						"name": "proposalId",
+						"type": "uint256"
+					},
+					{
+						"indexed": true,
+						"internalType": "uint256",
+						"name": "discussionIndex",
 						"type": "uint256"
 					},
 					{
@@ -83,21 +95,9 @@
 					},
 					{
 						"indexed": false,
-						"internalType": "uint256",
-						"name": "discussionIndex",
-						"type": "uint256"
-					},
-					{
-						"indexed": false,
 						"internalType": "string",
 						"name": "text",
 						"type": "string"
-					},
-					{
-						"indexed": false,
-						"internalType": "address",
-						"name": "proposer",
-						"type": "address"
 					},
 					{
 						"indexed": false,
@@ -113,7 +113,7 @@
 				"anonymous": false,
 				"inputs": [
 					{
-						"indexed": false,
+						"indexed": true,
 						"internalType": "address",
 						"name": "bonder",
 						"type": "address"
@@ -132,7 +132,13 @@
 				"anonymous": false,
 				"inputs": [
 					{
-						"indexed": false,
+						"indexed": true,
+						"internalType": "address",
+						"name": "voter",
+						"type": "address"
+					},
+					{
+						"indexed": true,
 						"internalType": "uint256",
 						"name": "proposalId",
 						"type": "uint256"
@@ -148,12 +154,6 @@
 						"internalType": "uint256",
 						"name": "amount",
 						"type": "uint256"
-					},
-					{
-						"indexed": false,
-						"internalType": "address",
-						"name": "voter",
-						"type": "address"
 					}
 				],
 				"name": "Voted",
@@ -199,6 +199,106 @@
 						"type": "uint256"
 					}
 				],
+				"name": "canExecute",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					},
+					{
+						"internalType": "string",
+						"name": "",
+						"type": "string"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "canPropose",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					},
+					{
+						"internalType": "string",
+						"name": "",
+						"type": "string"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "sender",
+						"type": "address"
+					}
+				],
+				"name": "canUnbond",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					},
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					},
+					{
+						"internalType": "string",
+						"name": "",
+						"type": "string"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "proposalId",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "amount",
+						"type": "uint256"
+					}
+				],
+				"name": "canVote",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					},
+					{
+						"internalType": "string",
+						"name": "",
+						"type": "string"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "proposalId",
+						"type": "uint256"
+					}
+				],
 				"name": "execute",
 				"outputs": [],
 				"stateMutability": "nonpayable",
@@ -206,7 +306,7 @@
 			},
 			{
 				"inputs": [],
-				"name": "getContactAddrs",
+				"name": "getContractAddrs",
 				"outputs": [
 					{
 						"internalType": "address",
@@ -222,6 +322,19 @@
 						"internalType": "address",
 						"name": "",
 						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "getDepositThreshold",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "result",
+						"type": "uint256"
 					}
 				],
 				"stateMutability": "view",
@@ -281,6 +394,24 @@
 						"name": "",
 						"type": "uint256"
 					},
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "getProposalCount",
+				"outputs": [
 					{
 						"internalType": "uint256",
 						"name": "",
@@ -356,19 +487,26 @@
 				"name": "getStatus",
 				"outputs": [
 					{
-						"internalType": "uint256",
+						"components": [
+							{
+								"internalType": "uint256",
+								"name": "bonders",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "totalBondedAmount",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "firstActiveProposalId",
+								"type": "uint256"
+							}
+						],
+						"internalType": "struct Governance.GovernanceInfo",
 						"name": "",
-						"type": "uint256"
-					},
-					{
-						"internalType": "uint256",
-						"name": "",
-						"type": "uint256"
-					},
-					{
-						"internalType": "uint256",
-						"name": "",
-						"type": "uint256"
+						"type": "tuple"
 					}
 				],
 				"stateMutability": "view",
@@ -415,6 +553,73 @@
 						"type": "uint8"
 					}
 				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "proposalId",
+						"type": "uint256"
+					}
+				],
+				"name": "getVoteStatus",
+				"outputs": [
+					{
+						"components": [
+							{
+								"internalType": "address[]",
+								"name": "voters",
+								"type": "address[]"
+							},
+							{
+								"internalType": "uint256",
+								"name": "amountTotal",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256[4]",
+								"name": "amounts",
+								"type": "uint256[4]"
+							}
+						],
+						"internalType": "struct Governance.VotingStatusInfo",
+						"name": "",
+						"type": "tuple"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "proposalId",
+						"type": "uint256"
+					}
+				],
+				"name": "getVoteStatusBrief",
+				"outputs": [
+					{
+						"components": [
+							{
+								"internalType": "uint256",
+								"name": "amountTotal",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256[4]",
+								"name": "amounts",
+								"type": "uint256[4]"
+							}
+						],
+						"internalType": "struct Governance.Voting",
+						"name": "",
+						"type": "tuple"
+					}
+				],
 				"stateMutability": "view",
 				"type": "function"
 			},
@@ -426,19 +631,6 @@
 						"internalType": "address",
 						"name": "",
 						"type": "address"
-					}
-				],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"inputs": [],
-				"name": "proposalCount",
-				"outputs": [
-					{
-						"internalType": "uint256",
-						"name": "",
-						"type": "uint256"
 					}
 				],
 				"stateMutability": "view",
@@ -474,7 +666,7 @@
 			},
 			{
 				"inputs": [],
-				"name": "renewFirstVotingProposal",
+				"name": "renew1stActiveProposal",
 				"outputs": [
 					{
 						"internalType": "uint256",
@@ -503,7 +695,7 @@
 						"type": "address"
 					}
 				],
-				"name": "setContactAddrs",
+				"name": "setContractAddrs",
 				"outputs": [],
 				"stateMutability": "nonpayable",
 				"type": "function"
@@ -542,7 +734,12 @@
 					},
 					{
 						"internalType": "uint256",
-						"name": "new_depositThreshold",
+						"name": "new_depositRatioThreshold",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "new_depositAmountThreshold",
 						"type": "uint256"
 					},
 					{
@@ -562,7 +759,7 @@
 					},
 					{
 						"internalType": "uint256",
-						"name": "new_maxActiveProposal",
+						"name": "new_maxActiveProposals",
 						"type": "uint256"
 					}
 				],
@@ -694,7 +891,11 @@
 		},
 		"userdoc": {
 			"kind": "user",
-			"methods": {},
+			"methods": {
+				"getDepositThreshold()": {
+					"notice": "getDepositThreshold is to get the required amount of FIG tokens for a proposal to deposit From the white paper:      To prevent spam, proposals must be accompanied by a deposit of FIG tokens from the proposer.     Proposals that have been deposited with at least the higher of 0.01% of FIG circulating supply or      500 FIG, will proceed to voting stage.      "
+				}
+			},
 			"version": 1
 		}
 	},
@@ -709,7 +910,7 @@
 		},
 		"optimizer": {
 			"enabled": true,
-			"runs": 50
+			"runs": 150
 		},
 		"remappings": []
 	},
@@ -1059,59 +1260,59 @@
 			]
 		},
 		"contracts/FILGovernance.sol": {
-			"keccak256": "0x70b54c68f48e5c17b19e56cb90471376abe3ab3a9bc96d77ba15d5a9e0cab38a",
+			"keccak256": "0x9a368bb936a6148b70850b6fe347174bc735988d95cbc694eea1930c04f88610",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://687cb645cb0bb22c1d1bb6a0f546b98a30d60f7b002afe798e48ff2961483928",
-				"dweb:/ipfs/QmUbcUaYiJj6EhsTKdixrPN92WcS9vAoG2UnK4SQE54YqZ"
+				"bzz-raw://85546b13ef245d3b461c1fad7310dda61c4471ffe37af959b1aa143b4d06d1af",
+				"dweb:/ipfs/QmZkYW446ECCdV3KLWgVFT5srzmsUEUnfPqwESY6rx7gDo"
 			]
 		},
 		"contracts/FILLiquid.sol": {
-			"keccak256": "0x48da35388e588311431c055bffd1bb33cbe08fab8a592978eaac5cb02ae4119f",
+			"keccak256": "0x23ad4b2393809dc24d084e246a38b1b1c66c2b65a07f3fb31a207fb76af8a984",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://ff3aba3fac56b91d213709854c73e338ae67ccedf2fa4d1d33517626dec33d78",
-				"dweb:/ipfs/QmRttXgz3Bn2qwdh4ETYo6BRDPs7WKp2h8rXEsqUNPnyQP"
+				"bzz-raw://fe73c3257aa4a0765aa8a593a10816626173f7362931fa27194bb490f7e1c90b",
+				"dweb:/ipfs/QmReabkUAcPNvHjAVqp8fPRYjTDd4nz7craUNcF8aiZ9v8"
 			]
 		},
 		"contracts/FILStake.sol": {
-			"keccak256": "0xe4559400987d127b004f08c071fb9f747604a31b242de65f0096aafce6d09551",
+			"keccak256": "0xdb483ec2ec9e8460df56dd4362cff565a96dc80424f7c172c1a41032ea1afeeb",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://a490304a3bed64c605086f96592168f74491c4c74783b03ef5d956ba6a8e9014",
-				"dweb:/ipfs/QmYnpCfAXPWegaasz73b7y7y5b4VegyPytzwYAQf4BiBVg"
+				"bzz-raw://a5642ead89a4c3f4c18b38a2f2b14e63dc25016463dcf90598d8524aa0c902bc",
+				"dweb:/ipfs/QmfCnzc7TM1E5DvmbsAoGQYhbgVPUFWECD4S2BkkVr7iuD"
 			]
 		},
 		"contracts/FILTrust.sol": {
-			"keccak256": "0x9d33d2823c34258174b5d297d997aef65c1907a3ebe4c5baf3bfba511f4c0dd4",
+			"keccak256": "0x5d8123c4dbce637cf613224af150541739f6ee7a572e59cbb23419d99323db9b",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://227b3b7a39e3fb6775ee7faaa41d3cb949dc34f4c669292f011a78a76b83a009",
-				"dweb:/ipfs/QmZemrKebL5h2Y72818DaoD7owFTvkueU8sayHgzu3HgXZ"
+				"bzz-raw://d092034500ed1d8fb19ee6a3441252c5eadb2f32cdf4d54951f202f0dc50f8b8",
+				"dweb:/ipfs/QmUhQAtDiX6TMYRRVYbSLjoZo1bZ16jMVNYvfKcjkGRQSq"
 			]
 		},
 		"contracts/Governance.sol": {
-			"keccak256": "0xf7afcca5ff07d364ef6e1d13470924b38c12c8975ac8556a5e618178912f5d61",
+			"keccak256": "0x94c076da465bf13d71fcaaf8ac78372fb7508e72cb9d175ed4099c90826e6871",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://7e31a024d787b41c2d5107de87d79a999c4af642fdf2b175395abb179959d0b1",
-				"dweb:/ipfs/Qmdu7MmdKz4sVYEd3VMj5jWNCuSrKuNRhZHH2Ybim2cWPV"
+				"bzz-raw://e394d960be084ecb76be3f69f16a881dbaa5641fccc17ac5ddc457109bb3a655",
+				"dweb:/ipfs/QmQCSHVAXcfchWiHLAhVSzRxwjS3iuCQL5BHWTwMcbHBQM"
 			]
 		},
 		"contracts/Utils/Calculation.sol": {
-			"keccak256": "0xe78ebba9986257ed4b0f6ba27254250aa44337ee5c0581eaaea7d776e359038e",
+			"keccak256": "0xa24fc89f2f98fc486bc4b9e0eb682ec0118bd6f4c348da8360ea81e3f7d4b602",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://27dd245a77ea84279ebbfef57f311125dbee310d2bcfb21eceb8e8321366ffa5",
-				"dweb:/ipfs/QmPCg1vAzHDbeT3zYKZfDH7Y3neaaqf1LmxQiAGMRG8nvG"
+				"bzz-raw://db88850aac7c16f0313bfe633f3a310d6d82ce02936fd4286d86d04e3f3a292c",
+				"dweb:/ipfs/QmWtbbrTUhcGe7bhEEokMwW97jPYmHM8uB9s36bmrTt3op"
 			]
 		},
-		"contracts/Utils/Convertion.sol": {
-			"keccak256": "0xf59c6e2521e57020c6fc9d65527c61f03e0281811f97e82b19e490fb7d0aa0ec",
+		"contracts/Utils/Conversion.sol": {
+			"keccak256": "0x5f94b8c08c333eddb9476cd0be012b3b4a41eb45e5e2e576babcbb8ac29c6252",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://1ef38309e024c044b0a2f69933f2b067adac16fc5aa417953290c4a0bb5cb004",
-				"dweb:/ipfs/QmesH5Q4Gh3A3iCLLhoEoKRjtrSvAWfnkdL3vdAzgyARrm"
+				"bzz-raw://bbb70169b377891c90b46b8af49abe72ba16580f3b943e3ea3633b30b9581d36",
+				"dweb:/ipfs/Qmct2jiy5zfsCHYSmKqRXiDLaUEjcxBq2WPKb6sS7bLNEM"
 			]
 		},
 		"contracts/Utils/FilAddress.sol": {
@@ -1123,11 +1324,11 @@
 			]
 		},
 		"contracts/Utils/FilecoinAPI.sol": {
-			"keccak256": "0x6a46707448a7ba585abaa4d053eba29f047a0cc0041bd52a8aa7bd1042ca0593",
+			"keccak256": "0xca4e8a61834b5734e99a515c6ee72b889834d27a32bd7cece40202b2367bb1fc",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://1203e6939382d4245912f0e469f8292b9ec5830c3fd4198fee3534e33b8b8f32",
-				"dweb:/ipfs/QmeKrxCi7Zhthy2Zqd6ArYTAGW4Ls23msL3aRCeY7BKbgf"
+				"bzz-raw://6bba1b8dc16fdba479f2da5097546bc1d0b2d008d98d6e4532f1048338777b65",
+				"dweb:/ipfs/QmZjdR36HZGJpCoLZeueVTtkcLz2Vmm7MZ6b4mp4a6qo9E"
 			]
 		},
 		"contracts/Utils/Validation.sol": {

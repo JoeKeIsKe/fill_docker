@@ -43,6 +43,7 @@ echarts.use([
   GridComponent,
   DatasetComponent,
   TransformComponent,
+  BarChart,
   LineChart,
   LabelLayout,
   UniversalTransition,
@@ -53,6 +54,7 @@ let chart: any = null;
 
 //ECOption
 interface Props {
+  height?: string;
   option: Record<string, any>;
 }
 
@@ -60,7 +62,7 @@ const Chart = memo((props: Props) => {
   // 1. get DOM
   const chartRef = useRef(null);
 
-  const { option } = props;
+  const { height, option } = props;
   useEffect(() => {
     // 2. 实例化表格对象
     if (chart != null && chart != "" && chart != undefined) {
@@ -71,12 +73,11 @@ const Chart = memo((props: Props) => {
     // 3. 定义数据
     const defaultOption = {
       backgroundColor: "transparent",
-      color: "#31D2FA",
-      tooltip: {},
+      color: "#4094E0",
       grid: {
         top: 15,
-        left: "5%",
-        right: "5%",
+        left: "2%",
+        right: "4.5%",
         bottom: 0,
         containLabel: true,
       },
@@ -102,7 +103,7 @@ const Chart = memo((props: Props) => {
   return (
     <div
       id="chart"
-      style={{ width: "100%", height: "90%", minHeight: "260px" }}
+      style={{ width: "100%", height: height ?? "80%", minHeight: "260px" }}
       ref={chartRef}
     />
   );

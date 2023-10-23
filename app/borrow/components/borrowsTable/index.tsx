@@ -327,7 +327,7 @@ function BorrowsTable(props: IProps) {
   return (
     <div className="relative mt-[50px] md:mt-0">
       <Button
-        className="flex items-center absolute -top-[40px] right-[20px] z-1"
+        className="flex items-center absolute -top-[40px] right-[0px] z-1"
         type="text"
         onClick={() => getData(true)}
       >
