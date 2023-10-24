@@ -215,10 +215,10 @@ function StakingCard(props: Props) {
       {/* confirm modal */}
       <ConfirmModal
         isOpen={isConfirmOpen}
-        title="Are you sure to withdraw this stake now?"
+        title="Are you sure to withdraw now?"
         desc={
           <>
-            Expected FIG rewards from this Variable-term staking:
+            Expected FIG rewards from this Variable-term Farm:
             <p>{`${expectedRewards || "calculating..."} FIG`}</p>
           </>
         }

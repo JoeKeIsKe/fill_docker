@@ -82,7 +82,7 @@ export interface MinerDetailItem {
 
 export interface ExpectedStake {
   expectedAmount: string | number;
-  expectedRate: string | number;
+  expectedRate?: string | number;
 }
 
 export interface ExpectedBorrow {

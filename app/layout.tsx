@@ -20,13 +20,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body id="root" className={montserrat.className}>
-        <ErrorBoundary fallback={<p>Something wrong!</p>}>
+      <ErrorBoundary fallback={<p>Something wrong!</p>}>
+        <body id="root" className={montserrat.className}>
           <StyledComponentsRegistry>
             <CustomProvider>{children}</CustomProvider>
           </StyledComponentsRegistry>
-        </ErrorBoundary>
-      </body>
+        </body>
+      </ErrorBoundary>
     </html>
   );
 }

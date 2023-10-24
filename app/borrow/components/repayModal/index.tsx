@@ -60,7 +60,7 @@ function RepayModal(props: IProps) {
       key: "minerId",
       render: (val, row) => (
         <Link
-          className="text-[#0093E9]"
+          className="text-[#4094e0]"
           href={`/miner/detail/${val}`}
           target="_blank"
         >{`${network}${val}`}</Link>
@@ -142,7 +142,7 @@ function RepayModal(props: IProps) {
       if (res) {
         handleCancel();
         api.success({
-          message: `successfully ${
+          message: `Successfully ${
             title === REPAY_MODAL_TITLE[2] ? "liquidated" : "repayed"
           }`,
         });
@@ -224,7 +224,7 @@ function RepayModal(props: IProps) {
         size: "large",
       }}
       onOk={handleConfirm}
-      okText={title === "Liquidate" ? "Confirm" : "Repay"}
+      okText={title === "Liquidate" ? "Liquidate" : "Repay"}
       okButtonProps={{
         size: "large",
         loading: loading,
@@ -248,20 +248,26 @@ function RepayModal(props: IProps) {
           />
           <div className="my-4 flex">
             <div>
-              <label className="block">From</label>
+              <label className="block opacity-40 text-[#06081B] text-sm font-medium mb-[5px]">
+                From
+              </label>
               <Select
                 className="mr-12"
                 style={{ width: 250 }}
+                size="large"
                 value={minerFrom}
                 onChange={handleChangeFrom}
                 options={options}
               />
             </div>
             <div>
-              <label className="block">To</label>
+              <label className="block opacity-40 text-[#06081B] text-sm font-medium mb-[5px]">
+                To
+              </label>
               <Select
                 disabled={title === REPAY_MODAL_TITLE[1]}
                 style={{ width: 250 }}
+                size="large"
                 value={minerTo}
                 onChange={handleChangeTo}
                 options={options}
@@ -287,7 +293,9 @@ function RepayModal(props: IProps) {
             {/* <div className="w-1/2">{`Family Available Credit: ${
               rawData?.familyInfo.availableCredit || DEFAULT_EMPTY
             } FIL`}</div> */}
-            <p className="text-xs font-semibold mb-4">Debt Outstanding</p>
+            <p className="text-xs font-semibold mb-4">
+              Family Debt Outstanding
+            </p>
             <p className="text-[22px] font-bold">
               {rawData?.miner?.debtOutStanding || DEFAULT_EMPTY}
               <span className="text-sm font-normal ml-2">FIL</span>
@@ -299,8 +307,6 @@ function RepayModal(props: IProps) {
               value={amount}
               prefix="FIL"
               max={maxNum}
-              // maxButton
-              // onMaxButtonClick={onMaxButtonClick}
               repayAll
               onChange={handleNumberInputChange}
             />

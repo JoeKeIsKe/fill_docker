@@ -176,6 +176,8 @@ function Borrow() {
     fetchChartData();
   }, []);
 
+  // console.log("userBorrow ==> ", userBorrow);
+
   const overviewData = useMemo(() => {
     return [
       {
@@ -239,7 +241,7 @@ function Borrow() {
           </div>
           <div className="lg:ml-[32px] mt-[60px] lg:mt-[0px] relative">
             <p className="absolute -top-[55px] font-bold my-[18px] text-[18px] mb-2">
-              Borrowing APR
+              {`Borrowing APR (%)`}
             </p>
             <Chart height="100%" option={default_opt} />
           </div>

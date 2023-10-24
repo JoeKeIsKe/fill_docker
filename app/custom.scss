@@ -48,7 +48,7 @@
   background-color: rgba(100, 111, 126, 0.06);
   border-radius: 12px;
   padding: 16px;
-  min-width: 258;
+  // min-width: 258px;
 }
 
 .text-linear {
@@ -171,6 +171,9 @@
         height: 54px;
       }
     }
+  }
+  .ant-input-number-group .ant-input-number-group-addon {
+    background-color: transparent;
   }
 }
 

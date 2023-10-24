@@ -7,6 +7,7 @@ import Step1 from "./Step1";
 import Step2 from "./Step2";
 import { useMetaMask } from "@/hooks/useMetaMask";
 import useLoading from "@/hooks/useLoading";
+import ActionButton from "@/packages/ActionButton";
 
 interface IProps {
   minerId: string;
@@ -46,24 +47,14 @@ export default ({ minerId, disabled }: IProps) => {
 
   return (
     <>
-      <a
-        className="text-[#0093E9]"
-        style={
-          disabled
-            ? {
-                color: "rgb(209 213 219)",
-                cursor: "default",
-              }
-            : {}
-        }
+      <ActionButton
+        name="Unbind"
+        disabled={disabled}
         onClick={() => {
-          if (disabled) return;
           clear();
           setShow(true);
         }}
-      >
-        Unbind
-      </a>
+      />
       <Modal
         width={1000}
         className="w-full"

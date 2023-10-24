@@ -75,7 +75,7 @@ function BorrowsTable(props: IProps) {
         key: "minerId",
         render: (val, row) => (
           <Link
-            className="text-[#0093E9]"
+            className="text-[#4094e0]"
             href={`/miner/detail/${val}`}
             target="_blank"
           >{`${network}${val}`}</Link>

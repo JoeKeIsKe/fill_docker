@@ -179,7 +179,7 @@ function FarmingCard(props: Props) {
   const overviewData = useMemo(() => {
     return [
       {
-        title: "Available to farm",
+        title: "Available to Farm",
         value: stakerData.filTrustBalance,
         unit: "FIT",
         span: true,
@@ -259,7 +259,7 @@ function FarmingCard(props: Props) {
 
         <div className="flex flex-col items-start mt-4">
           <label className="inline-block mb-[5px] font-medium text-sm text-[#06081B] opacity-40">
-            Staking terms
+            Farming Terms
           </label>
           <div className="flex gap-[20px] items-center">
             <Select
@@ -275,7 +275,7 @@ function FarmingCard(props: Props) {
         <div className="mt-[16px] space-y-3">
           <p className="text-xs font-medium text-[#06081B]">
             <span className="opacity-40">
-              Expected FIG rewards from Fixed-term farming :{" "}
+              Expected FIG rewards from Fixed-term Farming :{" "}
             </span>
             <span className="text-[#4094E0]">{expectedRewards}</span>
             <span className="opacity-40"> FIG</span>
@@ -294,7 +294,7 @@ function FarmingCard(props: Props) {
       <ConfirmModal
         type="success"
         isOpen={isFeedbackOpen}
-        title="Successfully Staked"
+        title="Successfully Farmed"
         onConfirm={onFeedbackClose}
       />
       {contextHolder}

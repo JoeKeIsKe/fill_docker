@@ -25,13 +25,14 @@ class contract {
 
   getUserBorrow(account: string) {
     this.account = account;
+    console.log(account);
+
     this.myContract.methods
       .userBorrows(account)
       .call()
       .then((res: any) => {
         if (res) {
           const r = res;
-
           const list = r.minerBorrowInfo.map((item: any) => ({
             availableBalance: getValueDivide(
               item?.availableBalance?.neg ? 0 : item?.availableBalance?.value,
@@ -229,7 +230,6 @@ class contract {
     minerIdPayee: number | string
   ) {
     const params = [minerIdPayee, minerIdPayer];
-    // console.log("liquidate params ==> ", params);
     return new Promise((resolve, reject) => {
       this.myContract.methods
         .liquidate(...params)
@@ -360,7 +360,6 @@ class contract {
         )
         .on("receipt", (data: any) => {
           resolve(true);
-          // console.log("receipt success", data);
         })
         .on("error", (err: any, res: any) => {
           throw new Error(err);

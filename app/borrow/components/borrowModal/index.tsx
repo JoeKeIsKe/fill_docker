@@ -1,6 +1,6 @@
 "use client";
 
-import { Modal, Divider, notification } from "antd";
+import { Modal, Divider, notification, Space } from "antd";
 import { useState, useEffect, useMemo } from "react";
 import NumberInput from "@/packages/NumberInput";
 import DescRow from "@/packages/DescRow";
@@ -12,6 +12,7 @@ import { isIndent } from "@/utils";
 import { DEFAULT_EMPTY } from "../constans";
 import useLoading from "@/hooks/useLoading";
 import { useMetaMask } from "@/hooks/useMetaMask";
+import InfoTips from "@/components/infoTips";
 
 interface IProps {
   isOpen?: boolean;
@@ -63,7 +64,7 @@ function BorrowModal(props: IProps) {
       if (res) {
         handleCancel();
         api.success({
-          message: "successfully borrowed",
+          message: "Successfully borrowed",
         });
       }
     } finally {
@@ -128,8 +129,9 @@ function BorrowModal(props: IProps) {
         unit: "FIL",
       },
       {
-        title: "D/A Ratio",
+        title: "Debt Ratio",
         value: data?.familyInfo.availableCredit || DEFAULT_EMPTY,
+        tip: "Debt-to-assets Ratio = Debt Outstanding / Total Account Balance",
         unit: "%",
       },
     ];
@@ -146,6 +148,7 @@ function BorrowModal(props: IProps) {
         title: "Miner Debt Outstanding",
         value: minerBorrow?.debtOutStanding || DEFAULT_EMPTY,
         unit: "FIL",
+        tip: "Sum of principal borrowed and interest accrued",
       },
       {
         title: "Lines of Credit",
@@ -154,6 +157,7 @@ function BorrowModal(props: IProps) {
       {
         title: "Miner Total Position",
         value: minerBorrow?.balance || DEFAULT_EMPTY,
+        tip: `Sum of miner’s total account balance and borrowed funds`,
       },
     ];
   }, [minerBorrow]);
@@ -167,7 +171,7 @@ function BorrowModal(props: IProps) {
       cancelButtonProps={{
         size: "large",
       }}
-      width={620}
+      width={670}
       onOk={handleConfirm}
       okText="Borrow"
       okButtonProps={{
@@ -185,7 +189,11 @@ function BorrowModal(props: IProps) {
             className={`data-card ${index === 0 && "btn-default text-white"}`}
             key={item.title}
           >
-            <p className="text-xs font-semibold mb-4">{item.title}</p>
+            <Space className="mb-4">
+              <p className="text-xs font-semibold">{item.title}</p>
+              {item.tip && <InfoTips type="small" content={item.tip} />}
+            </Space>
+
             <p className="text-[22px] font-bold">
               {item.value}
               {item.unit && (
@@ -202,9 +210,10 @@ function BorrowModal(props: IProps) {
             className={`data-card ${index === 0 && "btn-default text-white"}`}
             key={item.title}
           >
-            <p className="text-xs font-semibold mb-4 whitespace-nowrap">
-              {item.title}
-            </p>
+            <Space className="mb-4">
+              <p className="text-xs font-semibold">{item.title}</p>
+              {item.tip && <InfoTips type="small" content={item.tip} />}
+            </Space>
             <p className="text-[22px] font-bold">
               {item.value}
               {item.unit && (
@@ -216,7 +225,7 @@ function BorrowModal(props: IProps) {
       </div>
       <div className="my-5">
         <NumberInput
-          label="Amount"
+          label="Loan Amount"
           value={amount}
           prefix="FIL"
           min={10}
@@ -226,22 +235,31 @@ function BorrowModal(props: IProps) {
           onChange={(val) => setAmount(val)}
         />
         <NumberInput
-          label="Slippage tolerance"
-          className="w-[100px]"
+          label={
+            <Space size={[4, 4]}>
+              Slippage Tolerance{" "}
+              <InfoTips
+                type="small"
+                content="Due to the potential slippage of on-chain transactions, there may be discrepancies in the actual Borrowing APR compared to the expected Borrowing APR. Input the maximum acceptable borrowing APR for this transaction."
+              />
+            </Space>
+          }
+          className="w-[100px] border-r-none"
+          placeholder="Max. Acceptable Borrowing APR"
+          affix="%"
           value={slippage}
-          addonAfter="%"
           onChange={(val) => setSlippage(val)}
         />
       </div>
       <DescRow
-        title="Expected borrowing APR"
+        title="Expected Borrowing APR"
         desc={`${expected.expectedInterestRate}%`}
       />
       <DescRow
-        title="Expected 6mo interest"
+        title="Expected 6-Month Interest"
         desc={`${expected.expected6monthInterest} FIL`}
       />
-      <DescRow title="Borrowing transaction fee" desc="1%" />
+      <DescRow title="Borrowing Transaction Fee" desc="1%" />
       {contextHolder}
     </Modal>
   );

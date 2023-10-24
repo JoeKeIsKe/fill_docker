@@ -100,7 +100,7 @@ export default () => {
               setShow(true);
             }}
           >
-            Create a Family
+            Form a Family
           </Button>
         </div>
       ) : (
@@ -150,7 +150,7 @@ export default () => {
               <Step3
                 msg={msg}
                 onChange={(value) => {
-                  setSign(value);
+                  setSign(value?.slice(2));
                 }}
               />
             )}

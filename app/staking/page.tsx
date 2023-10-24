@@ -10,7 +10,7 @@ import notification from "antd/es/notification";
 import { rootState } from "@/store/type";
 import { isIndent, getValueToFixed, timestampToDateTime } from "@/utils";
 import { useMetaMask } from "@/hooks/useMetaMask";
-import { Button, Divider } from "antd";
+import { Button, Divider, Space } from "antd";
 import { useSelector } from "react-redux";
 import data_fetcher_contract from "@/server/data_fetcher";
 import FIL_contract from "@/server/FILLiquid_contract";
@@ -23,6 +23,7 @@ import { getChartData } from "../api/modules/index";
 import { ReloadOutlined } from "@ant-design/icons";
 import { FIT_contract } from "@/contract";
 import * as echarts from "echarts/core";
+import InfoTips from "@/components/infoTips";
 
 const TAB_KEYS = ["stake", "unstake"];
 
@@ -159,7 +160,7 @@ function Staking() {
             });
           } else {
             api.success({
-              message: `successfully ${tabKey}d`,
+              message: `Successfully ${tabKey}d`,
             });
             clear();
             if (currentAccount) {
@@ -272,6 +273,7 @@ function Staking() {
         title: "APY",
         value: currentAPY || DEFAULT_EMPTY,
         unit: "%",
+        tip: "The APY is estimated with the weighted average borrowing term. Please refer to the Annex of White Paper for detailed APY calculation.",
       },
     ];
   }, [filInfo, currentAPY]);
@@ -290,7 +292,11 @@ function Staking() {
                 }`}
                 key={item.title}
               >
-                <p className="text-xs font-semibold mb-4">{item.title}</p>
+                <Space className="mb-4">
+                  <p className="text-xs font-semibold">{item.title}</p>
+                  {item.tip && <InfoTips type="small" content={item.tip} />}
+                </Space>
+
                 <p className="text-[22px] font-bold">
                   {item.value}
                   {item.unit && (
@@ -314,7 +320,7 @@ function Staking() {
             </div>
             <div className="flex flex-row mb-3">
               <div>
-                <div className="text-sm">
+                <div className="text-sm font-semibold">
                   FIL Balance
                   <ReloadOutlined className="ml-3" onClick={fetchData} />
                 </div>
@@ -325,7 +331,7 @@ function Staking() {
             </div>
             <div className="flex">
               <div className="flex flex-col">
-                <p className="text-sm">FIT Balance</p>
+                <p className="text-sm font-semibold">FIT Balance</p>
                 <p className="text-xl">{`${Number(balance.FIT).toFixed(
                   2
                 )} FIT`}</p>
@@ -357,8 +363,12 @@ function Staking() {
                 onChange={(val) => setAmount(val)}
               />
               <NumberInput
-                label="Slippage tolerance"
-                className="w-[100px]"
+                label="Slippage Tolerance"
+                className="w-[100px] border-r-none"
+                placeholder={`${
+                  tabKey === TAB_KEYS[0] ? "Max" : "Min"
+                }. Acceptable FIL/FIT Ratio`}
+                affix="%"
                 value={slippage}
                 max={60}
                 onChange={(val) => setSlippage(val)}
@@ -367,28 +377,28 @@ function Staking() {
             <Divider />
             {tabKey === TAB_KEYS[0] ? (
               <div>
+                {/* <DescRow
+                  title="Expected FIL/FIT Ratio"
+                  desc={`${expected.expectedRate} %`}
+                /> */}
                 <DescRow
-                  title="Expected exchange rate"
-                  desc={`${expected.expectedRate}`}
-                />
-                <DescRow
-                  title="Expected to receive"
+                  title="Expected to Receive"
                   desc={`${expected.expectedAmount} FIT`}
                   color="#01A781"
                 />
               </div>
             ) : (
               <div>
-                <DescRow
-                  title="Expected exchange rate"
+                {/* <DescRow
+                  title="Expected FIL/FIT Ratio"
                   desc={`${expected.expectedRate}`}
-                />
+                /> */}
                 <DescRow
-                  title="Expected to receive"
+                  title="Expected to Receive"
                   desc={`${expected.expectedAmount} FIL`}
                   color="#01A781"
                 />
-                <DescRow title="Staking fee" desc="0.5%" />
+                <DescRow title="Staking Fee" desc="0.5%" />
               </div>
             )}
             <Button

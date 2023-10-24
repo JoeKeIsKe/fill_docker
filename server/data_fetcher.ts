@@ -131,20 +131,12 @@ class contract {
     const isStake = tabKey === "stake";
     const type = isStake ? "getDepositExpecting" : "getRedeemExpecting";
     return new Promise((resolve, reject) => {
-      this.myContract.methods[type](getValueMultiplied(amount))
+      this.myContract.methods[type](getValueMultiplied(amount)) // to do:
         .call()
         .then((res: any) => {
           if (res) {
-            const {
-              expectedExchangeRate,
-              expectedAmountFILTrust,
-              expectedAmountFIL,
-            } = res;
             const data: ExpectedStake = {
-              expectedRate: getValueDivide(Number(expectedExchangeRate), 6, 2),
-              expectedAmount: isStake
-                ? formatUnits(expectedAmountFILTrust)
-                : formatUnits(expectedAmountFIL),
+              expectedAmount: formatUnits(res),
             };
             resolve(data);
           }

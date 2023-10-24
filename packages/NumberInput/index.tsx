@@ -1,10 +1,11 @@
 import { InputNumber, InputNumberProps, Checkbox, Space } from "antd";
-import { useState } from "react";
+import { ReactNode, useState } from "react";
 
 interface Props extends InputNumberProps {
   className?: string;
-  label?: string;
+  label?: string | ReactNode;
   maxButton?: boolean;
+  affix?: string | ReactNode;
   repayAll?: boolean;
   onRepayAllCheck?: () => void;
   onChange?: (val: any) => void;
@@ -20,6 +21,7 @@ function NumberInput(props: Props) {
     onChange,
     onRepayAllCheck,
     onMaxButtonClick,
+    affix,
     ...rest
   } = props;
 
@@ -66,6 +68,14 @@ function NumberInput(props: Props) {
               onClick={handleMaxButtonClick}
             >
               Max
+            </div>
+          )}
+          {affix && (
+            <div
+              className="absolute"
+              style={{ top: "13px", right: "20px", zIndex: 10 }}
+            >
+              {affix}
             </div>
           )}
         </div>

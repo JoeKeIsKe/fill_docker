@@ -14,7 +14,7 @@ function ActionButton(props: Props) {
   };
   return (
     <a
-      className="text-[#0093E9]"
+      className={`${!disabled && "text-linear"} font-bold`}
       style={
         disabled
           ? {
