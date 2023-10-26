@@ -1,15 +1,15 @@
 export const Fill_liquid_contract =
-  "0x186C4f2578D77C7B3C25C1c1d7DfaeDF533eA913";
+  "0x65772c94ffb9aCfBb67673CAF4a4f76cc3435c7b";
 
-export const stake_contract = "0x603f5EdFfbEb7824C65f5236c30295e0372eA62f";
+export const stake_contract = "0x16be78f67ee4F647A6e5470eDf289AdC40a8b664";
 
 export const data_fetcher_contract =
-  "0xBa7A55421b4B0D30322674F1cd034A9879BE087C";
+  "0x3173B02b96393092ff1B84eE045bD7b52598b273";
 
-export const Validation_contract = "0xAd04bE9C627E6847C86d9EAb7a0F79DF2635b5a7";
+export const Validation_contract = "0xB629611a582F0595bF698E9493987f8F628304D0";
 
-export const FIT_contract = "0x426b60Ee90Ac5062E9776C54F6569425D3145F52";
-export const FIG_contract = "0x872d1A5309c81Dd3f21cFC7469b65dFbe216BAEa";
+export const FIT_contract = "0x97D8D8F3108E06Acc3c03274C930EFa17E5b5234";
+export const FIG_contract = "0x2bDe0625f35D2804B22906C1b2A31397BA5c3bF3";
 
 // export const Fill_liquid_contract =
 //   "0x85091e87159327b71981d1A3d7a9022108FE104E";

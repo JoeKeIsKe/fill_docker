@@ -79,15 +79,15 @@ class contract {
   // stake & unstake
   async onStakeOrUnstake(
     amount: number | string,
-    rate: number | string,
+    slippage: number | string,
     tabKey: string,
     account: string
   ) {
     const isStake = tabKey === "stake";
     const type = isStake ? "deposit" : "redeem";
-    const rateParam = getValueMultiplied(rate, 6);
+    const slippageParam = getValueMultiplied(slippage, 18);
     const amountParam = getValueMultiplied(amount, 18);
-    const params = isStake ? [rateParam] : [amountParam, rateParam];
+    const params = isStake ? [slippageParam] : [amountParam, slippageParam];
     return new Promise((resolve, reject) => {
       this.myContract.methods[type](...params)
         .send(

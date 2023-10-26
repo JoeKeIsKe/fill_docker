@@ -57,7 +57,6 @@ class contract {
               utilizedLiquidity,
               exchangeRate,
             }: FilLiquidInfo = res.filLiquidInfo;
-            console.log("exchangeRate ==> ", exchangeRate);
 
             const filInfo: FilLiquidInfo = {
               totalFIL: getValueDivide(Number(totalFIL), 18, 2),

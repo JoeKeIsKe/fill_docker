@@ -187,7 +187,20 @@ function Staking() {
       debouncedAmount || 0,
       tabKey
     );
-    setExpected(res);
+    setExpected({
+      ...res,
+      expectedRate: debouncedAmount
+        ? tabKey === TAB_KEYS[0]
+          ? BigNumber(debouncedAmount || 0)
+              .dividedBy(res.expectedAmount)
+              .decimalPlaces(2)
+              .toNumber()
+          : BigNumber(res.expectedAmount || 0)
+              .dividedBy(debouncedAmount || 1)
+              .decimalPlaces(2)
+              .toNumber()
+        : "-",
+    });
   };
 
   const fetchChartData = async () => {
@@ -363,40 +376,51 @@ function Staking() {
                 onChange={(val) => setAmount(val)}
               />
               <NumberInput
-                label="Slippage Tolerance"
+                label={
+                  <Space size={[4, 4]}>
+                    Slippage Tolerance{" "}
+                    <InfoTips
+                      type="small"
+                      content={`Due to the potential slippage of on-chain transactions, there may be discrepancies between the actual and the expected ${
+                        tabKey === TAB_KEYS[0] ? "FIT" : "FIL"
+                      } to be received. Please input the MINIMUM acceptable FIT for this transaction.`}
+                    />
+                  </Space>
+                }
                 className="w-[100px] border-r-none"
-                placeholder={`${
-                  tabKey === TAB_KEYS[0] ? "Max" : "Min"
-                }. Acceptable FIL/FIT Ratio`}
-                affix="%"
+                placeholder={`Min. accpetable ${
+                  tabKey === TAB_KEYS[0] ? "FIT" : "FIL"
+                }`}
+                affix={tabKey === TAB_KEYS[0] ? "FIT" : "FIL"}
                 value={slippage}
-                max={60}
+                max={expected.expectedAmount || 9999999999}
+                min={0}
                 onChange={(val) => setSlippage(val)}
               />
             </div>
             <Divider />
             {tabKey === TAB_KEYS[0] ? (
               <div>
-                {/* <DescRow
-                  title="Expected FIL/FIT Ratio"
-                  desc={`${expected.expectedRate} %`}
-                /> */}
                 <DescRow
                   title="Expected to Receive"
                   desc={`${expected.expectedAmount} FIT`}
                   color="#01A781"
                 />
+                <DescRow
+                  title="Expected FIL/FIT Exchange Rate"
+                  desc={`${expected.expectedRate}`}
+                />
               </div>
             ) : (
               <div>
-                {/* <DescRow
-                  title="Expected FIL/FIT Ratio"
-                  desc={`${expected.expectedRate}`}
-                /> */}
                 <DescRow
                   title="Expected to Receive"
                   desc={`${expected.expectedAmount} FIL`}
                   color="#01A781"
+                />
+                <DescRow
+                  title="Expected FIL/FIT Exchange Rate"
+                  desc={`${expected.expectedRate}`}
                 />
                 <DescRow title="Staking Fee" desc="0.5%" />
               </div>
