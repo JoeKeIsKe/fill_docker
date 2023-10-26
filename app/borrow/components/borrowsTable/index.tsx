@@ -93,7 +93,7 @@ function BorrowsTable(props: IProps) {
         key: "borrows",
       },
       {
-        title: "Action",
+        title: "Actions",
         key: "operation",
         render: (val, row) =>
           isMyFamily ? (
@@ -122,7 +122,8 @@ function BorrowsTable(props: IProps) {
             </Space>
           ) : (
             <ActionButton
-              name="Repay for others"
+              name="Repay for miner"
+              disabled={Number(row?.borrows) <= 0}
               onClick={() => onRepayClick(row, 3)}
             />
           ),
@@ -173,7 +174,7 @@ function BorrowsTable(props: IProps) {
 
   if (!isMyFamily) {
     columns.push({
-      title: "Action",
+      title: "Actions",
       key: "action",
       render: (val, row) => (
         <ActionButton

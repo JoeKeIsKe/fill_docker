@@ -181,7 +181,7 @@ function Borrow() {
   const overviewData = useMemo(() => {
     return [
       {
-        title: "Available",
+        title: "Available Liquidity",
         value: Number(available) <= 0 ? DEFAULT_EMPTY : available,
         unit: "FIL",
       },
@@ -229,7 +229,7 @@ function Borrow() {
             </div>
             {/* Utilization Ration */}
             <div className="data-card flex-1">
-              <p className="text-xs font-semibold mb-4">Utilization Ration</p>
+              <p className="text-xs font-semibold mb-4">Utilization Rate</p>
               <p className="text-[22px] font-bold">
                 {filInfo?.utilizationRate || DEFAULT_EMPTY}
                 <span className="text-sm font-normal ml-2">%</span>
@@ -261,7 +261,9 @@ function Borrow() {
               <AddMiner />
             </div>
           ))}
-        <p className="font-semibold text-xl mb-4">Borrowings</p>
+        <p className="font-semibold text-xl mb-4">
+          List of Families / Borrowings
+        </p>
         <div className="mb-4">
           <Input
             placeholder="Family Address / Miner ID"

@@ -207,7 +207,7 @@ function Staking() {
     const res = await getChartData();
     if (res) {
       const { Senior } = res;
-      const target = Senior?.slice(-9, -1) || [];
+      const target = Senior?.slice(-8) || [];
       const currentTarget = Senior?.slice(-1) || [];
       const APY = currentTarget[0]?.APY;
       setCurrentAPY(getValueToFixed(APY * 100, 6));
@@ -249,7 +249,7 @@ function Staking() {
     });
     if (res) {
       api.success({
-        message: "Successfully added",
+        message: "Token successfully added",
       });
     }
   };
@@ -274,7 +274,7 @@ function Staking() {
         unit: "FIL",
       },
       {
-        title: "Utilization Ratio",
+        title: "Utilization Rate",
         value: filInfo?.utilizationRate || DEFAULT_EMPTY,
         unit: "%",
       },
@@ -321,7 +321,7 @@ function Staking() {
               </div>
             ))}
           </div>
-          <div className="text-[18px] font-bold ml-4 mb-4">APY</div>
+          <div className="text-[18px] font-bold ml-4 mb-4">{`Staking APY (%)`}</div>
           <Chart option={default_opt} />
         </Card>
 
@@ -383,7 +383,9 @@ function Staking() {
                       type="small"
                       content={`Due to the potential slippage of on-chain transactions, there may be discrepancies between the actual and the expected ${
                         tabKey === TAB_KEYS[0] ? "FIT" : "FIL"
-                      } to be received. Please input the MINIMUM acceptable FIT for this transaction.`}
+                      } to be received. Please input the MINIMUM acceptable ${
+                        tabKey === TAB_KEYS[0] ? "FIT" : "FIL"
+                      } for this transaction.`}
                     />
                   </Space>
                 }

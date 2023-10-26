@@ -35,7 +35,7 @@ const defaultStakerData = {
 };
 
 function FarmingCard(props: Props) {
-  const [amount, setAmount] = useState<number | null>(defaultAmount);
+  const [amount, setAmount] = useState<number | null>();
   const [stakeTime, setStakeTime] = useState<number | null>();
   const [isClient, setIsClient] = useState<boolean>(false);
   const [isFeedbackOpen, setIsFeedbackOpen] = useState<boolean>(false);
@@ -102,18 +102,25 @@ function FarmingCard(props: Props) {
     if (amount && stakeTime) {
       const staker = currentAccount;
       setLoading(true);
-      const res: any = await stake_contract.onStake(amount, stakeTime, staker);
-      if (res) {
-        if (res?.message) {
-          api.error({
-            message: res?.message,
-          });
-        } else {
-          setRewards(res);
-          onFeedbackOpen();
+      try {
+        const res: any = await stake_contract.onStake(
+          amount,
+          stakeTime,
+          staker
+        );
+        if (res) {
+          if (res?.message) {
+            api.error({
+              message: res?.message,
+            });
+          } else {
+            setRewards(res);
+            onFeedbackOpen();
+          }
         }
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     }
   };
 
@@ -146,7 +153,7 @@ function FarmingCard(props: Props) {
     });
     if (res) {
       api.success({
-        message: "Successfully added",
+        message: "Token successfully added",
       });
     }
   };
@@ -185,12 +192,12 @@ function FarmingCard(props: Props) {
         span: true,
       },
       {
-        title: "Fixed-term FIT",
+        title: "Fixed-term",
         value: stakerData.filTrustFixed,
         unit: "FIT",
       },
       {
-        title: "Variable-term FIT",
+        title: "Variable-term",
         value: stakerData.filTrustVariable,
         unit: "FIT",
       },
@@ -269,7 +276,7 @@ function FarmingCard(props: Props) {
               options={STAKE_MONTH_OPTIONS}
               size="large"
             />
-            <span>mos</span>
+            <span>Months</span>
           </div>
         </div>
         <div className="mt-[16px] space-y-3">

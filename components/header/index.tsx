@@ -125,7 +125,7 @@ function Header() {
       style={{ zIndex: 999 }}
     >
       <div className="max-w-screen-xl h-[80px] w-full flex items-center justify-between px-5 m-auto">
-        <Image src={FIlLogo} height={30} alt="logo" />
+        <Image src={FIlLogo} height={34} alt="logo" />
         <div className="h-full flex gap-x-5 items-center leading-[80px]">
           {RouterList.map((item) => {
             return (
