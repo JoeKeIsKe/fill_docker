@@ -1,6 +1,6 @@
 "use client";
 
-import { isIndent } from "@/utils";
+import { isIndent, numberWithCommas } from "@/utils";
 import { rootState } from "@/store/type";
 import { useSelector } from "react-redux";
 import { Select, Button, notification, Space } from "antd";
@@ -187,23 +187,23 @@ function FarmingCard(props: Props) {
     return [
       {
         title: "Available to Farm",
-        value: stakerData.filTrustBalance,
+        value: numberWithCommas(stakerData.filTrustBalance),
         unit: "FIT",
         span: true,
       },
       {
         title: "Fixed-term",
-        value: stakerData.filTrustFixed,
+        value: numberWithCommas(stakerData.filTrustFixed),
         unit: "FIT",
       },
       {
         title: "Variable-term",
-        value: stakerData.filTrustVariable,
+        value: numberWithCommas(stakerData.filTrustVariable),
         unit: "FIT",
       },
       {
         title: "FIG Balance",
-        value: stakerData.filGovernanceBalance,
+        value: numberWithCommas(stakerData.filGovernanceBalance),
         unit: "FIG",
         span: true,
         action: (

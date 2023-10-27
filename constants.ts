@@ -69,22 +69,22 @@ export const STAKE_MONTH_OPTIONS = [
 ];
 
 export const NETWORK: NetworkItemType[] = [
-  {
-    name: "MainNet",
-    key: "MainNet",
-    chainId: "0x1",
-    config: {
-      chainId: "0x13a",
-      chainName: "Filecoin",
-      nativeCurrency: {
-        name: "FIL",
-        symbol: "FIL",
-        decimals: 18,
-      },
-      rpcUrls: ["https://api.node.glif.io"],
-      blockExplorerUrls: ["https://filscan.io"],
-    },
-  },
+  // {
+  //   name: "MainNet",
+  //   key: "MainNet",
+  //   chainId: "0x1",
+  //   config: {
+  //     chainId: "0x13a",
+  //     chainName: "Filecoin",
+  //     nativeCurrency: {
+  //       name: "FIL",
+  //       symbol: "FIL",
+  //       decimals: 18,
+  //     },
+  //     rpcUrls: ["https://api.node.glif.io"],
+  //     blockExplorerUrls: ["https://filscan.io"],
+  //   },
+  // },
   {
     name: "Calibration",
     key: "Calibration",

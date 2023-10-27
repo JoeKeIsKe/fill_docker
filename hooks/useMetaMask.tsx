@@ -80,8 +80,11 @@ export const MetaMaskContextProvider = ({ children }: PropsWithChildren) => {
       (await window?.ethereum.request({ method: "eth_accounts" }));
 
     if (accounts.length === 0) {
+      const chainId = await window?.ethereum.request({
+        method: "eth_chainId",
+      });
       // If there are no accounts, then the user is disconnected
-      setWallet(disconnectedState);
+      setWallet({ ...disconnectedState, chainId });
       return;
     }
     const balance = formatBalance(

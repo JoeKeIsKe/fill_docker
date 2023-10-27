@@ -12,7 +12,7 @@ import data_fetcher_contract from "@/server/data_fetcher";
 import { useMetaMask } from "@/hooks/useMetaMask";
 import { useSelector } from "react-redux";
 import { rootState } from "@/store/type";
-import { isIndent } from "@/utils";
+import { isIndent, numberWithCommas } from "@/utils";
 import store from "@/store";
 import {
   MinerListItem,
@@ -25,6 +25,7 @@ import UnbindMiner from "../../../certified/unbindMiner";
 import { getBorrowingsFamily } from "../../../api/modules/index";
 import ActionButton from "@/packages/ActionButton";
 import { useDebounce } from "use-debounce";
+import InfoTips from "@/components/infoTips";
 
 interface ExpandedDataType extends MinerListItem {}
 
@@ -85,7 +86,7 @@ function BorrowsTable(props: IProps) {
         title: "Debt Outstanding",
         dataIndex: "debtOutStanding",
         key: "debtOutStanding",
-        render: (val, row) => `${val} FIL`,
+        render: (val, row) => `${numberWithCommas(val)} FIL`,
       },
       {
         title: "Lines of Credit",
@@ -122,7 +123,7 @@ function BorrowsTable(props: IProps) {
             </Space>
           ) : (
             <ActionButton
-              name="Repay for miner"
+              name="Repay for this miner"
               disabled={Number(row?.borrows) <= 0}
               onClick={() => onRepayClick(row, 3)}
             />
@@ -156,7 +157,7 @@ function BorrowsTable(props: IProps) {
       title: "Debt Outstanding",
       dataIndex: "debtOutStanding",
       key: "debtOutStanding",
-      render: (val) => `${val} FIL`,
+      render: (val) => `${numberWithCommas(val)} FIL`,
     },
     {
       title: "Available Credit",
@@ -165,7 +166,15 @@ function BorrowsTable(props: IProps) {
       render: (val) => `${val} FIL`,
     },
     {
-      title: "D/A ratio(%)",
+      title: (
+        <Space size={[4, 4]}>
+          Debt Ratio(%){" "}
+          <InfoTips
+            type="small"
+            content="Debt-to-assets Ratio = Debt Outstanding / Total Account Balance"
+          />
+        </Space>
+      ),
       dataIndex: "liquidateConditionInfo",
       key: "ratio",
       render: (val) => val?.rate,

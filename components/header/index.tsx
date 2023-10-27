@@ -84,7 +84,6 @@ function Header() {
   }, []);
 
   useEffect(() => {
-    if (!isNetworkCorrect) return;
     if (!filInfo || refreshAllData) {
       data_fetcher_contract.fetchAllData();
       store.dispatch({
@@ -140,7 +139,7 @@ function Header() {
               </a>
             );
           })}
-          {currentAccount && (
+          {
             <Space size="middle" className="hidden md:inline-flex">
               <Dropdown
                 menu={{ items }}
@@ -150,14 +149,19 @@ function Header() {
                   top: "60px",
                 }}
               >
-                <div className="flex h-[40px] px-2 cursor-pointer items-center rounded-[6px] bg-white text-[rgb(0,147,233)]">
+                <div
+                  className="border flex h-[40px] px-2 cursor-pointer items-center rounded-[6px] bg-white text-[rgb(0,147,233)]"
+                  style={{
+                    borderColor: targetNetwork?.name ? "#0093E9" : "#d4380d",
+                  }}
+                >
                   {targetNetwork?.name || (
                     <span className="text-[#d4380d]">Wrong Network</span>
                   )}
                 </div>
               </Dropdown>
             </Space>
-          )}
+          }
           <div className="hidden md:block">{connectButton()}</div>
         </div>
       </div>

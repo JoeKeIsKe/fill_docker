@@ -5,8 +5,8 @@ import Card from "@/packages/card";
 import Chart from "@/components/charts";
 import PieChart from "@/components/pieChart";
 import { rootState } from "@/store/type";
-import { timestampToDateTime } from "@/utils";
-import { Input } from "antd";
+import { timestampToDateTime, numberWithCommas } from "@/utils";
+import { Input, Space } from "antd";
 import { shallowEqual, useSelector } from "react-redux";
 import BorrowsTable from "./components/borrowsTable";
 import AddMiner from "../certified/addMiner";
@@ -15,6 +15,7 @@ import { getChartData } from "../api/modules/index";
 import { SearchOutlined } from "@ant-design/icons";
 import BigNumber from "bignumber.js";
 import * as echarts from "echarts/core";
+import InfoTips from "@/components/infoTips";
 
 function Borrow() {
   const [chartData, setChartData] = useState([]);
@@ -123,17 +124,26 @@ function Borrow() {
       return [
         {
           value: filInfo?.utilizedLiquidity,
-          name: "Supplied",
+          name: "Utilized",
           itemStyle: { color: "#0093E9" },
         },
         {
-          value: filInfo?.availableFIL,
+          value: available,
+          name: "Available",
+          itemStyle: { color: "#4adfe7" },
+        },
+        {
+          value: BigNumber(filInfo?.totalFIL || 0)
+            .minus(available)
+            .minus(filInfo?.utilizedLiquidity || 0)
+            .decimalPlaces(6, 1)
+            .toNumber(),
           name: "",
           itemStyle: { color: "rgb(156, 163, 175, 0.3)" },
         },
       ];
     }
-  }, [filInfo]);
+  }, [filInfo, available]);
 
   const pie_option = useMemo(() => {
     return {
@@ -176,20 +186,21 @@ function Borrow() {
     fetchChartData();
   }, []);
 
-  // console.log("userBorrow ==> ", userBorrow);
-
   const overviewData = useMemo(() => {
     return [
       {
         title: "Available Liquidity",
-        value: Number(available) <= 0 ? DEFAULT_EMPTY : available,
+        value: numberWithCommas(
+          Number(available) <= 0 ? DEFAULT_EMPTY : available
+        ),
         unit: "FIL",
+        tips: "Up to 90% of the Total FIL Liquidity is available to borrow",
       },
       {
-        title: "Total supplied",
-        value: `${filInfo?.utilizedLiquidity || DEFAULT_EMPTY} of ${
-          filInfo?.totalFIL || DEFAULT_EMPTY
-        }`,
+        title: "Total Utilized",
+        value: `${numberWithCommas(
+          filInfo?.utilizedLiquidity || 0
+        )} of ${numberWithCommas(filInfo?.totalFIL || 0)}`,
         unit: "FIL",
       },
       {
@@ -215,7 +226,12 @@ function Borrow() {
                   }`}
                   key={item.title}
                 >
-                  <p className="text-xs font-semibold mb-4">{item.title}</p>
+                  <Space className="mb-4">
+                    <p className="text-xs font-semibold">{item.title}</p>
+                    {item?.tips && (
+                      <InfoTips type="small" content={item.tips} />
+                    )}
+                  </Space>
                   <p className="text-[22px] font-bold">
                     {item.value}
                     {item.unit && (
@@ -240,9 +256,12 @@ function Borrow() {
             </div>
           </div>
           <div className="lg:ml-[32px] mt-[60px] lg:mt-[0px] relative">
-            <p className="absolute -top-[55px] font-bold my-[18px] text-[18px] mb-2">
-              {`Borrowing APR (%)`}
-            </p>
+            <div className="absolute -top-[55px] font-bold my-[18px] text-[18px] mb-2">
+              <Space>
+                <span>Borrowing APR (%)</span>
+                <InfoTips content="Due to the on-chain transactions, the visualization could be delayed." />
+              </Space>
+            </div>
             <Chart height="100%" option={default_opt} />
           </div>
         </div>

@@ -24,3 +24,10 @@ export function getBorrowingsFamily(params?: {}): Promise<any> {
     params,
   });
 }
+
+export function getDataFromFilscan(params?: {}): Promise<any> {
+  return postReq({
+    url: "https://api-cali.filscan.io/api/v1/AccountInfoByID", //  https://api-v2.filscan.io/api/v1/AccountInfoByID
+    data: params,
+  });
+}

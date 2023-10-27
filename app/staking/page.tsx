@@ -8,7 +8,12 @@ import DescRow from "@/packages/DescRow";
 import Chart from "@/components/charts";
 import notification from "antd/es/notification";
 import { rootState } from "@/store/type";
-import { isIndent, getValueToFixed, timestampToDateTime } from "@/utils";
+import {
+  isIndent,
+  getValueToFixed,
+  timestampToDateTime,
+  numberWithCommas,
+} from "@/utils";
 import { useMetaMask } from "@/hooks/useMetaMask";
 import { Button, Divider, Space } from "antd";
 import { useSelector } from "react-redux";
@@ -43,7 +48,7 @@ function Staking() {
   const [chartDate, setChartDate] = useState([]);
   const [currentAPY, setCurrentAPY] = useState<string | number>();
 
-  const { filInfo, balance } = useSelector(
+  const { filInfo, balance, stakeOverview } = useSelector(
     (state: rootState) => state?.contract
   );
 
@@ -269,9 +274,14 @@ function Staking() {
   const overviewData = useMemo(() => {
     return [
       {
-        title: "Total Supply",
-        value: filInfo?.availableFIL || DEFAULT_EMPTY,
+        title: "Total FIL Liquidity",
+        value: numberWithCommas(filInfo?.totalFIL || DEFAULT_EMPTY),
         unit: "FIL",
+      },
+      {
+        title: "Total FIT Outstanding",
+        value: numberWithCommas(stakeOverview?.fitTotalSupply || DEFAULT_EMPTY),
+        unit: "FIT",
       },
       {
         title: "Utilization Rate",
@@ -283,26 +293,26 @@ function Staking() {
         value: filInfo?.exchangeRate || DEFAULT_EMPTY,
       },
       {
-        title: "APY",
+        title: "Staking APY",
         value: currentAPY || DEFAULT_EMPTY,
         unit: "%",
-        tip: "The APY is estimated with the weighted average borrowing term. Please refer to the Annex of White Paper for detailed APY calculation.",
+        tip: "The Staking APY is estimated with the weighted average borrowing term. Please refer to the White Paper for detailed APY calculation.",
       },
     ];
-  }, [filInfo, currentAPY]);
+  }, [filInfo, stakeOverview, currentAPY]);
 
   return (
     <section>
       <label className="inline-block mb-[5px] font-medium text-sm text-[#06081B] hidden opacity-40"></label>
-      <div className="text-[36px] font-semibold my-4">Stake</div>
+      <div className="text-[30px] font-semibold my-4">Stake</div>
       <div className="flex gap-[24px] flex-col md:flex-row">
         <Card title="Overview" className="flex-1">
-          <div className="grid grid-cols-2 gap-4 mb-[60px]">
+          <div className="grid grid-cols-6 gap-4 mb-[60px]">
             {overviewData.map((item, index) => (
               <div
-                className={`data-card ${
-                  index === 0 && "btn-default text-white"
-                }`}
+                className={`data-card col-span-2 ${
+                  (index === 0 || index === 1) && "col-span-3"
+                } ${index === 0 && "btn-default text-white"}`}
                 key={item.title}
               >
                 <Space className="mb-4">
@@ -321,7 +331,15 @@ function Staking() {
               </div>
             ))}
           </div>
-          <div className="text-[18px] font-bold ml-4 mb-4">{`Staking APY (%)`}</div>
+          <div className="text-[18px] font-bold ml-4 mb-4">
+            <Space>
+              <span>Staking APY (%)</span>
+              <InfoTips
+                type="small"
+                content="Due to the on-chain transactions, the visualization could be delayed. "
+              />
+            </Space>
+          </div>
           <Chart option={default_opt} />
         </Card>
 
@@ -337,15 +355,17 @@ function Staking() {
                   FIL Balance
                   <ReloadOutlined className="ml-3" onClick={fetchData} />
                 </div>
-                <p className="text-xl">{`${new BigNumber(
-                  Number(balance.FIL)
-                ).toFixed(2, 1)} FIL`}</p>
+                <p className="text-xl">{`${numberWithCommas(
+                  balance.FIL,
+                  2
+                )} FIL`}</p>
               </div>
             </div>
             <div className="flex">
               <div className="flex flex-col">
                 <p className="text-sm font-semibold">FIT Balance</p>
-                <p className="text-xl">{`${Number(balance.FIT).toFixed(
+                <p className="text-xl">{`${numberWithCommas(
+                  balance.FIT,
                   2
                 )} FIT`}</p>
               </div>
@@ -405,7 +425,7 @@ function Staking() {
               <div>
                 <DescRow
                   title="Expected to Receive"
-                  desc={`${expected.expectedAmount} FIT`}
+                  desc={`${numberWithCommas(expected.expectedAmount, 6)} FIT`}
                   color="#01A781"
                 />
                 <DescRow
@@ -417,7 +437,7 @@ function Staking() {
               <div>
                 <DescRow
                   title="Expected to Receive"
-                  desc={`${expected.expectedAmount} FIL`}
+                  desc={`${numberWithCommas(expected.expectedAmount, 6)} FIL`}
                   color="#01A781"
                 />
                 <DescRow

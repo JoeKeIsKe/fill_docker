@@ -2,13 +2,13 @@
   .ant-popover-inner {
     max-width: 400px;
   }
-  // .ant-popover-inner,
-  // .ant-popover-arrow:before {
-  //   background-color: #2539bd;
-  // }
-  // .ant-popover-title,
-  // .ant-popover-inner-content {
-  //   font-size: 14px;
-  //   color: #fff;
-  // }
+  .ant-popover-inner,
+  .ant-popover-arrow:before {
+    background-color: rgba($color: #000, $alpha: 0.8);
+  }
+  .ant-popover-title,
+  .ant-popover-inner-content {
+    font-size: 14px;
+    color: #fff;
+  }
 }

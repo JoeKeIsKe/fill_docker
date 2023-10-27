@@ -3,7 +3,7 @@
 import type { TableColumnsType } from "antd";
 import { Table, Button } from "antd";
 import { ReloadOutlined } from "@ant-design/icons";
-import { getValueDivide } from "@/utils";
+import { getValueDivide, numberWithCommas } from "@/utils";
 import { UserBorrow, MinerBorrows, MinerDetailItem } from "@/utils/type";
 import BigNumber from "bignumber.js";
 import { useMetaMask } from "@/hooks/useMetaMask";
@@ -42,13 +42,13 @@ function MinerDetailTable(props: IProps) {
         title: "Principal",
         dataIndex: "remainingOriginalAmount",
         key: "remainingOriginalAmount",
-        render: (val) => `${val} FIL`,
+        render: (val) => `${numberWithCommas(val)} FIL`,
       },
       {
         title: "Interest",
         dataIndex: "interest",
         key: "interest",
-        render: (val) => `${val} FIL`,
+        render: (val) => `${numberWithCommas(val)} FIL`,
       },
       {
         title: "Total",

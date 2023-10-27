@@ -8,11 +8,12 @@ import { useDebounce } from "use-debounce";
 import { ExpectedBorrow, BorrowModalData, MinerBorrows } from "@/utils/type";
 import data_fetcher_contract from "@/server/data_fetcher";
 import FIL_contract from "@/server/FILLiquid_contract";
-import { isIndent } from "@/utils";
+import { getValueDivide, isIndent, numberWithCommas } from "@/utils";
 import { DEFAULT_EMPTY } from "../constans";
 import useLoading from "@/hooks/useLoading";
 import { useMetaMask } from "@/hooks/useMetaMask";
 import InfoTips from "@/components/infoTips";
+import { getDataFromFilscan } from "../../../api/modules";
 
 interface IProps {
   isOpen?: boolean;
@@ -120,17 +121,21 @@ function BorrowModal(props: IProps) {
     return [
       {
         title: "Debt Outstanding",
-        value: data?.familyInfo.debtOutstanding || DEFAULT_EMPTY,
+        value: numberWithCommas(
+          data?.familyInfo.debtOutstanding || DEFAULT_EMPTY
+        ),
         unit: "FIL",
       },
       {
         title: "Available Credit",
-        value: data?.familyInfo.availableCredit || DEFAULT_EMPTY,
+        value: numberWithCommas(
+          data?.familyInfo.availableCredit || DEFAULT_EMPTY
+        ),
         unit: "FIL",
       },
       {
         title: "Debt Ratio",
-        value: data?.familyInfo.availableCredit || DEFAULT_EMPTY,
+        value: data?.familyInfo.ratio || DEFAULT_EMPTY,
         tip: "Debt-to-assets Ratio = Debt Outstanding / Total Account Balance",
         unit: "%",
       },
@@ -140,13 +145,8 @@ function BorrowModal(props: IProps) {
   const minerData = useMemo(() => {
     return [
       {
-        title: "Available Balance",
-        value: minerBorrow?.availableBalance || DEFAULT_EMPTY,
-        unit: "FIL",
-      },
-      {
         title: "Miner Debt Outstanding",
-        value: minerBorrow?.debtOutStanding || DEFAULT_EMPTY,
+        value: numberWithCommas(minerBorrow?.debtOutStanding || 0),
         unit: "FIL",
         tip: "Sum of principal borrowed and interest accrued",
       },
@@ -156,11 +156,45 @@ function BorrowModal(props: IProps) {
       },
       {
         title: "Miner Total Position",
-        value: minerBorrow?.balance || DEFAULT_EMPTY,
+        value: numberWithCommas(minerBorrow?.balance || DEFAULT_EMPTY),
         tip: `Sum of miner’s total account balance and borrowed funds`,
+      },
+      {
+        title: "Available Balance",
+        value: numberWithCommas(minerBorrow?.availableBalance || DEFAULT_EMPTY),
+        unit: "FIL",
+      },
+      {
+        title: "Initial Pledge*",
+        value: "--",
+        // unit: "FIL",
+      },
+      {
+        title: "QAP*",
+        value: "--",
+        tip: "Quality Adjusted Power",
       },
     ];
   }, [minerBorrow]);
+
+  const getMinerInfo = async () => {
+    const res = await getDataFromFilscan({
+      account_id: "f02816081",
+    });
+    if (res && res?._data) {
+      const {
+        result: {
+          account_info: { account_miner },
+        },
+      } = res?._data;
+      const initialPledge = getValueDivide(account_miner?.init_pledge || 0);
+      // const
+    }
+  };
+
+  useEffect(() => {
+    // getMinerInfo();
+  }, []);
 
   return (
     <Modal
@@ -223,6 +257,12 @@ function BorrowModal(props: IProps) {
           </div>
         ))}
       </div>
+      <p className="text-gray-400 text-sm mt-[10px]">
+        *Miner specific data is provided by{" "}
+        <a className="underline" target="_blank" href="https://filscan.io/">
+          Filscan.io
+        </a>
+      </p>
       <div className="my-5">
         <NumberInput
           label="Loan Amount"

@@ -112,3 +112,10 @@ export const removeStorage = (key: string) => {
     window["localStorage"].removeItem(key);
   }
 };
+
+export function numberWithCommas(x: number | string, decimal?: number) {
+  if (!x || Number(x) <= 0) {
+    x = 0;
+  }
+  return BigNumber(x || 0).toFormat(decimal || 2);
+}

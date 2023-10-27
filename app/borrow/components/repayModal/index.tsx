@@ -7,7 +7,7 @@ import Tabs from "@/packages/Tabs";
 import type { ColumnsType } from "antd/es/table";
 import { DEFAULT_EMPTY, REPAY_MODAL_TITLE, REPAY_TAB_KEYS } from "../constans";
 import { MinerListItem, RepayModalData } from "@/utils/type";
-import { isIndent } from "@/utils";
+import { isIndent, numberWithCommas } from "@/utils";
 import Link from "next/link";
 import BigNumber from "bignumber.js";
 import useLoading from "@/hooks/useLoading";
@@ -70,13 +70,13 @@ function RepayModal(props: IProps) {
       title: "Credit Outstanding",
       dataIndex: "debtOutStanding",
       key: "debtOutStanding",
-      render: (val) => `${val} FIL`,
+      render: (val) => `${numberWithCommas(val)} FIL`,
     },
     {
       title: "Available Balance",
       dataIndex: "availableBalance",
       key: "availableBalance",
-      render: (val) => `${val} FIL`,
+      render: (val) => `${numberWithCommas(val)} FIL`,
     },
   ];
 

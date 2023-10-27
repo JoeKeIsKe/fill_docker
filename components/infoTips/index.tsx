@@ -12,7 +12,6 @@ interface Props {
 
 function InfoTips({ type, content }: Props) {
   const isSmall = type === "small";
-
   return (
     <Popover
       rootClassName="info-tips-component"
@@ -24,7 +23,7 @@ function InfoTips({ type, content }: Props) {
         style={{
           width: isSmall ? "14px" : "16px",
           height: isSmall ? "14px" : "16px",
-          color: isSmall ? "#666" : "inherit",
+          color: "inherit",
         }}
       />
     </Popover>
