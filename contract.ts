@@ -1,10 +1,11 @@
 export const Fill_liquid_contract =
   "0x65772c94ffb9aCfBb67673CAF4a4f76cc3435c7b";
+export const Fill_liquid_contract_id = "t043685";
 
 export const stake_contract = "0x16be78f67ee4F647A6e5470eDf289AdC40a8b664";
 
 export const data_fetcher_contract =
-  "0x3173B02b96393092ff1B84eE045bD7b52598b273";
+  "0x1AEBd92390Dbe1aF48486Ed1049Dbc141E54Ba04";
 
 export const Validation_contract = "0xB629611a582F0595bF698E9493987f8F628304D0";
 

@@ -21,6 +21,7 @@ export default ({ minerId, disabled }: IProps) => {
 
   const [show, setShow] = useState(false);
   const [current, setCurrent] = useState(0);
+  console.log("current ==>", current);
 
   const handleClick = async () => {
     switch (current) {
@@ -32,13 +33,12 @@ export default ({ minerId, disabled }: IProps) => {
           setLoading(false);
         }
       default:
-        setCurrent(current + 1);
         break;
     }
 
-    if (current < 2) {
-      setCurrent(current + 1);
-    }
+    // if (current < 2) {
+    //   setCurrent(current + 1);
+    // }
   };
 
   const clear = () => {
@@ -57,14 +57,14 @@ export default ({ minerId, disabled }: IProps) => {
       />
       <Modal
         width={1000}
-        className="w-full"
+        className="w-full form-family-modal"
         title={`Unbind Miner ${network}${minerId}`}
         show={show}
         onCancel={() => {
           setShow(false);
         }}
       >
-        <div className="my-4 border-t px-5 border-slate-300	">
+        <div className="my-4 px-5">
           <Steps
             type="navigation"
             size="small"

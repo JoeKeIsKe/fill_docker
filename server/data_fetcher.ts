@@ -1,11 +1,6 @@
 import DataFetcher from "@/server/jsons/DataFetcher_metadata.json";
 import { data_fetcher_contract } from "@/contract";
-import {
-  getValueDivide,
-  formatUnits,
-  getValueMultiplied,
-  getStorage,
-} from "@/utils";
+import { getValueDivide, formatUnits, getValueMultiplied } from "@/utils";
 import {
   FilLiquidInfo,
   StakeOverview,
@@ -16,6 +11,7 @@ import {
 } from "@/utils/type";
 import store from "@/store";
 import web3 from "@/utils/web3";
+import BigNumber from "bignumber.js";
 
 class contract {
   contractAbi: any;
@@ -43,10 +39,10 @@ class contract {
         .then((res: any) => {
           if (res) {
             // data for Stake
-            // console.log("fetchAll Data ==>", res);
-            const { fitTotalSupply }: StakeOverview = res;
+            const { fitTotalSupply, figTotalSupply }: StakeOverview = res;
             const stakeOverview: StakeOverview = {
               fitTotalSupply: formatUnits(fitTotalSupply),
+              figTotalSupply: formatUnits(figTotalSupply),
             };
             // data for Borrow
             const {
@@ -155,11 +151,11 @@ class contract {
           if (res) {
             const { expectedInterestRate, sixMonthInterest } = res;
             const data: ExpectedBorrow = {
-              expectedInterestRate: getValueDivide(
-                Number(expectedInterestRate) * 100,
-                6,
-                2
-              ),
+              expectedInterestRate: BigNumber(
+                Number(expectedInterestRate) * 100
+              )
+                .dividedBy(Math.pow(10, 6))
+                .toFixed(2, 2),
               expected6monthInterest: getValueDivide(sixMonthInterest),
             };
             resolve(data);
@@ -184,6 +180,82 @@ class contract {
           console.log("err ==> ", err);
         });
     });
+  }
+
+  getPendingStatus(minerId: string | number) {
+    return new Promise((resolve, reject) => {
+      this.myContract.methods
+        .getPendingBeneficiary(minerId)
+        .call()
+        .then((res: any) => {
+          resolve(res);
+        });
+    });
+  }
+
+  getOwnFamily(account: string) {
+    if (!account) return;
+    this.myContract.methods
+      .getUserBorrowsAndBorrowable(account)
+      .call()
+      .then((res: any) => {
+        const r = res?.info;
+        const borrowables = res?.borrowables;
+        if (r) {
+          const list = r?.minerBorrowInfo?.map((item: any, index: number) => ({
+            availableBalance: getValueDivide(
+              item?.availableBalance?.neg ? 0 : item?.availableBalance?.value,
+              18,
+              2
+            ),
+            balance: formatUnits(item.balance),
+            borrowSum: formatUnits(item.borrowSum),
+            debtOutStanding: getValueDivide(
+              Number(item.debtOutStanding),
+              18,
+              2
+            ),
+            haveCollateralizing: item.haveCollateralizing,
+            minerId: item.minerId.toString(),
+            borrows: item?.borrows?.length,
+            borrowable: borrowables?.[index]?.borrowable,
+            reason: borrowables?.[index]?.reason,
+          }));
+
+          store.dispatch({
+            type: "contract/change",
+            payload: {
+              ownFamilyList: [
+                {
+                  user: r.user,
+                  availableCredit: getValueDivide(
+                    Number(r.availableCredit),
+                    18,
+                    2
+                  ),
+                  balanceSum: formatUnits(r.balanceSum),
+                  borrowSum: formatUnits(r.borrowSum),
+                  debtOutStanding: getValueDivide(
+                    Number(r.debtOutStanding),
+                    18,
+                    2
+                  ),
+                  liquidateConditionInfo: {
+                    rate: getValueDivide(
+                      Number(r.liquidateConditionInfo?.rate) * 100,
+                      6,
+                      2
+                    ),
+                    alertable: r.liquidateConditionInfo?.alertable,
+                    liquidatable: r.liquidateConditionInfo?.liquidatable,
+                  },
+                  minerBorrowInfo: list,
+                },
+              ],
+            },
+          });
+        }
+      });
   }
 
   getBatchedFamily(accounts: string[]) {

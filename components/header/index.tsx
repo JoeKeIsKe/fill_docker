@@ -156,7 +156,9 @@ function Header() {
                   }}
                 >
                   {targetNetwork?.name || (
-                    <span className="text-[#d4380d]">Wrong Network</span>
+                    <span className="text-[#d4380d] whitespace-nowrap">
+                      Wrong Network
+                    </span>
                   )}
                 </div>
               </Dropdown>

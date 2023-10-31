@@ -22,6 +22,7 @@ export interface StakeInfoType {
 
 export interface StakeOverview {
   fitTotalSupply: string | number;
+  figTotalSupply: string | number;
 }
 
 export interface BalanceType {
@@ -70,6 +71,8 @@ export interface MinerListItem {
   borrowSum: string | number;
   haveCollateralizing: boolean;
   borrows?: any[];
+  borrowable?: boolean;
+  reason?: string;
 }
 
 export interface MinerDetailItem {

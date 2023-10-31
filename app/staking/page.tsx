@@ -271,6 +271,8 @@ function Staking() {
     onExpectedRewards();
   }, [debouncedAmount]);
 
+  console.log("balance ==> ", balance);
+
   const overviewData = useMemo(() => {
     return [
       {
@@ -294,7 +296,10 @@ function Staking() {
       },
       {
         title: "Staking APY",
-        value: currentAPY || DEFAULT_EMPTY,
+        value:
+          BigNumber(currentAPY || 0)
+            .decimalPlaces(2, 1)
+            .toNumber() || DEFAULT_EMPTY,
         unit: "%",
         tip: "The Staking APY is estimated with the weighted average borrowing term. Please refer to the White Paper for detailed APY calculation.",
       },
@@ -386,7 +391,7 @@ function Staking() {
                 value={amount}
                 prefix={tabKey === TAB_KEYS[0] ? "FIL" : "FIT"}
                 maxButton
-                min={1}
+                min={tabKey === TAB_KEYS[0] ? 1 : 0}
                 max={
                   tabKey === TAB_KEYS[0]
                     ? getValueToFixed(balance.FIL)

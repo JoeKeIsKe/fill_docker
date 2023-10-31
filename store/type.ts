@@ -1,4 +1,9 @@
-import { FilLiquidInfo, StakeOverview, UserBorrow } from "@/utils/type";
+import {
+  FilLiquidInfo,
+  StakeOverview,
+  UserBorrow,
+  MinerListItem,
+} from "@/utils/type";
 
 export interface ITEM {
   label: string;
@@ -26,6 +31,7 @@ export interface contractState {
   contractBalance?: number;
   contractBalanceRes?: number;
   userBorrow?: UserBorrow;
+  ownFamilyList?: UserBorrow[];
   filInfo?: FilLiquidInfo;
   stakeOverview?: StakeOverview;
   balance: {

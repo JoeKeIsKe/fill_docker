@@ -25,7 +25,7 @@ function _axios(_axiosRequest: AxiosRequest) {
         }
       })
       .catch((error) => {
-        console.error(error);
+        console.error("axios error ==> ", error);
         // console.log("error.response: ", error.response)
         const message = error?.response?.data?.detail || "Request failed";
         reject({

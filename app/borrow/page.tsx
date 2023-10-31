@@ -6,7 +6,7 @@ import Chart from "@/components/charts";
 import PieChart from "@/components/pieChart";
 import { rootState } from "@/store/type";
 import { timestampToDateTime, numberWithCommas } from "@/utils";
-import { Input, Space } from "antd";
+import { Button, Input, Space } from "antd";
 import { shallowEqual, useSelector } from "react-redux";
 import BorrowsTable from "./components/borrowsTable";
 import AddMiner from "../certified/addMiner";
@@ -274,6 +274,11 @@ function Borrow() {
             <div className="mb-8">
               <p className="font-semibold text-xl mb-4">My Family</p>
               <BorrowsTable type="my" />
+              {(userBorrow?.minerBorrowInfo || []).length < 5 && (
+                <div className="text-center mt-4">
+                  <AddMiner btn="+" />
+                </div>
+              )}
             </div>
           ) : (
             <div className="flex justify-center">

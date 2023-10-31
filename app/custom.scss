@@ -49,6 +49,9 @@
   border-radius: 12px;
   padding: 16px;
   // min-width: 258px;
+
+  &.small {
+  }
 }
 
 .text-linear {
@@ -174,6 +177,46 @@
   }
   .ant-input-number-group .ant-input-number-group-addon {
     background-color: transparent;
+  }
+
+  .form-family-modal {
+    .ant-steps-item-title {
+      font-weight: 600;
+    }
+    .ant-steps-item-description {
+      font-size: 14px;
+      font-weight: 500;
+      color: rgba(18, 18, 18, 0.4);
+    }
+    .ant-steps.ant-steps-navigation .ant-steps-item-container {
+      justify-content: center;
+    }
+    .ant-steps.ant-steps-navigation .ant-steps-item::after {
+      inset-inline-start: 110%;
+    }
+    .ant-steps .ant-steps-item-icon {
+      width: 40px;
+      height: 40px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-right: 16px;
+    }
+    .ant-steps .ant-steps-item-process .ant-steps-item-icon {
+      background-image: linear-gradient(90deg, #4094e0 0%, #4adfe7 100%);
+      border: none;
+    }
+    .ant-steps-icon {
+      font-size: 24px;
+      font-weight: 600;
+    }
+    .ant-steps-finish-icon {
+      font-size: 20px;
+    }
+    .ant-steps.ant-steps-navigation
+      .ant-steps-item.ant-steps-item-active::before {
+      inset-inline-start: 20px;
+    }
   }
 }
 

@@ -29,7 +29,7 @@ export function getValueMultiplied(num: number | string, pow: number = 18) {
 }
 
 export function getValueToFixed(num: string | number, unit: number = 2) {
-  return Number(new BigNumber(Number(num || 0)).toFixed(unit, 1));
+  return new BigNumber(Number(num || 0)).toNumber();
 }
 
 const FILECOIN_GENESIS_UNIX_EPOCH = 1598306400;
@@ -77,8 +77,10 @@ export type ExtractPropsFromArray<T> = Omit<
 >;
 
 export const formatUnits = (val: any) => {
-  // return ethers.utils.formatUnits(val);
-  return getValueDivide(Number(val), 18, 2);
+  return BigNumber(Number(val))
+    .dividedBy(Math.pow(10, 18))
+    .decimalPlaces(6)
+    .toNumber();
 };
 
 export const formatResult = (res: any) => {
@@ -117,5 +119,5 @@ export function numberWithCommas(x: number | string, decimal?: number) {
   if (!x || Number(x) <= 0) {
     x = 0;
   }
-  return BigNumber(x || 0).toFormat(decimal || 2);
+  return BigNumber(x || 0).toFormat(decimal || 2, 1);
 }

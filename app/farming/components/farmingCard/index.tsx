@@ -189,7 +189,8 @@ function FarmingCard(props: Props) {
         title: "Available to Farm",
         value: numberWithCommas(stakerData.filTrustBalance),
         unit: "FIT",
-        span: true,
+        colSpan: 2,
+        rowSpan: 2,
       },
       {
         title: "Fixed-term",
@@ -205,6 +206,7 @@ function FarmingCard(props: Props) {
         title: "FIG Balance",
         value: numberWithCommas(stakerData.filGovernanceBalance),
         unit: "FIG",
+        colSpan: 2,
         span: true,
         action: (
           <Button
@@ -224,31 +226,48 @@ function FarmingCard(props: Props) {
       <p className="absolute top-[24px] right-[20px] py-1 px-2 rounded-[24px] bg-gray-100 text-gray-500 text-sm">
         {isClient && isIndent(currentAccount)}
       </p>
-      <div className="grid grid-cols-2 gap-4">
-        {overviewData.map((item, index) => (
-          <div
-            className={`data-card ${index === 0 && "btn-default text-white"} ${
-              item.span ? "col-span-2" : ""
-            }`}
-            key={item.title}
-          >
-            {item.action ? (
-              <Space className="m-0 mb-4" align="center">
-                <p className="text-xs font-semibold">{item.title}</p>
-                {item.action}
-              </Space>
-            ) : (
-              <p className="text-xs font-semibold mb-4">{item.title}</p>
-            )}
-
-            <p className="text-[22px] font-bold">
-              {item.value}
-              {item.unit && (
-                <span className="text-sm font-normal ml-2">{item.unit}</span>
+      <div className="grid grid-cols-2 grid-rows-3 gap-4">
+        {overviewData.map((item, index) =>
+          Array.isArray(item) ? (
+            <div>
+              {item.map((i) => (
+                <div className={`data-card !p-[8px] gap-[8px]`} key={i.title}>
+                  <p className={`text-xs font-semibold mb-1`}>{i.title}</p>
+                  <p className="text-[22px] font-bold">
+                    {i.value}
+                    {i.unit && (
+                      <span className="text-sm font-normal ml-2">{i.unit}</span>
+                    )}
+                  </p>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div
+              className={`data-card ${
+                (index === 0 || index === 5) && "btn-default text-white"
+              } ${item.colSpan ? `col-span-${item.colSpan}` : ""} ${
+                item.rowSpan ? `row-span-${item.rowSpan}` : ""
+              }`}
+              key={item.title}
+            >
+              {item.action ? (
+                <Space className={`m-0 mb-4`} align="center">
+                  <p className="text-xs font-semibold">{item.title}</p>
+                  {item.action}
+                </Space>
+              ) : (
+                <p className={`text-xs font-semibold mb-4`}>{item.title}</p>
               )}
-            </p>
-          </div>
-        ))}
+              <p className="text-[22px] font-bold">
+                {item.value}
+                {item.unit && (
+                  <span className="text-sm font-normal ml-2">{item.unit}</span>
+                )}
+              </p>
+            </div>
+          )
+        )}
       </div>
       <div className="bg-white pt-2 rounded-[10px] mt-[-10px]">
         <div className="">

@@ -64,8 +64,8 @@ function BorrowsTable(props: IProps) {
     REPAY_MODAL_TITLE[1]
   );
 
-  const userBorrow = useSelector(
-    (state: rootState) => state?.contract?.userBorrow
+  const { userBorrow, ownFamilyList } = useSelector(
+    (state: rootState) => state?.contract
   );
 
   const expandedRowRender = (record: UserBorrow) => {
@@ -99,14 +99,16 @@ function BorrowsTable(props: IProps) {
         render: (val, row) =>
           isMyFamily ? (
             <Space size="middle" className="text-[#0093E9]">
-              <ActionButton
-                name="Borrow"
-                disabled={
-                  Number(row?.borrows) >= 5 ||
-                  Number(record.availableCredit) <= 0
-                }
-                onClick={() => onBorrowClick(row)}
-              />
+              <Space className="!text-[rgb(209,213,219)]">
+                <ActionButton
+                  name="Borrow"
+                  disabled={!row.borrowable}
+                  onClick={() => onBorrowClick(row)}
+                />
+                {!row.borrowable && (
+                  <InfoTips type="small" content={row.reason} />
+                )}
+              </Space>
               {row.borrows ? (
                 <ActionButton
                   name="Repay"
@@ -132,7 +134,7 @@ function BorrowsTable(props: IProps) {
     ];
 
     const data: MinerListItem[] = isMyFamily
-      ? userBorrow?.minerBorrowInfo || []
+      ? ownFamilyList?.[0]?.minerBorrowInfo || []
       : familyBorrows.find((item) => item.user === record.user)
           ?.minerBorrowInfo || [];
 
@@ -195,7 +197,11 @@ function BorrowsTable(props: IProps) {
     });
   }
 
-  const data = isMyFamily && userBorrow ? [userBorrow] : familyBorrows;
+  const data = isMyFamily && ownFamilyList ? ownFamilyList : familyBorrows;
+  // console.log("ownFamilyList ==> ", ownFamilyList);
+  // console.log("data ==> ", data);
+  // console.log("userBorrow ==> ", userBorrow);
+
   const minerBorrowInfo: BorrowModalData = {
     minerId: selectedMiner?.minerId || "",
     familyInfo: {
@@ -262,6 +268,10 @@ function BorrowsTable(props: IProps) {
     }
   };
 
+  const getOwnFamily = () => {
+    data_fetcher_contract.getOwnFamily(currentAccount);
+  };
+
   const getFamilyCount = async () => {
     if (!isMyFamily && currentAccount) {
       const res: any = await getBorrowingsFamily();
@@ -287,6 +297,7 @@ function BorrowsTable(props: IProps) {
     if (!isNetworkCorrect) return;
     getUserBorrow(refresh);
     getFamilyBorrows();
+    getOwnFamily();
   };
 
   const handleTableChange = (page: TablePaginationConfig) => {
@@ -326,6 +337,7 @@ function BorrowsTable(props: IProps) {
 
   useEffect(() => {
     getFamilyCount();
+    getOwnFamily();
   }, [currentAccount]);
 
   useEffect(() => {

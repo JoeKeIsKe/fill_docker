@@ -4,6 +4,7 @@ import {
   getValueDivide,
   getBlockHeightByDuration,
   getValueMultiplied,
+  formatUnits,
 } from "@/utils";
 import { StakeInfoType } from "@/utils/type";
 import web3 from "@/utils/web3";
@@ -122,6 +123,24 @@ class contract {
               }))
               .sort((a: any, b: any) => Number(b.id) - Number(a.id));
             resolve(list);
+          }
+        });
+    });
+  }
+
+  getStakeStatus() {
+    return new Promise((resolve, reject) => {
+      this.myContract.methods
+        .getStatus()
+        .call()
+        .then((res: any) => {
+          if (res) {
+            const { accumulatedStakeMint, accumulatedInterestMint } = res;
+            const stakeStatus = {
+              accumulatedStakeMint: formatUnits(accumulatedStakeMint),
+              accumulatedInterestMint: formatUnits(accumulatedInterestMint),
+            };
+            resolve(stakeStatus);
           }
         });
     });

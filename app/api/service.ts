@@ -15,7 +15,7 @@ const CancelToken = axios.CancelToken;
 const service = axios.create({
   baseURL: config.baseUrl,
   withCredentials: false,
-  timeout: 350000,
+  timeout: 700000,
 });
 
 const removePending = (config: AxiosRequestConfig) => {

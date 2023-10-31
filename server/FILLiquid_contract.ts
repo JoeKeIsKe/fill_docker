@@ -162,7 +162,9 @@ class contract {
             }
           }
         )
-        .on("receipt", () => {
+        .on("receipt", (res: any) => {
+          console.log("res ==> ", res);
+
           resolve(true);
         });
     });

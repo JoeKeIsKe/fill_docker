@@ -1,19 +1,40 @@
-import Input from "@/packages/custom_input";
-import { useMetaMask } from "@/hooks/useMetaMask";
+import { Input } from "antd";
 
-export default ({ onChange }: { onChange: (value: string) => void }) => {
-  const { wallet } = useMetaMask();
-  const network = wallet?.chainId?.includes("0x1") ? "f0" : "t0";
+export default ({
+  msg,
+  onChange,
+}: {
+  msg?: string;
+  onChange: (value: string) => void;
+}) => {
+  // console.log("----333", msg);
   return (
     <div className="h-40">
-      <p className="mb-4 mt-5">Miner Address:</p>
-      <Input
-        className="h-16"
-        suffixText={network}
-        onChange={(value) => {
-          onChange(value);
-        }}
-      />
+      <div className="flex flex-col mb-5">
+        <span className="text-gray-500">Sign</span>
+        <span className=" font-medium	text-gray-600">{msg}</span>
+        {/* <span className=" font-medium	text-gray-600">{msg?.slice(2)}</span> */}
+      </div>
+
+      <div>
+        <label htmlFor="sign" className="mb-[10px] block text-base">
+          Sign:
+        </label>
+        <div className="relative flex h-[49px] w-full flex-row-reverse overflow-clip rounded-lg border hover:border-hover">
+          <Input
+            type="text"
+            name="sign"
+            className="peer w-full px-5  rounded-none transition-colors duration-300 hover:border-transparent"
+            autoComplete="off"
+            onChange={(e) => {
+              onChange(e.target.value);
+            }}
+          />
+          <span className="flex items-center  border border-r-0 border-[#EAEAEF] bg-slate-50 px-4 text-sm text-slate-400 transition-colors duration-300 peer-focus:border-hover peer-focus:bg-active peer-focus:text-white">
+            0x
+          </span>
+        </div>
+      </div>
     </div>
   );
 };
