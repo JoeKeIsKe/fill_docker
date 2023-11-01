@@ -10,15 +10,14 @@ export default ({
   // console.log("----333", msg);
   return (
     <div className="h-40">
+      <p className="pb-4">Sign for Beneficiary Address transfer proposal.</p>
       <div className="flex flex-col mb-5">
-        <span className="text-gray-500">Sign</span>
-        <span className=" font-medium	text-gray-600">{msg}</span>
-        {/* <span className=" font-medium	text-gray-600">{msg?.slice(2)}</span> */}
+        <span className="text-base">Keys</span>
+        <span className="font-medium	text-gray-600">{msg}</span>
       </div>
-
       <div>
         <label htmlFor="sign" className="mb-[10px] block text-base">
-          Sign:
+          Sign
         </label>
         <div className="relative flex h-[49px] w-full flex-row-reverse overflow-clip rounded-lg border hover:border-hover">
           <Input

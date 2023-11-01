@@ -276,7 +276,7 @@ function Borrow() {
               <BorrowsTable type="my" />
               {(userBorrow?.minerBorrowInfo || []).length < 5 && (
                 <div className="text-center mt-4">
-                  <AddMiner btn="+" />
+                  <AddMiner btn="+ Add Miner" />
                 </div>
               )}
             </div>

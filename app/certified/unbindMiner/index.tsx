@@ -21,7 +21,7 @@ export default ({ minerId, disabled }: IProps) => {
 
   const [show, setShow] = useState(false);
   const [current, setCurrent] = useState(0);
-  console.log("current ==>", current);
+  const [sign, setSign] = useState<string | null>();
 
   const handleClick = async () => {
     switch (current) {
@@ -82,20 +82,28 @@ export default ({ minerId, disabled }: IProps) => {
             ]}
           />
           <div className="mt-5">
-            {current === 0 && <Step1 />}
+            {current === 0 && (
+              <Step1
+                msg="1"
+                onChange={(value) => {
+                  setSign(value);
+                }}
+              />
+            )}
             {current === 1 && <Step2 />}
-
-            <Button
-              className="w-1/3 mt-20"
-              type="primary"
-              onClick={handleClick}
-            >
-              {loading ? (
-                <LoadingOutlined />
-              ) : (
-                <span>{current === 1 ? "Unbind Miner" : "Next"}</span>
-              )}
-            </Button>
+            <div className="text-center">
+              <Button
+                className="w-1/3 mt-20 h-[40px] !rounded-[60px]"
+                type="primary"
+                onClick={handleClick}
+              >
+                {loading ? (
+                  <LoadingOutlined />
+                ) : (
+                  <span>{current === 1 ? "Unbind Miner" : "Next"}</span>
+                )}
+              </Button>
+            </div>
           </div>
         </div>
       </Modal>

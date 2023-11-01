@@ -125,10 +125,6 @@ export default ({ btn }: { btn?: string | React.ReactNode }) => {
         }
         break;
     }
-
-    // if (current < 3) {
-    //   setCurrent(current + 1);
-    // }
   };
 
   const clear = () => {
@@ -221,7 +217,7 @@ export default ({ btn }: { btn?: string | React.ReactNode }) => {
             <div className="flex flex-col items-center justify-center">
               <Image src={SuccessIcon} width={120} height={120} alt="" />
               <p className="font-semibold text-[24px] mt-[24px] mb-[40px]">
-                Successfully Formed
+                Successfully created
               </p>
             </div>
           );
@@ -234,7 +230,7 @@ export default ({ btn }: { btn?: string | React.ReactNode }) => {
     if (current < 0) return null;
     return (
       <Button
-        className="w-1/3 mt-2 !rounded-[60px]"
+        className="w-1/3 mt-20 !rounded-[60px]"
         type="primary"
         size="large"
         onClick={() => {
@@ -257,6 +253,7 @@ export default ({ btn }: { btn?: string | React.ReactNode }) => {
         btn ? (
           <Button
             size="large"
+            type="primary"
             onClick={() => {
               clear();
               setShow(true);

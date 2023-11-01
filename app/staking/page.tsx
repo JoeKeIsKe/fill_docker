@@ -271,8 +271,6 @@ function Staking() {
     onExpectedRewards();
   }, [debouncedAmount]);
 
-  console.log("balance ==> ", balance);
-
   const overviewData = useMemo(() => {
     return [
       {

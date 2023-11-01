@@ -67,8 +67,6 @@ function StakingCard(props: Props) {
     };
   }, [stakeOverview, stakeStatus]);
 
-  console.log("stakeStatusData ==> ", stakeStatusData);
-
   const getList = async () => {
     if (!isNetworkCorrect) return;
     const staker = currentAccount;

@@ -11,11 +11,12 @@ export default ({
   return (
     <div className="h-40">
       <div className="flex flex-col mb-5">
-        <span className="text-gray-500">Sign</span>
+        <p className="pb-4">
+          Sign for Beneficiary Address transfer execution. Bind an f4 address as
+          a Miner Family ID.
+        </p>
+        <span className="text-base">Keys</span>
         <span className=" font-medium	text-gray-600">{msg?.slice(2)}</span>
-        {/* <span className="text-gray-500">
-          with owner address to propose transfer owner to SPex contract
-        </span> */}
       </div>
 
       <div>
