@@ -1,9 +1,7 @@
-import { Input } from "antd";
-
 export default () => {
   return (
     <div className="h-40">
-      <span className="text-gray-500">Are you sure to unbind this miner?</span>
+      <span className="text-base">To confirm unbinding this miner.</span>
     </div>
   );
 };

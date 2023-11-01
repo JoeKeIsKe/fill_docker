@@ -7,7 +7,6 @@ export default ({
   msg?: string;
   onChange: (value: string) => void;
 }) => {
-  // console.log("----333", msg);
   return (
     <div className="h-40">
       <div className="flex flex-col mb-5">

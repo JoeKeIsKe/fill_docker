@@ -97,7 +97,7 @@ export const getStorage = (key: string) => {
     return;
   }
   const isBrowser: boolean = ((): boolean => typeof window !== "undefined")();
-  return isBrowser ? JSON.parse(window["localStorage"][key]) : "";
+  return isBrowser ? JSON.parse(window["localStorage"][key] || "{}") : "";
 };
 export const setStorage = (key: string, value: any) => {
   if (!key || !value) {

@@ -1,7 +1,7 @@
 import FILLiquid from "@/server/jsons/FILLiquid_metadata.json";
 import { Fill_liquid_contract } from "@/contract";
 import { getValueDivide, getValueMultiplied, formatUnits } from "@/utils";
-import { MinerListItem, UserBorrow, MinerBorrows } from "@/utils/type";
+import { UserBorrow, MinerBorrows } from "@/utils/type";
 import store from "@/store";
 import web3 from "@/utils/web3";
 
@@ -163,8 +163,6 @@ class contract {
           }
         )
         .on("receipt", (res: any) => {
-          console.log("res ==> ", res);
-
           resolve(true);
         });
     });
@@ -319,7 +317,6 @@ class contract {
   bindMiner(minerAddr: string, signature: string, account: string) {
     this.account = account;
     return new Promise((resolve) => {
-      console.log("====3", minerAddr, "0x" + signature);
       this.myContract.methods
         .collateralizingMiner(minerAddr, "0x" + signature)
         .send(
@@ -335,11 +332,10 @@ class contract {
         )
         .on("receipt", (data: any) => {
           resolve(true);
-          // console.log("receipt success", data);
-        })
-        .on("error", (err: any, res: any) => {
-          throw new Error(err);
         });
+      // .on("error", (err: any, res: any) => {
+      //   throw new Error(err);
+      // });
     });
   }
 
@@ -362,10 +358,10 @@ class contract {
         )
         .on("receipt", (data: any) => {
           resolve(true);
-        })
-        .on("error", (err: any, res: any) => {
-          throw new Error(err);
         });
+      // .on("error", (err: any, res: any) => {
+      //   throw new Error(err);
+      // });
     });
   }
 }

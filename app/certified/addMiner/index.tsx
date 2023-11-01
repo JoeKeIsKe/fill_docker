@@ -45,27 +45,23 @@ export default ({ btn }: { btn?: string | React.ReactNode }) => {
           });
         setLoading(true);
 
-        try {
-          let pendingData: any;
-          data_fetcher_contract
-            .getPendingStatus(Number(miner))
-            .then((res) => {
-              pendingData = res;
-            })
-            .catch(() => {
-              setLoading(false);
-            });
-          if (
-            pendingData &&
-            pendingData?.[1] === true &&
-            pendingData?.[0]?.toLocaleLowerCase() ===
-              Fill_liquid_contract.toLocaleLowerCase()
-          ) {
+        let pendingData: any;
+        data_fetcher_contract
+          .getPendingStatus(Number(miner))
+          .then((res) => {
+            pendingData = res;
+          })
+          .catch(() => {
             setLoading(false);
-            return setCurrent(2);
-          }
-        } finally {
+          });
+        if (
+          pendingData &&
+          pendingData?.[1] === true &&
+          pendingData?.[0]?.toLocaleLowerCase() ===
+            Fill_liquid_contract.toLocaleLowerCase()
+        ) {
           setLoading(false);
+          return setCurrent(2);
         }
 
         try {
@@ -73,7 +69,7 @@ export default ({ btn }: { btn?: string | React.ReactNode }) => {
             miner_id: Number(miner),
             to_address: Fill_liquid_contract_id,
           });
-          console.log("msgData ==> ", msgData);
+          // console.log("msgData ==> ", msgData);
           setMsgData(msgData);
           setCurrent(1);
         } finally {
@@ -89,15 +85,21 @@ export default ({ btn }: { btn?: string | React.ReactNode }) => {
             sign,
             wait: true,
           };
-          let res = await postPushMessage(pushMessageParams);
-          res = res;
-          setMsgData({
-            ...msgData,
-            ...res,
-          });
+          try {
+            const res = await postPushMessage(pushMessageParams);
+            setMsgData({
+              ...msgData,
+              ...res,
+            });
+          } catch (err: any) {
+            api.error({
+              message: err.message,
+            });
+            setShow(false);
+          }
           const msg = await Validation.getSigningMsg(miner);
           setMsg(msg);
-          setCurrent(current + 1);
+          setCurrent(2);
         } finally {
           setLoading(false);
         }
@@ -114,9 +116,7 @@ export default ({ btn }: { btn?: string | React.ReactNode }) => {
         }
         break;
       default:
-        if (current < 2) {
-          setCurrent(current + 1);
-        } else {
+        if (current > 2) {
           setShow(false);
           store.dispatch({
             type: "common/change",
@@ -216,7 +216,7 @@ export default ({ btn }: { btn?: string | React.ReactNode }) => {
           return (
             <div className="flex flex-col items-center justify-center">
               <Image src={SuccessIcon} width={120} height={120} alt="" />
-              <p className="font-semibold text-[24px] mt-[24px] mb-[40px]">
+              <p className="font-semibold text-[24px] mt-[24px]">
                 Successfully created
               </p>
             </div>
@@ -229,21 +229,28 @@ export default ({ btn }: { btn?: string | React.ReactNode }) => {
   const renderBtn = useCallback(() => {
     if (current < 0) return null;
     return (
-      <Button
-        className="w-1/3 mt-20 !rounded-[60px]"
-        type="primary"
-        size="large"
-        onClick={() => {
-          if (loading) return;
-          handleClick();
-        }}
-      >
-        {loading ? (
-          <LoadingOutlined />
-        ) : (
-          <span>{current > 2 ? "OK" : "Next"}</span>
+      <div className="mt-20 ">
+        {current === 1 && loading && (
+          <p className="text-sm mb-2 text-gray-300">
+            It may take 2-3 minutes...
+          </p>
         )}
-      </Button>
+        <Button
+          className="w-1/3 !rounded-[60px]"
+          type="primary"
+          size="large"
+          onClick={() => {
+            if (loading) return;
+            handleClick();
+          }}
+        >
+          {loading ? (
+            <LoadingOutlined />
+          ) : (
+            <span>{current > 2 ? "OK" : "Next"}</span>
+          )}
+        </Button>
+      </div>
     );
   }, [current, loading, handleClick]);
 

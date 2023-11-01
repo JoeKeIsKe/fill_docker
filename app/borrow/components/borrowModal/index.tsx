@@ -198,7 +198,7 @@ function BorrowModal(props: IProps) {
 
   return (
     <Modal
-      className="custom-modal big-btn"
+      className="custom-modal big-btn top-[30px]"
       title=""
       open={isOpen}
       onCancel={handleCancel}

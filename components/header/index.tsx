@@ -15,11 +15,13 @@ import notification from "antd/es/notification";
 import store from "@/store";
 import { usePathname } from "next/navigation";
 import { Dropdown, Space } from "antd";
+import { getStorage } from "@/utils";
 
 function Header() {
   const dispath = useDispatch();
-  const { wallet, connectButton, currentAccount, isNetworkCorrect } =
-    useMetaMask();
+  const { wallet, connectButton, currentAccount } = useMetaMask();
+
+  const { isNetworkCorrect } = getStorage("network_info");
 
   const [api, contextHolder] = notification.useNotification();
   const pathname = usePathname();
@@ -116,7 +118,7 @@ function Header() {
       window?.removeEventListener("unhandledrejection", handleRejectionError);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [isNetworkCorrect]);
 
   return (
     <div

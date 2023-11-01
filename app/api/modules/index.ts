@@ -46,10 +46,9 @@ export function postBuildMessage(data: {
 
 export function postUnbindBuildMessage(data: {
   miner_id: number;
-  to_address?: string;
 }): Promise<any> {
   return postReq({
-    url: `${config.msgUrl}/api/v1/spex/messages/build-change-beneficiary-in`,
+    url: `${config.msgUrl}/api/v1/spex/messages/build-change-beneficiary-out`,
     data,
   });
 }

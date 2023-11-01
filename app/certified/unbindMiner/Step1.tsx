@@ -10,7 +10,7 @@ export default ({
   return (
     <div className="h-40">
       <div className="flex flex-col mb-5">
-        <span className="text-gray-500"></span>
+        <span className="text-base">Keys</span>
         <span className=" font-medium	text-gray-600">{msg}</span>
         {/* <span className=" font-medium	text-gray-600">{msg?.slice(2)}</span> */}
       </div>
@@ -26,7 +26,7 @@ export default ({
             className="peer w-full px-5  rounded-none transition-colors duration-300 hover:border-transparent"
             autoComplete="off"
             onChange={(e) => {
-              onChange(e.target.value);
+              onChange(e.target.value?.trim());
             }}
           />
           <span className="flex items-center  border border-r-0 border-[#EAEAEF] bg-slate-50 px-4 text-sm text-slate-400 transition-colors duration-300 peer-focus:border-hover peer-focus:bg-active peer-focus:text-white">
