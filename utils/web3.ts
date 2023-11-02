@@ -10,6 +10,8 @@ if (typeof window !== "undefined" && typeof window?.ethereum !== "undefined") {
     "https://mainnet.infura.io/v3/56f2e560f10342caae022634319bed78"
   );
   web3 = new Web3(provider);
+  web3.eth.transactionBlockTimeout = 100;
+  web3.eth.transactionPollingTimeout = 1000;
 }
 
 export default web3;

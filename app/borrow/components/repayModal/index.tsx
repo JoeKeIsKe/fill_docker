@@ -100,7 +100,7 @@ function RepayModal(props: IProps) {
       });
     setLoading(true);
     try {
-      let res;
+      let res: any;
       switch (title) {
         case REPAY_MODAL_TITLE[1]:
           // repay - from miner
@@ -143,7 +143,9 @@ function RepayModal(props: IProps) {
         handleCancel();
         api.success({
           message: `Successfully ${
-            title === REPAY_MODAL_TITLE[2] ? "liquidated" : "repayed"
+            title === REPAY_MODAL_TITLE[2]
+              ? "liquidated"
+              : `repayed ${res?.amount || 0} FIL`
           }`,
         });
       }

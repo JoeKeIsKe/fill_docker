@@ -46,15 +46,21 @@ class contract {
           },
           (err: any, transactionHash: any) => {
             if (err) {
+              console.log("err ==> ", err);
+
               resolve(false);
+              throw new Error(err);
             }
           }
         )
-        .then((res: any) => {
-          resolve(true);
-        })
-        .catch((err: any) => {
-          resolve(err);
+        .on("receipt", (res: any) => {
+          const returnValues = res?.events?.["Staked"]?.returnValues;
+          console.log("onstake returnValues ==> ", returnValues);
+
+          const result = {
+            amount: getValueDivide(returnValues?.minted || 0),
+          };
+          resolve(result);
         });
     });
   }
@@ -66,11 +72,21 @@ class contract {
         .send({
           from: address,
         })
-        .then((res: any) => {
-          resolve(res);
+        .on("receipt", (res: any) => {
+          const returnValues = res?.events?.["Unstaked"]?.returnValues;
+          console.log("onstake returnValues ==> ", returnValues);
+
+          const result = {
+            amount: getValueDivide(returnValues?.minted || 0),
+          };
+          resolve(result);
         })
-        .catch((err: any) => {
-          resolve(err);
+        .on("error", (err: any) => {
+          if (err) {
+            console.log("err ==> ", err);
+            resolve(false);
+            throw new Error(err);
+          }
         });
     });
   }

@@ -13,6 +13,7 @@ import {
   getValueToFixed,
   timestampToDateTime,
   numberWithCommas,
+  getValueDivide,
 } from "@/utils";
 import { useMetaMask } from "@/hooks/useMetaMask";
 import { Button, Divider, Space } from "antd";
@@ -159,18 +160,23 @@ function Staking() {
           currentAccount
         );
         if (res) {
-          if (res?.message) {
-            api.error({
-              message: res?.message,
-            });
-          } else {
-            api.success({
-              message: `Successfully ${tabKey}d`,
-            });
-            clear();
-            if (currentAccount) {
-              data_fetcher_contract.fetchPersonalData(currentAccount);
-            }
+          api.success({
+            message:
+              tabKey === TAB_KEYS[0]
+                ? `${getValueDivide(
+                    res?.amountFIL
+                  )} FIL successfully staked, ${getValueDivide(
+                    res?.amountFIT || 0
+                  )} FIT minted`
+                : `${getValueDivide(
+                    res?.amountFIT || 0
+                  )} FIT successfully redeemed, ${getValueDivide(
+                    res?.amountFIL || 0
+                  )} FIL unstaked`,
+          });
+          clear();
+          if (currentAccount) {
+            data_fetcher_contract.fetchPersonalData(currentAccount);
           }
         }
       } finally {

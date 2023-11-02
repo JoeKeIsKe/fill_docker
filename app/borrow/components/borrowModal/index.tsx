@@ -61,11 +61,15 @@ function BorrowModal(props: IProps) {
       });
     setLoading(true);
     try {
-      const res = await FIL_contract.onBorrow(data.minerId, amount, slippage);
+      const res: any = await FIL_contract.onBorrow(
+        data.minerId,
+        amount,
+        slippage
+      );
       if (res) {
         handleCancel();
         api.success({
-          message: "Successfully borrowed",
+          message: `Successfully borrowed ${res?.amountFIL} FIL`,
         });
       }
     } finally {

@@ -15,7 +15,7 @@ export function getValueDivide(
   unit: number = 6
 ) {
   let res = new BigNumber(num || 0).dividedBy(Math.pow(10, pow));
-  return res.toFixed(unit);
+  return res.toFixed(unit, BigNumber.ROUND_DOWN);
 }
 
 export function getBlockHeightByDuration(duration: number) {
@@ -119,5 +119,5 @@ export function numberWithCommas(x: number | string, decimal?: number) {
   if (!x || Number(x) <= 0) {
     x = 0;
   }
-  return BigNumber(x || 0).toFormat(decimal || 2, 1);
+  return BigNumber(x || 0).toFormat(decimal || 2, BigNumber.ROUND_DOWN);
 }

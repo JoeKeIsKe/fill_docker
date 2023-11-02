@@ -44,6 +44,7 @@ function StakingCard(props: Props) {
   const [selectedRow, setSelectedRow] = useState<any>();
 
   const [expectedRewards, setExpectedRewards] = useState<any>("");
+  const [receivedRewards, setReceivedRewards] = useState<any>("");
   const [stakeStatus, setStakeStatus] =
     useState<StakeStatusType>(defaultStakeStatus);
 
@@ -227,7 +228,7 @@ function StakingCard(props: Props) {
               </p>
             </div>
             <div>
-              <p>From Interest Repaymen</p>
+              <p>From Interest Repayment</p>
               <p className="text-[24px] text-center">
                 {` ${stakeStatusData.accumulatedInterestMint}`}
               </p>
@@ -277,7 +278,7 @@ function StakingCard(props: Props) {
         isOpen={isFeedbackOpen}
         type="success"
         title="Successfully Withdrawn"
-        // desc={`You received ${expectedRewards} FIG`}
+        // desc={`You received ${receivedRewards || 0} FIG`}
         onConfirm={onFeedbackClose}
       />
       {contextHolder}

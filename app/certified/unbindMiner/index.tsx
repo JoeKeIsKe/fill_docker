@@ -11,6 +11,7 @@ import ActionButton from "@/packages/ActionButton";
 import { postUnbindBuildMessage, postPushMessage } from "../../api/modules";
 import Image from "next/image";
 
+import WarningIcon from "@/assets/warning_icon.png";
 import SuccessIcon from "@/assets/success_icon.png";
 
 interface IProps {
@@ -139,7 +140,13 @@ export default ({ minerId, disabled }: IProps) => {
           )}
           <div className="mt-5">
             {current === 0 && (
-              <p className="text-base">Are you sure to unbind this miner?</p>
+              <div className="flex flex-col items-center pt-2">
+                <Image src={WarningIcon} width={88} height={88} alt="" />
+                <p className="font-semibold text-[24px] text-center mt-[24px] max-w-[500px]">
+                  Are you sure to unbind this miner and retrieve the
+                  beneficiary?
+                </p>
+              </div>
             )}
             {current === 1 && (
               <Step1
@@ -153,7 +160,7 @@ export default ({ minerId, disabled }: IProps) => {
             {current === 3 && (
               <div className="flex flex-col items-center justify-center">
                 <Image src={SuccessIcon} width={120} height={120} alt="" />
-                <p className="font-semibold text-[24px] mt-[24px] mb-[40px]">
+                <p className="font-semibold text-[24px] mt-[24px]">
                   Successfully unbound
                 </p>
               </div>

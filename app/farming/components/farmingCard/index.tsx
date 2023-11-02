@@ -114,7 +114,7 @@ function FarmingCard(props: Props) {
               message: res?.message,
             });
           } else {
-            setRewards(res);
+            setRewards(res?.amount || 0);
             onFeedbackOpen();
           }
         }
@@ -321,6 +321,7 @@ function FarmingCard(props: Props) {
         type="success"
         isOpen={isFeedbackOpen}
         title="Successfully Farmed"
+        // desc={`You received ${rewards || 0} FIG`}
         onConfirm={onFeedbackClose}
       />
       {contextHolder}

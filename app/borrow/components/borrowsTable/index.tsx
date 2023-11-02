@@ -165,7 +165,7 @@ function BorrowsTable(props: IProps) {
       title: "Available Credit",
       dataIndex: "availableCredit",
       key: "availableCredit",
-      render: (val) => `${val} FIL`,
+      render: (val) => `${numberWithCommas(val)} FIL`,
     },
     {
       title: (

@@ -4,6 +4,7 @@ import { getValueDivide, getValueMultiplied, formatUnits } from "@/utils";
 import { UserBorrow, MinerBorrows } from "@/utils/type";
 import store from "@/store";
 import web3 from "@/utils/web3";
+import BigNumber from "bignumber.js";
 
 class contract {
   contractAbi: any;
@@ -25,8 +26,6 @@ class contract {
 
   getUserBorrow(account: string) {
     this.account = account;
-    console.log(account);
-
     this.myContract.methods
       .userBorrows(account)
       .call()
@@ -102,8 +101,14 @@ class contract {
             }
           }
         )
-        .on("receipt", () => {
-          resolve(true);
+        .on("receipt", (res: any) => {
+          const returnValues =
+            res?.events?.[isStake ? "Deposit" : "Redeem"]?.returnValues;
+          const result = {
+            amountFIL: returnValues?.amountFIL,
+            amountFIT: returnValues?.amountFILTrust,
+          };
+          resolve(result);
         });
     });
   }
@@ -163,7 +168,11 @@ class contract {
           }
         )
         .on("receipt", (res: any) => {
-          resolve(true);
+          const returnValues = res?.events?.["Borrow"]?.returnValues;
+          const result = {
+            amountFIL: getValueDivide(returnValues?.amountFIL || 0),
+          };
+          resolve(result);
         });
     });
   }
@@ -189,8 +198,16 @@ class contract {
             }
           }
         )
-        .on("receipt", () => {
-          resolve(true);
+        .on("receipt", (res: any) => {
+          const returnValues = res?.events?.["Payback"]?.returnValues;
+          resolve({
+            amount: getValueDivide(
+              BigNumber(returnValues?.principal || 0)
+                .plus(returnValues?.interest || 0)
+                .decimalPlaces(6, 1)
+                .toNumber() || 0
+            ),
+          });
         });
     });
   }
@@ -219,8 +236,16 @@ class contract {
             }
           }
         )
-        .on("receipt", () => {
-          resolve(true);
+        .on("receipt", (res: any) => {
+          const returnValues = res?.events?.["Payback"]?.returnValues;
+          resolve({
+            amount: getValueDivide(
+              BigNumber(returnValues?.principal || 0)
+                .plus(returnValues?.interest || 0)
+                .decimalPlaces(6, 1)
+                .toNumber() || 0
+            ),
+          });
         });
     });
   }
@@ -264,55 +289,6 @@ class contract {
     });
   }
 
-  //access or  redeem
-  // async access(type: string, value: string | number, accept: number | string) {
-  //   const number = getValueMultiplied(value, 18);
-  //   const acceptValue = getValueMultiplied(accept, 6);
-  //   const obj =
-  //     type === "deposit"
-  //       ? {
-  //           value: number,
-  //         }
-  //       : {};
-  //   console.log("====3=44", this.myContract.methods[type]);
-  //   return new Promise((resolve, reject) => {
-  //     this.myContract.methods[type](number, acceptValue)
-  //       .send(
-  //         {
-  //           from: this.account,
-  //           ...obj,
-  //         },
-  //         (err: any, res: any) => {
-  //           if (err) {
-  //             resolve(true);
-  //             throw new Error(err);
-  //           }
-  //         }
-  //       )
-  //       .on("receipt", (data: any) => {
-  //         console.log("receipt success", data);
-  //         // success
-  //         //     const typeStr = type === 'deposit' ? 'Deposit' : 'Redeem';
-  //         //     const notiStr = type === 'deposit' ? 'Deposit' : 'Redemption';
-  //         //  const returnValue = data.events[typeStr].returnValues;
-  //         //  // FIT/FIL
-  //         //  const value = getValueDivide(Number(returnValue[2]), 18)
-  //         // notification.open({
-  //         //     message: "",
-  //         //     description: `${notiStr} is completed, ${value} ${type === 'deposit' ?'FIT received':'FIL withDrawn' }`,
-  //         //     duration: 10,
-  //         //     className: "app-notic",
-  //         // });
-  //         // //this.getBalance(this.account);
-  //         //  return resolve(true);
-  //         // this.getBalance(this.account);
-  //       })
-  //       .on("error", (err: any, res: any) => {
-  //         throw new Error(err);
-  //       });
-  //   });
-  // }
-
   //bind miner
   bindMiner(minerAddr: string, signature: string, account: string) {
     this.account = account;
@@ -333,9 +309,6 @@ class contract {
         .on("receipt", (data: any) => {
           resolve(true);
         });
-      // .on("error", (err: any, res: any) => {
-      //   throw new Error(err);
-      // });
     });
   }
 
@@ -359,9 +332,6 @@ class contract {
         .on("receipt", (data: any) => {
           resolve(true);
         });
-      // .on("error", (err: any, res: any) => {
-      //   throw new Error(err);
-      // });
     });
   }
 }

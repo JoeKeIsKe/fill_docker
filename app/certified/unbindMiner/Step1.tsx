@@ -9,10 +9,10 @@ export default ({
 }) => {
   return (
     <div className="h-40">
+      <p className="pb-4">Sign for Beneficiary Address transfer execution.</p>
       <div className="flex flex-col mb-5">
         <span className="text-base">Keys</span>
         <span className=" font-medium	text-gray-600">{msg}</span>
-        {/* <span className=" font-medium	text-gray-600">{msg?.slice(2)}</span> */}
       </div>
 
       <div>
