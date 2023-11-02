@@ -79,7 +79,7 @@ export type ExtractPropsFromArray<T> = Omit<
 export const formatUnits = (val: any) => {
   return BigNumber(Number(val))
     .dividedBy(Math.pow(10, 18))
-    .decimalPlaces(6)
+    .decimalPlaces(6, BigNumber.ROUND_DOWN)
     .toNumber();
 };
 

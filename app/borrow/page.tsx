@@ -30,7 +30,7 @@ function Borrow() {
   const available = BigNumber(filInfo?.totalFIL || 0)
     .times(0.9)
     .minus(BigNumber(filInfo?.utilizedLiquidity || 0))
-    .toFixed(2);
+    .toFixed(2, BigNumber.ROUND_DOWN);
 
   const default_opt = useMemo(() => {
     return {
