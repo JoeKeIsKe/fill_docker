@@ -94,8 +94,10 @@ export default ({ btn }: { btn?: string | React.ReactNode }) => {
           } catch (err: any) {
             api.error({
               message: err.message,
+              onClose: () => {
+                setShow(false);
+              },
             });
-            setShow(false);
           }
           const msg = await Validation.getSigningMsg(miner);
           setMsg(msg);

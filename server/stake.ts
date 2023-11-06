@@ -8,6 +8,8 @@ import {
 } from "@/utils";
 import { StakeInfoType } from "@/utils/type";
 import web3 from "@/utils/web3";
+import { provider, signer } from "@/utils/ethers";
+import { ethers } from "ethers";
 
 interface StakeType {
   canWithdraw: boolean;
@@ -18,6 +20,7 @@ class contract {
   contractAbi: any;
   contractAddress: string;
   myContract: any;
+  contract: any;
   account: string = "";
   accountBalance: string | undefined;
   rate: number | string | undefined;
@@ -30,62 +33,152 @@ class contract {
       this.contractAbi,
       this.contractAddress
     );
+
+    this.contract = new ethers.Contract(
+      this.contractAddress,
+      this.contractAbi,
+      signer
+    );
+    this.listenOnStake();
   }
+
+  listenOnStake = () => {
+    console.log("listening ==>");
+    if (this.contract) {
+      this.contract.listeners("Staked");
+      this.contract.on(
+        "Staked",
+        (from: any, to: any, value: any, event: any) => {
+          let transferEvent = {
+            from: from,
+            to: to,
+            value: value,
+            eventData: event,
+          };
+          console.log(JSON.stringify(transferEvent, null, 4));
+        }
+      );
+
+      this.contract.on(
+        "Unstaked",
+        (from: any, to: any, value: any, event: any) => {
+          let transferEvent = {
+            from: from,
+            to: to,
+            value: value,
+            eventData: event,
+          };
+          console.log(JSON.stringify(transferEvent, null, 4));
+        }
+      );
+    }
+  };
 
   onStake(amount: number, duration: number, address: string) {
     return new Promise((resolve, reject) => {
-      this.myContract.methods
+      // this.myContract.methods
+      //   .stakeFilTrust(
+      //     getValueMultiplied(amount),
+      //     200000000000,
+      //     getBlockHeightByDuration(duration)
+      //   )
+      //   .send(
+      //     {
+      //       from: address,
+      //     },
+      //     (err: any, transactionHash: any) => {
+      //       if (err) {
+      //         console.log("err ==> ", err);
+
+      //         resolve(false);
+      //         throw new Error(err);
+      //       }
+      //     }
+      //   )
+      //   .on("receipt", (res: any) => {
+      //     const returnValues = res?.events?.["Staked"]?.returnValues;
+      //     console.log("onstake returnValues ==> ", returnValues);
+
+      //     const result = {
+      //       amount: getValueDivide(returnValues?.minted || 0),
+      //     };
+      //     resolve(result);
+      //   });
+
+      this.contract
         .stakeFilTrust(
           getValueMultiplied(amount),
           200000000000,
-          getBlockHeightByDuration(duration)
-        )
-        .send(
+          getBlockHeightByDuration(duration),
           {
             from: address,
-          },
-          (err: any, transactionHash: any) => {
-            if (err) {
-              console.log("err ==> ", err);
-
-              resolve(false);
-              throw new Error(err);
-            }
           }
         )
-        .on("receipt", (res: any) => {
-          const returnValues = res?.events?.["Staked"]?.returnValues;
-          console.log("onstake returnValues ==> ", returnValues);
-
-          const result = {
-            amount: getValueDivide(returnValues?.minted || 0),
-          };
-          resolve(result);
+        .then(async (res: any) => {
+          const receipt = await res.wait();
+          if (receipt) {
+            console.log("receipt ==> ", receipt);
+            const returnValues = res?.events?.["Staked"]?.returnValues;
+            console.log("onstake returnValues ==> ", returnValues);
+            const result = {
+              amount: getValueDivide(returnValues?.minted || 0),
+            };
+            resolve(result);
+          }
         });
     });
   }
 
   onUnstake(id: string, address: string) {
     return new Promise((resolve, reject) => {
-      this.myContract.methods
-        .unStakeFilTrust(id)
-        .send({
+      // this.myContract.methods
+      //   .unStakeFilTrust(id)
+      //   .send({
+      //     from: address,
+      //   })
+      //   .on("receipt", (res: any) => {
+      //     const returnValues = res?.events?.["Unstaked"]?.returnValues;
+      //     console.log("onstake returnValues ==> ", returnValues);
+
+      //     const result = {
+      //       amount: getValueDivide(returnValues?.minted || 0),
+      //     };
+      //     resolve(result);
+      //   })
+      //   .on("error", (err: any) => {
+      //     if (err) {
+      //       console.log("err ==> ", err);
+      //       resolve(false);
+      //       throw new Error(err);
+      //     }
+      //   });
+      this.contract.on(
+        "Unstaked",
+        (from: any, to: any, value: any, event: any) => {
+          let transferEvent = {
+            from: from,
+            to: to,
+            value: value,
+            eventData: event,
+          };
+          console.log("listen ==> ", JSON.stringify(transferEvent, null, 4));
+        }
+      );
+
+      this.contract
+        .unStakeFilTrust(id, {
           from: address,
         })
-        .on("receipt", (res: any) => {
-          const returnValues = res?.events?.["Unstaked"]?.returnValues;
-          console.log("onstake returnValues ==> ", returnValues);
-
-          const result = {
-            amount: getValueDivide(returnValues?.minted || 0),
-          };
-          resolve(result);
-        })
-        .on("error", (err: any) => {
-          if (err) {
-            console.log("err ==> ", err);
-            resolve(false);
-            throw new Error(err);
+        .then(async (res: any) => {
+          const receipt = await res.wait();
+          if (receipt) {
+            console.log("receipt ==> ", receipt);
+            const returnValues = res?.events?.["Staked"]?.returnValues;
+            console.log("onstake returnValues ==> ", returnValues);
+            const result = {
+              amount: getValueDivide(returnValues?.minted || 0),
+            };
+            resolve(result);
           }
         });
     });

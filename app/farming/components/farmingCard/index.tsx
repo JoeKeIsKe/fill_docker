@@ -162,6 +162,7 @@ function FarmingCard(props: Props) {
   useEffect(() => {
     setIsClient(true);
     fetchStakerData();
+    // stake_contract.listenOnStake();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentAccount]);
 

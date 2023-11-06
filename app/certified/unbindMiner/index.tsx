@@ -48,26 +48,27 @@ export default ({ minerId, disabled }: IProps) => {
         }
         break;
       case 1:
+        setLoading(true);
+        const pushMessageParams = {
+          message: msgData?.msg_hex as string,
+          cid: msgData?.msg_cid_str as string,
+          sign,
+          wait: true,
+        };
         try {
-          setLoading(true);
-          const pushMessageParams = {
-            message: msgData?.msg_hex as string,
-            cid: msgData?.msg_cid_str as string,
-            sign,
-            wait: true,
-          };
-          try {
-            await postPushMessage(pushMessageParams);
-            setCurrent(2);
-          } catch (err: any) {
-            api.error({
-              message: err.message,
-            });
-            setShow(false);
-          }
+          await postPushMessage(pushMessageParams);
+          setCurrent(2);
+        } catch (err: any) {
+          api.error({
+            message: err.message,
+            onClose: () => {
+              setShow(false);
+            },
+          });
         } finally {
           setLoading(false);
         }
+
         break;
       case 2:
         setLoading(true);
