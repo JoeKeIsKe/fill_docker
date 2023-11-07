@@ -168,23 +168,26 @@ class contract {
             const result = {
               amount: getValueDivide(returnValues?.minted || 0),
             };
-            await this.contract.on(
-              "Unstaked",
-              (
-                staker: any,
-                id: any,
-                amount: any,
-                start: any,
-                end: any,
-                realEnd: any,
-                minted: number
-              ) => {
-                console.log("minted", ethers.utils.formatEther(minted));
-                resolve({
-                  amount: ethers.utils.formatEther(minted),
-                });
-              }
-            );
+            if (result) {
+              resolve(true);
+            }
+            // await this.contract.on(
+            //   "Unstaked",
+            //   (
+            //     staker: any,
+            //     id: any,
+            //     amount: any,
+            //     start: any,
+            //     end: any,
+            //     realEnd: any,
+            //     minted: number
+            //   ) => {
+            //     console.log("minted", ethers.utils.formatEther(minted));
+            //     resolve({
+            //       amount: ethers.utils.formatEther(minted),
+            //     });
+            //   }
+            // );
           }
         });
     });
