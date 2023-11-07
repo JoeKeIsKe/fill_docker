@@ -16,6 +16,7 @@ import store from "@/store";
 import { usePathname } from "next/navigation";
 import { Dropdown, Space } from "antd";
 import { getStorage } from "@/utils";
+import NextLink from "next/link";
 
 function Header() {
   const dispath = useDispatch();
@@ -141,6 +142,17 @@ function Header() {
               </a>
             );
           })}
+          {/* {RouterList.map((item) => (
+            <Link
+              className={`text-[#000] h-full block text-center md:w-[160px] ${
+                pathname.includes(item.value) && "active"
+              }`}
+              href={`/${item.value}`}
+              key={item.value}
+            >
+              {item.label}
+            </Link>
+          ))} */}
           {
             <Space size="middle" className="hidden md:inline-flex">
               <Dropdown

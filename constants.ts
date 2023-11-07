@@ -21,10 +21,6 @@ export const RouterList: Array<ITEM> = [
     label: "Farming",
     value: "farming",
   },
-  // {
-  //   label: "Analytics",
-  //   value: "analytic",
-  // },
 ];
 
 export const default_opt = {
@@ -97,7 +93,7 @@ export const NETWORK: NetworkItemType[] = [
         symbol: "tFIL",
         decimals: 18,
       },
-      rpcUrls: ["https://filecoin-calibration.chainup.net/rpc/v1"],
+      rpcUrls: ["https://calibration.filfox.info/rpc/v1"],
       blockExplorerUrls: ["https://calibration.filfox.info/en"],
     },
   },

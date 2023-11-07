@@ -27,7 +27,7 @@ class contract {
   myBorrowList: Array<any> = [];
   minerList: Record<string, any> = {};
   constructor() {
-    this.contractAbi = JSON.parse(JSON.stringify(Stake.output.abi));
+    this.contractAbi = JSON.parse(JSON.stringify(Stake.abi));
     this.contractAddress = stake_contract;
     this.myContract = new web3.eth.Contract(
       this.contractAbi,
@@ -39,36 +39,38 @@ class contract {
       this.contractAbi,
       signer
     );
-    this.listenOnStake();
+    // this.listenOnStake();
   }
 
   listenOnStake = () => {
-    console.log("listening ==>");
     if (this.contract) {
-      this.contract.listeners("Staked");
       this.contract.on(
         "Staked",
-        (from: any, to: any, value: any, event: any) => {
-          let transferEvent = {
-            from: from,
-            to: to,
-            value: value,
-            eventData: event,
-          };
-          console.log(JSON.stringify(transferEvent, null, 4));
+        (
+          staker: any,
+          id: any,
+          amount: any,
+          start: any,
+          end: any,
+          realEnd: any,
+          minted: number
+        ) => {
+          console.log("minted", ethers.utils.formatEther(minted));
         }
       );
 
       this.contract.on(
         "Unstaked",
-        (from: any, to: any, value: any, event: any) => {
-          let transferEvent = {
-            from: from,
-            to: to,
-            value: value,
-            eventData: event,
-          };
-          console.log(JSON.stringify(transferEvent, null, 4));
+        (
+          staker: any,
+          id: any,
+          amount: any,
+          start: any,
+          end: any,
+          realEnd: any,
+          minted: number
+        ) => {
+          console.log("minted", ethers.utils.formatEther(minted));
         }
       );
     }
@@ -152,18 +154,6 @@ class contract {
       //       throw new Error(err);
       //     }
       //   });
-      this.contract.on(
-        "Unstaked",
-        (from: any, to: any, value: any, event: any) => {
-          let transferEvent = {
-            from: from,
-            to: to,
-            value: value,
-            eventData: event,
-          };
-          console.log("listen ==> ", JSON.stringify(transferEvent, null, 4));
-        }
-      );
 
       this.contract
         .unStakeFilTrust(id, {
@@ -178,7 +168,23 @@ class contract {
             const result = {
               amount: getValueDivide(returnValues?.minted || 0),
             };
-            resolve(result);
+            await this.contract.on(
+              "Unstaked",
+              (
+                staker: any,
+                id: any,
+                amount: any,
+                start: any,
+                end: any,
+                realEnd: any,
+                minted: number
+              ) => {
+                console.log("minted", ethers.utils.formatEther(minted));
+                resolve({
+                  amount: ethers.utils.formatEther(minted),
+                });
+              }
+            );
           }
         });
     });
@@ -187,7 +193,7 @@ class contract {
   onExpectedRewardsFromVariableTerm(id: string, address: string) {
     return new Promise((resolve, reject) => {
       this.myContract.methods
-        .unStakeFilTrust(id)
+        .unStakeFilTrust(Number(id))
         .call({
           from: address,
         })
