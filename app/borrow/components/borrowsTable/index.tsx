@@ -373,6 +373,7 @@ function BorrowsTable(props: IProps) {
       <BorrowModal
         isOpen={isBorrowModalOpen}
         data={minerBorrowInfo}
+        updateList={() => getData(true)}
         onCancel={() => setIsBorrowModalOpen(false)}
       />
       <RepayModal
@@ -380,6 +381,7 @@ function BorrowsTable(props: IProps) {
         title={repayModalTitle}
         rawData={minerRepayInfo}
         hideTabs={repayModalTitle !== REPAY_MODAL_TITLE[1]}
+        updateList={() => getData(true)}
         onCancel={() => setIsRepayModalOpen(false)}
       />
     </div>

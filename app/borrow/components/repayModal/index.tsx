@@ -9,20 +9,26 @@ import { DEFAULT_EMPTY, REPAY_MODAL_TITLE, REPAY_TAB_KEYS } from "../constans";
 import { MinerListItem, RepayModalData } from "@/utils/type";
 import { isIndent, numberWithCommas } from "@/utils";
 import Link from "next/link";
-import BigNumber from "bignumber.js";
 import useLoading from "@/hooks/useLoading";
 import FIL_contract from "@/server/FILLiquid_contract";
 import { useMetaMask } from "@/hooks/useMetaMask";
+import ConfirmModal from "@/components/confirmModal";
 
 interface IProps {
   isOpen?: boolean;
   title?: string;
   rawData?: RepayModalData;
   hideTabs?: boolean;
+  updateList?: () => void;
   onCancel?: () => void;
 }
 
 interface DataType extends MinerListItem {}
+
+interface Rewards {
+  amountFIT?: number | string;
+  amountFIL?: number | string;
+}
 
 function RepayModal(props: IProps) {
   const {
@@ -30,6 +36,7 @@ function RepayModal(props: IProps) {
     title = "Repay",
     rawData,
     hideTabs = false,
+    updateList,
     onCancel,
   } = props;
 
@@ -38,6 +45,8 @@ function RepayModal(props: IProps) {
   const [minerFrom, setMinerFrom] = useState<string | null>();
   const [minerTo, setMinerTo] = useState<string>();
   const [repayAll, setRepayAll] = useState<boolean>(false);
+  const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
+  const [rewards, setRewards] = useState<Rewards>();
 
   const [api, contextHolder] = notification.useNotification();
   const { loading, setLoading } = useLoading();
@@ -79,6 +88,16 @@ function RepayModal(props: IProps) {
       render: (val) => `${numberWithCommas(val)} FIL`,
     },
   ];
+
+  const handleFeedbackCancel = () => {
+    setIsFeedbackOpen(false);
+    if (rewards) {
+      setRewards(undefined);
+      if (updateList) {
+        updateList();
+      }
+    }
+  };
 
   const handleCancel = () => {
     if (onCancel) {
@@ -141,12 +160,9 @@ function RepayModal(props: IProps) {
 
       if (res) {
         handleCancel();
-        api.success({
-          message: `Successfully ${
-            title === REPAY_MODAL_TITLE[2]
-              ? "liquidated"
-              : `repayed ${res?.amount || 0} FIL`
-          }`,
+        setIsFeedbackOpen(true);
+        setRewards({
+          amountFIL: res?.amount || 0,
         });
       }
     } finally {
@@ -216,107 +232,120 @@ function RepayModal(props: IProps) {
   }, [hideTabs, currentMinerId, isOpen]);
 
   return (
-    <Modal
-      className="custom-modal big-btn"
-      title=""
-      open={isOpen}
-      width={600}
-      onCancel={handleCancel}
-      cancelButtonProps={{
-        size: "large",
-      }}
-      onOk={handleConfirm}
-      okText={title === "Liquidate" ? "Liquidate" : "Repay"}
-      okButtonProps={{
-        size: "large",
-        loading: loading,
-      }}
-    >
-      {/* <div className="text-xl font-bold my-4">{title}</div> */}
-      {!hideTabs && (
-        <Tabs className="mb-4" tabs={REPAY_TAB_KEYS} onChange={onTabChange} />
-      )}
-      {tabKey === REPAY_TAB_KEYS[0] ? (
-        <>
-          <p className="text-lg font-semibold mb-4">
-            {isIndent(rawData?.familyInfo?.user || "")}
-          </p>
-          <Table
-            className="[& .ant-table-thead > tr > th]:border-b-0"
-            columns={columns}
-            dataSource={list}
-            pagination={false}
-            rowKey="minerId"
-          />
-          <div className="my-4 flex">
-            <div>
-              <label className="block opacity-40 text-[#06081B] text-sm font-medium mb-[5px]">
-                From
-              </label>
-              <Select
-                className="mr-12"
-                style={{ width: 250 }}
-                size="large"
-                value={minerFrom}
-                onChange={handleChangeFrom}
-                options={options}
-              />
-            </div>
-            <div>
-              <label className="block opacity-40 text-[#06081B] text-sm font-medium mb-[5px]">
-                To
-              </label>
-              <Select
-                disabled={title === REPAY_MODAL_TITLE[1]}
-                style={{ width: 250 }}
-                size="large"
-                value={minerTo}
-                onChange={handleChangeTo}
-                options={options}
-              />
-            </div>
-          </div>
-          {!hideTabs && (
-            <NumberInput
-              label="Amount"
-              value={amount}
-              prefix="FIL"
-              min={1}
-              max={maxNum}
-              repayAll
-              onChange={handleNumberInputChange}
+    <>
+      <Modal
+        className="custom-modal big-btn"
+        title=""
+        open={isOpen}
+        width={600}
+        onCancel={handleCancel}
+        cancelButtonProps={{
+          size: "large",
+        }}
+        onOk={handleConfirm}
+        okText={title === "Liquidate" ? "Liquidate" : "Repay"}
+        okButtonProps={{
+          size: "large",
+          loading: loading,
+        }}
+      >
+        {!hideTabs && (
+          <Tabs className="mb-4" tabs={REPAY_TAB_KEYS} onChange={onTabChange} />
+        )}
+        {tabKey === REPAY_TAB_KEYS[0] ? (
+          <>
+            <p className="text-lg font-semibold mb-4">
+              {isIndent(rawData?.familyInfo?.user || "")}
+            </p>
+            <Table
+              className="[& .ant-table-thead > tr > th]:border-b-0"
+              columns={columns}
+              dataSource={list}
+              pagination={false}
+              rowKey="minerId"
             />
-          )}
-        </>
-      ) : (
-        <>
-          <p className="font-semibold my-2 opacity-60">{`Miner ID: ${network}${currentMinerId}`}</p>
-          <div className="data-card">
-            {/* <div className="w-1/2">{`Family Available Credit: ${
+            <div className="my-4 flex">
+              <div>
+                <label className="block opacity-40 text-[#06081B] text-sm font-medium mb-[5px]">
+                  From
+                </label>
+                <Select
+                  className="mr-12"
+                  style={{ width: 250 }}
+                  size="large"
+                  value={minerFrom}
+                  onChange={handleChangeFrom}
+                  options={options}
+                />
+              </div>
+              <div>
+                <label className="block opacity-40 text-[#06081B] text-sm font-medium mb-[5px]">
+                  To
+                </label>
+                <Select
+                  disabled={title === REPAY_MODAL_TITLE[1]}
+                  style={{ width: 250 }}
+                  size="large"
+                  value={minerTo}
+                  onChange={handleChangeTo}
+                  options={options}
+                />
+              </div>
+            </div>
+            {!hideTabs && (
+              <NumberInput
+                label="Amount"
+                value={amount}
+                prefix="FIL"
+                min={1}
+                max={maxNum}
+                repayAll
+                onChange={handleNumberInputChange}
+              />
+            )}
+          </>
+        ) : (
+          <>
+            <p className="font-semibold my-2 opacity-60">{`Miner ID: ${network}${currentMinerId}`}</p>
+            <div className="data-card">
+              {/* <div className="w-1/2">{`Family Available Credit: ${
               rawData?.familyInfo.availableCredit || DEFAULT_EMPTY
             } FIL`}</div> */}
-            <p className="text-xs font-semibold mb-4">
-              Family Debt Outstanding
-            </p>
-            <p className="text-[22px] font-bold">
-              {rawData?.miner?.debtOutStanding || DEFAULT_EMPTY}
-              <span className="text-sm font-normal ml-2">FIL</span>
-            </p>
-          </div>
-          <div className="mt-5">
-            <NumberInput
-              label="Amount"
-              value={amount}
-              prefix="FIL"
-              max={maxNum}
-              repayAll
-              onChange={handleNumberInputChange}
-            />
-          </div>
-        </>
-      )}
-      {contextHolder}
-    </Modal>
+              <p className="text-xs font-semibold mb-4">
+                Family Debt Outstanding
+              </p>
+              <p className="text-[22px] font-bold">
+                {rawData?.miner?.debtOutStanding || DEFAULT_EMPTY}
+                <span className="text-sm font-normal ml-2">FIL</span>
+              </p>
+            </div>
+            <div className="mt-5">
+              <NumberInput
+                label="Amount"
+                value={amount}
+                prefix="FIL"
+                max={maxNum}
+                repayAll
+                onChange={handleNumberInputChange}
+              />
+            </div>
+          </>
+        )}
+        {contextHolder}
+      </Modal>
+      <ConfirmModal
+        isOpen={isFeedbackOpen}
+        type="success"
+        title={`Successfully ${
+          title === REPAY_MODAL_TITLE[2] ? "Liquidated" : "Repayed"
+        }`}
+        desc={`${rewards?.amountFIL} FIL ${
+          title === REPAY_MODAL_TITLE[2] ? "liquidated" : "repayed"
+        }`}
+        onConfirm={handleFeedbackCancel}
+        onCancel={handleFeedbackCancel}
+      />
+    </>
   );
 }
 

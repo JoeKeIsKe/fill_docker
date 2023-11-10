@@ -27,11 +27,17 @@ import { ExpectedStake } from "@/utils/type";
 import useLoading from "@/hooks/useLoading";
 import { getChartData } from "../api/modules/index";
 import { ReloadOutlined } from "@ant-design/icons";
-import { FIT_contract } from "@/contract";
 import * as echarts from "echarts/core";
 import InfoTips from "@/components/infoTips";
+import ConfirmModal from "@/components/confirmModal";
+import AddToWalletBtn from "@/components/addToWalletBtn";
 
 const TAB_KEYS = ["stake", "unstake"];
+
+interface Rewards {
+  amountFIT: number | string;
+  amountFIL: number | string;
+}
 
 function Staking() {
   const [api, contextHolder] = notification.useNotification();
@@ -48,6 +54,8 @@ function Staking() {
   const [chartData, setChartData] = useState([]);
   const [chartDate, setChartDate] = useState([]);
   const [currentAPY, setCurrentAPY] = useState<string | number>();
+  const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
+  const [rewards, setRewards] = useState<Rewards>();
 
   const { filInfo, balance, stakeOverview } = useSelector(
     (state: rootState) => state?.contract
@@ -145,12 +153,12 @@ function Staking() {
         message: "Please input the amount",
         placement: "top",
       });
-    if (!slippage)
+    if (slippage === undefined)
       return api.warning({
         message: "Please input the slippage tolerance",
         placement: "top",
       });
-    if (amount && slippage) {
+    if (amount) {
       setLoading(true);
       try {
         const res: any = await FIL_contract.onStakeOrUnstake(
@@ -160,20 +168,11 @@ function Staking() {
           currentAccount
         );
         if (res) {
-          api.success({
-            message:
-              tabKey === TAB_KEYS[0]
-                ? `${getValueDivide(
-                    res?.amountFIL
-                  )} FIL successfully staked, ${getValueDivide(
-                    res?.amountFIT || 0
-                  )} FIT minted`
-                : `${getValueDivide(
-                    res?.amountFIT || 0
-                  )} FIT successfully redeemed, ${getValueDivide(
-                    res?.amountFIL || 0
-                  )} FIL unstaked`,
+          setRewards({
+            amountFIL: getValueDivide(res?.amountFIL || 0),
+            amountFIT: getValueDivide(res?.amountFIT || 0),
           });
+          setIsFeedbackOpen(true);
           clear();
           if (currentAccount) {
             data_fetcher_contract.fetchPersonalData(currentAccount);
@@ -183,6 +182,11 @@ function Staking() {
         setLoading(false);
       }
     }
+  };
+
+  const onModalCancel = () => {
+    setIsFeedbackOpen(false);
+    setRewards(undefined);
   };
 
   const onMaxButtonClick = () => {
@@ -243,26 +247,6 @@ function Staking() {
   const fetchData = () => {
     if (!isNetworkCorrect) return;
     fetchPersonalData();
-  };
-
-  const handleAddToWallet = async () => {
-    const res = await window?.ethereum.request({
-      method: "wallet_watchAsset",
-      params: {
-        type: "ERC20",
-        options: {
-          address: FIT_contract,
-          symbol: "FIT",
-          decimals: 18,
-          // image: "https://foo.io/token-image.svg",
-        },
-      },
-    });
-    if (res) {
-      api.success({
-        message: "Token successfully added",
-      });
-    }
   };
 
   useEffect(() => {
@@ -378,13 +362,7 @@ function Staking() {
                   2
                 )} FIT`}</p>
               </div>
-              <Button
-                className="bg-gray-400 text-[#fff] !text-xs !rounded-[24px] border-none hover:!text-[#fff] h-[28px] ml-2"
-                size="small"
-                onClick={handleAddToWallet}
-              >
-                Add to wallet
-              </Button>
+              <AddToWalletBtn coinType="FIT" />
             </div>
           </Card>
           <Card>
@@ -469,6 +447,24 @@ function Staking() {
       </div>
 
       {contextHolder}
+      <ConfirmModal
+        isOpen={isFeedbackOpen}
+        type="success"
+        title={
+          tabKey === TAB_KEYS[0]
+            ? "Successfully Staked"
+            : "Successfully Redeemed"
+        }
+        desc={
+          <>
+            {tabKey === TAB_KEYS[0]
+              ? `${rewards?.amountFIL} FIL successfully staked, ${rewards?.amountFIT} FIT minted`
+              : `${rewards?.amountFIT} FIT successfully redeemed, ${rewards?.amountFIL} FIL unstaked`}
+          </>
+        }
+        onConfirm={onModalCancel}
+        onCancel={onModalCancel}
+      />
     </section>
   );
 }

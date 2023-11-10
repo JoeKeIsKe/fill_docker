@@ -10,6 +10,7 @@ import { StakeInfoType } from "@/utils/type";
 import web3 from "@/utils/web3";
 import { provider, signer } from "@/utils/ethers";
 import { ethers } from "ethers";
+import BigNumber from "bignumber.js";
 
 interface StakeType {
   canWithdraw: boolean;
@@ -39,74 +40,10 @@ class contract {
       this.contractAbi,
       signer
     );
-    // this.listenOnStake();
   }
-
-  listenOnStake = () => {
-    if (this.contract) {
-      this.contract.on(
-        "Staked",
-        (
-          staker: any,
-          id: any,
-          amount: any,
-          start: any,
-          end: any,
-          realEnd: any,
-          minted: number
-        ) => {
-          console.log("minted", ethers.utils.formatEther(minted));
-        }
-      );
-
-      this.contract.on(
-        "Unstaked",
-        (
-          staker: any,
-          id: any,
-          amount: any,
-          start: any,
-          end: any,
-          realEnd: any,
-          minted: number
-        ) => {
-          console.log("minted", ethers.utils.formatEther(minted));
-        }
-      );
-    }
-  };
 
   onStake(amount: number, duration: number, address: string) {
     return new Promise((resolve, reject) => {
-      // this.myContract.methods
-      //   .stakeFilTrust(
-      //     getValueMultiplied(amount),
-      //     200000000000,
-      //     getBlockHeightByDuration(duration)
-      //   )
-      //   .send(
-      //     {
-      //       from: address,
-      //     },
-      //     (err: any, transactionHash: any) => {
-      //       if (err) {
-      //         console.log("err ==> ", err);
-
-      //         resolve(false);
-      //         throw new Error(err);
-      //       }
-      //     }
-      //   )
-      //   .on("receipt", (res: any) => {
-      //     const returnValues = res?.events?.["Staked"]?.returnValues;
-      //     console.log("onstake returnValues ==> ", returnValues);
-
-      //     const result = {
-      //       amount: getValueDivide(returnValues?.minted || 0),
-      //     };
-      //     resolve(result);
-      //   });
-
       this.contract
         .stakeFilTrust(
           getValueMultiplied(amount),
@@ -119,11 +56,12 @@ class contract {
         .then(async (res: any) => {
           const receipt = await res.wait();
           if (receipt) {
-            console.log("receipt ==> ", receipt);
-            const returnValues = res?.events?.["Staked"]?.returnValues;
-            console.log("onstake returnValues ==> ", returnValues);
+            const event = receipt.events.find(
+              (event: any) => event.event === "Staked"
+            );
+            const minted = ethers.utils.formatEther(event?.args?.minted);
             const result = {
-              amount: getValueDivide(returnValues?.minted || 0),
+              amount: BigNumber(minted || 0).toFixed(6, BigNumber.ROUND_DOWN),
             };
             resolve(result);
           }
@@ -133,28 +71,6 @@ class contract {
 
   onUnstake(id: string, address: string) {
     return new Promise((resolve, reject) => {
-      // this.myContract.methods
-      //   .unStakeFilTrust(id)
-      //   .send({
-      //     from: address,
-      //   })
-      //   .on("receipt", (res: any) => {
-      //     const returnValues = res?.events?.["Unstaked"]?.returnValues;
-      //     console.log("onstake returnValues ==> ", returnValues);
-
-      //     const result = {
-      //       amount: getValueDivide(returnValues?.minted || 0),
-      //     };
-      //     resolve(result);
-      //   })
-      //   .on("error", (err: any) => {
-      //     if (err) {
-      //       console.log("err ==> ", err);
-      //       resolve(false);
-      //       throw new Error(err);
-      //     }
-      //   });
-
       this.contract
         .unStakeFilTrust(id, {
           from: address,
@@ -162,32 +78,16 @@ class contract {
         .then(async (res: any) => {
           const receipt = await res.wait();
           if (receipt) {
-            console.log("receipt ==> ", receipt);
-            const returnValues = res?.events?.["Staked"]?.returnValues;
-            console.log("onstake returnValues ==> ", returnValues);
+            const event = receipt.events.find(
+              (event: any) => event.event === "Unstaked"
+            );
+            const minted = ethers.utils.formatEther(event?.args?.minted);
             const result = {
-              amount: getValueDivide(returnValues?.minted || 0),
+              amount: BigNumber(minted || 0).toFixed(6, BigNumber.ROUND_DOWN),
             };
             if (result) {
-              resolve(true);
+              resolve(result);
             }
-            // await this.contract.on(
-            //   "Unstaked",
-            //   (
-            //     staker: any,
-            //     id: any,
-            //     amount: any,
-            //     start: any,
-            //     end: any,
-            //     realEnd: any,
-            //     minted: number
-            //   ) => {
-            //     console.log("minted", ethers.utils.formatEther(minted));
-            //     resolve({
-            //       amount: ethers.utils.formatEther(minted),
-            //     });
-            //   }
-            // );
           }
         });
     });

@@ -10,7 +10,7 @@ import theme from "./ThemeConfig";
 import Loading from "../loading";
 import GlobalLoading from "./GlobalLoading";
 import { MetaMaskContextProvider } from "@/hooks/useMetaMask";
-import ConfirmModal from "@/components/confirmModal";
+import { GlobalModal } from "@/components/globalModal";
 import "../custom.scss";
 
 interface ConfirmProps {
@@ -42,27 +42,18 @@ function CustomProvider({ children }: { children: ReactNode }) {
 
   return (
     <MetaMaskContextProvider>
-      <Provider
-        store={{
-          ...store,
-        }}
-      >
-        <ConfigProvider theme={theme}>
-          <GlobalLoading>
-            <div className="max-w-screen-xl p-5 m-auto mt-[80px]">
-              <Header />
-              {children}
-            </div>
-          </GlobalLoading>
-        </ConfigProvider>
+      <Provider store={store}>
+        <GlobalModal>
+          <ConfigProvider theme={theme}>
+            <GlobalLoading>
+              <div className="max-w-screen-xl p-5 m-auto mt-[80px]">
+                <Header />
+                {children}
+              </div>
+            </GlobalLoading>
+          </ConfigProvider>
+        </GlobalModal>
       </Provider>
-      <ConfirmModal
-        isOpen={confirmProps.open}
-        type={confirmProps.type}
-        title={confirmProps.title}
-        desc={confirmProps.desc}
-        onConfirm={confirmProps.callback}
-      />
     </MetaMaskContextProvider>
   );
 }

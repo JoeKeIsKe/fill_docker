@@ -13,8 +13,8 @@ import ConfirmModal from "@/components/confirmModal";
 import { useMetaMask } from "@/hooks/useMetaMask";
 import NumberInput from "@/packages/NumberInput";
 import useLoading from "@/hooks/useLoading";
-import { FIG_contract } from "@/contract";
 import Card from "@/packages/card";
+import AddToWalletBtn from "@/components/addToWalletBtn";
 
 interface Props {}
 
@@ -24,8 +24,6 @@ interface StakerDataType {
   filTrustVariable: number | string;
   filGovernanceBalance: number | string;
 }
-
-const defaultAmount = 1;
 
 const defaultStakerData = {
   filTrustBalance: 0,
@@ -109,14 +107,10 @@ function FarmingCard(props: Props) {
           staker
         );
         if (res) {
-          if (res?.message) {
-            api.error({
-              message: res?.message,
-            });
-          } else {
-            setRewards(res?.amount || 0);
-            onFeedbackOpen();
-          }
+          console.log("res ==> ", res);
+
+          setRewards(res?.amount || 0);
+          onFeedbackOpen();
         }
       } finally {
         setLoading(false);
@@ -139,30 +133,10 @@ function FarmingCard(props: Props) {
     }
   };
 
-  const handleAddToWallet = async () => {
-    const res = await window?.ethereum.request({
-      method: "wallet_watchAsset",
-      params: {
-        type: "ERC20",
-        options: {
-          address: FIG_contract,
-          symbol: "FIG",
-          decimals: 18,
-        },
-      },
-    });
-    if (res) {
-      api.success({
-        message: "Token successfully added",
-      });
-    }
-  };
-
   // hack for text mismatch error in next.js
   useEffect(() => {
     setIsClient(true);
     fetchStakerData();
-    // stake_contract.listenOnStake();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentAccount]);
 
@@ -209,15 +183,7 @@ function FarmingCard(props: Props) {
         unit: "FIG",
         colSpan: 2,
         span: true,
-        action: (
-          <Button
-            className="bg-gray-400 text-[#fff] !text-xs !rounded-[24px] border-none hover:!text-[#fff] h-[28px] ml-2"
-            size="small"
-            onClick={handleAddToWallet}
-          >
-            Add to wallet
-          </Button>
-        ),
+        action: <AddToWalletBtn coinType="FIG" />,
       },
     ];
   }, [stakerData]);
@@ -322,8 +288,9 @@ function FarmingCard(props: Props) {
         type="success"
         isOpen={isFeedbackOpen}
         title="Successfully Farmed"
-        // desc={`You received ${rewards || 0} FIG`}
+        desc={`You received ${rewards || 0} FIG`}
         onConfirm={onFeedbackClose}
+        onCancel={onFeedbackClose}
       />
       {contextHolder}
     </Card>

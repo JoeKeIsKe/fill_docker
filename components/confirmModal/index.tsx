@@ -2,12 +2,13 @@
 
 import { Modal } from "antd";
 import { ReactNode } from "react";
+import { ModalFuncProps } from "antd";
 
 import WarningIcon from "@/assets/warning_icon.png";
 import SuccessIcon from "@/assets/success_icon.png";
 import Image from "next/image";
 
-interface IProps {
+interface IProps extends ModalFuncProps {
   isOpen?: boolean;
   type?: "warning" | "success";
   title?: string;
@@ -18,7 +19,9 @@ interface IProps {
 }
 
 function ConfirmModal(props: IProps) {
-  const { isOpen, type, title, desc, loading, onCancel, onConfirm } = props;
+  const { isOpen, type, title, desc, loading, onCancel, onConfirm, ...rest } =
+    props;
+
   const isSuccess = type === "success";
 
   const handleCancel = () => {
@@ -53,6 +56,7 @@ function ConfirmModal(props: IProps) {
         className: "",
         loading,
       }}
+      {...rest}
     >
       <div className="flex flex-col items-center pt-2">
         <Image

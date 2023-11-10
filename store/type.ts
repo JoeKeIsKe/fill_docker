@@ -56,6 +56,7 @@ export interface commonState {
     [key in string]: boolean;
   };
 }
+
 export interface rootState {
   contract: contractState;
   user: userState;

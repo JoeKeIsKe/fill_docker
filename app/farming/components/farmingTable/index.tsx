@@ -5,7 +5,7 @@ import { rootState } from "@/store/type";
 import { shallowEqual, useSelector } from "react-redux";
 import { Table, Space, Button, notification, Tag } from "antd";
 import { LoadingOutlined } from "@ant-design/icons";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import stake_contract from "@/server/stake";
 import type { ColumnsType } from "antd/es/table";
 import store from "@/store";
@@ -278,8 +278,9 @@ function StakingCard(props: Props) {
         isOpen={isFeedbackOpen}
         type="success"
         title="Successfully Withdrawn"
-        // desc={`You received ${receivedRewards || 0} FIG`}
+        desc={`You received ${receivedRewards || 0} FIG`}
         onConfirm={onFeedbackClose}
+        onCancel={onFeedbackClose}
       />
       {contextHolder}
     </div>

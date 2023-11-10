@@ -1,6 +1,6 @@
 "use client";
 
-import { Modal, Divider, notification, Space } from "antd";
+import { Modal, notification, Space } from "antd";
 import { useState, useEffect, useMemo } from "react";
 import NumberInput from "@/packages/NumberInput";
 import DescRow from "@/packages/DescRow";
@@ -14,11 +14,18 @@ import useLoading from "@/hooks/useLoading";
 import { useMetaMask } from "@/hooks/useMetaMask";
 import InfoTips from "@/components/infoTips";
 import { getDataFromFilscan } from "../../../api/modules";
+import ConfirmModal from "@/components/confirmModal";
 
 interface IProps {
   isOpen?: boolean;
   data: BorrowModalData;
   onCancel?: () => void;
+  updateList?: () => void;
+}
+
+interface Rewards {
+  amountFIT?: number | string;
+  amountFIL?: number | string;
 }
 
 const defaultExpected = {
@@ -27,7 +34,7 @@ const defaultExpected = {
 };
 
 function BorrowModal(props: IProps) {
-  const { isOpen = false, data, onCancel } = props;
+  const { isOpen = false, data, onCancel, updateList } = props;
 
   const [amount, setAmount] = useState<number | null>();
   const [debouncedAmount] = useDebounce(amount, 2);
@@ -37,6 +44,8 @@ function BorrowModal(props: IProps) {
   const [slippage, setSlippage] = useState();
   const [api, contextHolder] = notification.useNotification();
   const { loading, setLoading } = useLoading();
+  const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
+  const [rewards, setRewards] = useState<Rewards>();
 
   const { wallet } = useMetaMask();
   const network = wallet?.chainId?.includes("0x1") ? "f0" : "t0";
@@ -45,6 +54,16 @@ function BorrowModal(props: IProps) {
     if (onCancel) {
       clear();
       onCancel();
+    }
+  };
+
+  const handleFeedbackCancel = () => {
+    setIsFeedbackOpen(false);
+    if (rewards) {
+      setRewards(undefined);
+      if (updateList) {
+        updateList();
+      }
     }
   };
 
@@ -68,8 +87,9 @@ function BorrowModal(props: IProps) {
       );
       if (res) {
         handleCancel();
-        api.success({
-          message: `Successfully borrowed ${res?.amountFIL} FIL`,
+        setIsFeedbackOpen(true);
+        setRewards({
+          amountFIL: res?.amountFIL,
         });
       }
     } finally {
@@ -201,111 +221,121 @@ function BorrowModal(props: IProps) {
   }, []);
 
   return (
-    <Modal
-      className="custom-modal big-btn top-[30px]"
-      title=""
-      open={isOpen}
-      onCancel={handleCancel}
-      cancelButtonProps={{
-        size: "large",
-      }}
-      width={670}
-      onOk={handleConfirm}
-      okText="Borrow"
-      okButtonProps={{
-        size: "large",
-        loading: loading,
-      }}
-    >
-      {/* <div className="text-xl font-bold">Borrow</div> */}
-      <p className="font-bold text-[18px] mb-4">
-        {isIndent(data?.familyInfo.user)}
-      </p>
-      <div className="grid grid-cols-3 gap-[16px]">
-        {familyData.map((item, index) => (
-          <div
-            className={`data-card ${index === 0 && "btn-default text-white"}`}
-            key={item.title}
-          >
-            <Space className="mb-4">
-              <p className="text-xs font-semibold">{item.title}</p>
-              {item.tip && <InfoTips type="small" content={item.tip} />}
-            </Space>
+    <>
+      <Modal
+        className="custom-modal big-btn top-[30px]"
+        title=""
+        open={isOpen}
+        onCancel={handleCancel}
+        cancelButtonProps={{
+          size: "large",
+        }}
+        width={670}
+        onOk={handleConfirm}
+        okText="Borrow"
+        okButtonProps={{
+          size: "large",
+          loading: loading,
+        }}
+      >
+        <p className="font-bold text-[18px] mb-4">
+          {isIndent(data?.familyInfo.user)}
+        </p>
+        <div className="grid grid-cols-3 gap-[16px]">
+          {familyData.map((item, index) => (
+            <div
+              className={`data-card ${index === 0 && "btn-default text-white"}`}
+              key={item.title}
+            >
+              <Space className="mb-4">
+                <p className="text-xs font-semibold">{item.title}</p>
+                {item.tip && <InfoTips type="small" content={item.tip} />}
+              </Space>
 
-            <p className="text-[22px] font-bold">
-              {item.value}
-              {item.unit && (
-                <span className="text-sm font-normal ml-2">{item.unit}</span>
-              )}
-            </p>
-          </div>
-        ))}
-      </div>
-      <p className="font-bold text-[18px] my-4">{`Miner ID: ${network}${minerBorrow?.minerId}`}</p>
-      <div className="grid grid-cols-3 gap-[16px]">
-        {minerData.map((item, index) => (
-          <div
-            className={`data-card ${index === 0 && "btn-default text-white"}`}
-            key={item.title}
-          >
-            <Space className="mb-4">
-              <p className="text-xs font-semibold">{item.title}</p>
-              {item.tip && <InfoTips type="small" content={item.tip} />}
-            </Space>
-            <p className="text-[22px] font-bold">
-              {item.value}
-              {item.unit && (
-                <span className="text-sm font-normal ml-2">{item.unit}</span>
-              )}
-            </p>
-          </div>
-        ))}
-      </div>
-      <p className="text-gray-400 text-sm mt-[10px]">
-        *Miner specific data is provided by{" "}
-        <a className="underline" target="_blank" href="https://filscan.io/">
-          Filscan.io
-        </a>
-      </p>
-      <div className="my-5">
-        <NumberInput
-          label="Loan Amount"
-          value={amount}
-          prefix="FIL"
-          min={10}
-          max={maxBorrowable}
-          maxButton
-          onMaxButtonClick={onMaxButtonClick}
-          onChange={(val) => setAmount(val)}
+              <p className="text-[22px] font-bold">
+                {item.value}
+                {item.unit && (
+                  <span className="text-sm font-normal ml-2">{item.unit}</span>
+                )}
+              </p>
+            </div>
+          ))}
+        </div>
+        <p className="font-bold text-[18px] my-4">{`Miner ID: ${network}${minerBorrow?.minerId}`}</p>
+        <div className="grid grid-cols-3 gap-[16px]">
+          {minerData.map((item, index) => (
+            <div
+              className={`data-card ${index === 0 && "btn-default text-white"}`}
+              key={item.title}
+            >
+              <Space className="mb-4">
+                <p className="text-xs font-semibold">{item.title}</p>
+                {item.tip && <InfoTips type="small" content={item.tip} />}
+              </Space>
+              <p className="text-[22px] font-bold">
+                {item.value}
+                {item.unit && (
+                  <span className="text-sm font-normal ml-2">{item.unit}</span>
+                )}
+              </p>
+            </div>
+          ))}
+        </div>
+        <p className="text-gray-400 text-sm mt-[10px]">
+          *Miner specific data is provided by{" "}
+          <a className="underline" target="_blank" href="https://filscan.io/">
+            Filscan.io
+          </a>
+        </p>
+        <div className="my-5">
+          <NumberInput
+            label="Loan Amount"
+            value={amount}
+            prefix="FIL"
+            min={10}
+            max={maxBorrowable}
+            maxButton
+            onMaxButtonClick={onMaxButtonClick}
+            onChange={(val) => setAmount(val)}
+          />
+          <NumberInput
+            label={
+              <Space size={[4, 4]}>
+                Slippage Tolerance{" "}
+                <InfoTips
+                  type="small"
+                  content="Due to the potential slippage of on-chain transactions, there may be discrepancies in the actual Borrowing APR compared to the expected Borrowing APR. Input the maximum acceptable borrowing APR for this transaction."
+                />
+              </Space>
+            }
+            className="w-[100px] border-r-none"
+            placeholder="Max. Acceptable Borrowing APR"
+            affix="%"
+            value={slippage}
+            onChange={(val) => setSlippage(val)}
+          />
+        </div>
+        <DescRow
+          title="Expected Borrowing APR"
+          desc={`${expected.expectedInterestRate}%`}
         />
-        <NumberInput
-          label={
-            <Space size={[4, 4]}>
-              Slippage Tolerance{" "}
-              <InfoTips
-                type="small"
-                content="Due to the potential slippage of on-chain transactions, there may be discrepancies in the actual Borrowing APR compared to the expected Borrowing APR. Input the maximum acceptable borrowing APR for this transaction."
-              />
-            </Space>
-          }
-          className="w-[100px] border-r-none"
-          placeholder="Max. Acceptable Borrowing APR"
-          affix="%"
-          value={slippage}
-          onChange={(val) => setSlippage(val)}
+        <DescRow
+          title="Expected 6-Month Interest"
+          desc={`${expected.expected6monthInterest} FIL`}
         />
-      </div>
-      <DescRow
-        title="Expected Borrowing APR"
-        desc={`${expected.expectedInterestRate}%`}
+        <DescRow title="Borrowing Transaction Fee" desc="1%" />
+        {contextHolder}
+      </Modal>
+
+      <ConfirmModal
+        isOpen={isFeedbackOpen}
+        type="success"
+        title="Successfully Borrowed"
+        desc={`${rewards?.amountFIL} FIL borrowed`}
+        onConfirm={handleFeedbackCancel}
+        onCancel={handleFeedbackCancel}
       />
-      <DescRow
-        title="Expected 6-Month Interest"
-        desc={`${expected.expected6monthInterest} FIL`}
-      />
-      <DescRow title="Borrowing Transaction Fee" desc="1%" />
-      {contextHolder}
-    </Modal>
+    </>
   );
 }
 
