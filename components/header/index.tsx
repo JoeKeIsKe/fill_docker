@@ -7,7 +7,6 @@ import { RouterList, NETWORK } from "@/constants";
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useMetaMask } from "@/hooks/useMetaMask";
-import data_fetcher_contract from "@/server/data_fetcher";
 import { useSelector } from "react-redux";
 import { rootState } from "@/store/type";
 import { NetworkItemType } from "@/utils/type";
@@ -16,18 +15,19 @@ import store from "@/store";
 import { usePathname } from "next/navigation";
 import { Dropdown, Space } from "antd";
 import { getStorage } from "@/utils";
-import NextLink from "next/link";
+import { fetchChartAndPanelData } from "@/app/api/common";
 
 function Header() {
   const dispath = useDispatch();
   const { wallet, connectButton, currentAccount } = useMetaMask();
+
+  const [loading, setLoading] = useState(false);
 
   const { isNetworkCorrect } = getStorage("network_info");
 
   const [api, contextHolder] = notification.useNotification();
   const pathname = usePathname();
 
-  const { filInfo } = useSelector((state: rootState) => state?.contract);
   const { refreshAllData } = useSelector(
     (state: rootState) => state?.commonStore
   );
@@ -86,15 +86,25 @@ function Header() {
     }
   }, []);
 
-  useEffect(() => {
-    if (!filInfo || refreshAllData) {
-      data_fetcher_contract.fetchAllData();
-      store.dispatch({
-        type: "common/change",
-        payload: { refreshAllData: false },
-      });
+  const fetchData = async () => {
+    if (loading) return;
+    try {
+      setLoading(true);
+      if (refreshAllData) {
+        await fetchChartAndPanelData();
+        store.dispatch({
+          type: "common/change",
+          payload: { refreshAllData: false },
+        });
+      }
+    } finally {
+      setLoading(false);
     }
-  }, [currentAccount, filInfo, refreshAllData]);
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, [refreshAllData]);
 
   useEffect(() => {
     // catch the errors from MetaMask
@@ -131,7 +141,7 @@ function Header() {
         <div className="h-full flex gap-x-5 items-center leading-[80px]">
           {RouterList.map((item) => (
             <Link
-              className={`text-[#000] h-full block text-center md:w-[160px] ${
+              className={`text-[#000] h-full block text-center md:w-[100px] lg:w-[160px] ${
                 pathname.includes(item.value) && "active"
               }`}
               href={`/${item.value}`}

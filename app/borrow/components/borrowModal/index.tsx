@@ -10,11 +10,16 @@ import data_fetcher_contract from "@/server/data_fetcher";
 import FIL_contract from "@/server/FILLiquid_contract";
 import { getValueDivide, isIndent, numberWithCommas } from "@/utils";
 import { DEFAULT_EMPTY } from "../constans";
+import { SLIPPAGE_TAG_MAP } from "@/constants";
 import useLoading from "@/hooks/useLoading";
 import { useMetaMask } from "@/hooks/useMetaMask";
-import InfoTips from "@/components/infoTips";
+import InfoTips from "@/components/InfoTips";
 import { getDataFromFilscan } from "../../../api/modules";
-import ConfirmModal from "@/components/confirmModal";
+import ConfirmModal from "@/components/ConfirmModal";
+import { Tag } from "antd";
+import BigNumber from "bignumber.js";
+
+const { CheckableTag } = Tag;
 
 interface IProps {
   isOpen?: boolean;
@@ -37,11 +42,12 @@ function BorrowModal(props: IProps) {
   const { isOpen = false, data, onCancel, updateList } = props;
 
   const [amount, setAmount] = useState<number | null>();
+  const [selectedTags, setSelectedTags] = useState<string>("");
   const [debouncedAmount] = useDebounce(amount, 2);
   const [expected, setExpected] = useState<ExpectedBorrow>(defaultExpected);
   const [minerBorrow, setMinerBorrow] = useState<MinerBorrows | null>();
   const [maxBorrowable, setMaxBorrowable] = useState();
-  const [slippage, setSlippage] = useState();
+  const [slippage, setSlippage] = useState<any>();
   const [api, contextHolder] = notification.useNotification();
   const { loading, setLoading } = useLoading();
   const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
@@ -129,7 +135,22 @@ function BorrowModal(props: IProps) {
   const clear = () => {
     setAmount(undefined);
     setSlippage(undefined);
+    setSelectedTags("");
     setExpected(defaultExpected);
+  };
+
+  const getDebtRatioStyle = (rate: number) => {
+    if (Number(rate) > 85)
+      return {
+        color: "#ff4d4f",
+        fontWeight: 700,
+      };
+    if (Number(rate) > 75)
+      return {
+        color: "#faad14",
+        fontWeight: 700,
+      };
+    return {};
   };
 
   useEffect(() => {
@@ -159,7 +180,11 @@ function BorrowModal(props: IProps) {
       },
       {
         title: "Debt Ratio",
-        value: data?.familyInfo.ratio || DEFAULT_EMPTY,
+        value: (
+          <span style={getDebtRatioStyle(Number(data?.familyInfo.ratio || 0))}>
+            {data?.familyInfo.ratio || DEFAULT_EMPTY}
+          </span>
+        ),
         tip: "Debt-to-assets Ratio = Debt Outstanding / Total Account Balance",
         unit: "%",
       },
@@ -212,13 +237,57 @@ function BorrowModal(props: IProps) {
         },
       } = res?._data;
       const initialPledge = getValueDivide(account_miner?.init_pledge || 0);
-      // const
     }
   };
 
   useEffect(() => {
     // getMinerInfo();
   }, []);
+
+  const handleChange = (tag: string, checked: boolean) => {
+    if (selectedTags === tag) {
+      setSelectedTags("");
+    } else {
+      setSelectedTags(tag);
+    }
+  };
+
+  useEffect(() => {
+    switch (selectedTags) {
+      case SLIPPAGE_TAG_MAP[0]:
+        setSlippage(
+          BigNumber(expected.expectedInterestRate)
+            .times(1 + 0.05)
+            .decimalPlaces(2, BigNumber.ROUND_DOWN)
+            .toNumber()
+        );
+        break;
+      case SLIPPAGE_TAG_MAP[1]:
+        setSlippage(
+          BigNumber(expected.expectedInterestRate)
+            .times(1 + 0.1)
+            .decimalPlaces(2, BigNumber.ROUND_DOWN)
+            .toNumber()
+        );
+        break;
+      case SLIPPAGE_TAG_MAP[2]:
+        setSlippage(
+          BigNumber(expected.expectedInterestRate)
+            .times(1 + 0.2)
+            .decimalPlaces(2, BigNumber.ROUND_DOWN)
+            .toNumber()
+        );
+        break;
+      case SLIPPAGE_TAG_MAP[3]:
+        setSlippage(100);
+        break;
+      case "":
+        setSlippage(undefined);
+        break;
+      default:
+        break;
+    }
+  }, [selectedTags, expected.expectedInterestRate]);
 
   return (
     <>
@@ -312,8 +381,20 @@ function BorrowModal(props: IProps) {
             placeholder="Max. Acceptable Borrowing APR"
             affix="%"
             value={slippage}
+            disabled={selectedTags === SLIPPAGE_TAG_MAP[3]}
             onChange={(val) => setSlippage(val)}
           />
+          <Space className="mt-2" size={[0, 8]} wrap>
+            {SLIPPAGE_TAG_MAP.map((tag) => (
+              <CheckableTag
+                key={tag}
+                checked={selectedTags.includes(tag)}
+                onChange={(checked) => handleChange(tag, checked)}
+              >
+                {tag}
+              </CheckableTag>
+            ))}
+          </Space>
         </div>
         <DescRow
           title="Expected Borrowing APR"

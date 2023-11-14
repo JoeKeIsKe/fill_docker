@@ -15,7 +15,7 @@ import Image from "next/image";
 import { postBuildMessage, postPushMessage } from "@/app/api/modules";
 import data_fetcher_contract from "@/server/data_fetcher";
 import { Fill_liquid_contract_id, Fill_liquid_contract } from "@/contract";
-import InfoTips from "@/components/infoTips";
+import InfoTips from "@/components/InfoTips";
 
 import SuccessIcon from "@/assets/success_icon.png";
 
@@ -109,7 +109,11 @@ export default ({ btn }: { btn?: string | React.ReactNode }) => {
       case 2:
         setLoading(true);
         try {
-          const res = await FIL_contract.bindMiner(miner, sign, currentAccount);
+          const res = await FIL_contract.bindMiner(
+            miner,
+            sign,
+            currentAccount || ""
+          );
           if (res) {
             setCurrent(current + 1);
           }
@@ -286,7 +290,9 @@ export default ({ btn }: { btn?: string | React.ReactNode }) => {
           </div>
         )
       ) : (
-        connectButton()
+        <div className="flex w-full justify-center border border-[rgba(100, 111, 126, 0.2)] py-[40px] border-dashed rounded-[8px] mb-[24px]">
+          <div className="w-[400px]">{connectButton()}</div>
+        </div>
       )}
       <Modal
         width={1000}

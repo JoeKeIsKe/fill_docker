@@ -103,7 +103,7 @@ const Chart = memo((props: Props) => {
   return (
     <div
       id="chart"
-      style={{ width: "100%", height: height ?? "80%", minHeight: "260px" }}
+      style={{ width: "100%", height: height ?? "80%", minHeight: "300px" }}
       ref={chartRef}
     />
   );

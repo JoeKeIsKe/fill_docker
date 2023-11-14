@@ -3,7 +3,6 @@ import { data_fetcher_contract } from "@/contract";
 import { getValueDivide, formatUnits, getValueMultiplied } from "@/utils";
 import {
   FilLiquidInfo,
-  StakeOverview,
   BalanceType,
   ExpectedStake,
   ExpectedBorrow,
@@ -38,12 +37,6 @@ class contract {
         .call()
         .then((res: any) => {
           if (res) {
-            // data for Stake
-            const { fitTotalSupply, figTotalSupply }: StakeOverview = res;
-            const stakeOverview: StakeOverview = {
-              fitTotalSupply: formatUnits(fitTotalSupply),
-              figTotalSupply: formatUnits(figTotalSupply),
-            };
             // data for Borrow
             const {
               totalFIL,
@@ -69,7 +62,7 @@ class contract {
             };
             store.dispatch({
               type: "contract/change",
-              payload: { stakeOverview, filInfo },
+              payload: { filInfo },
             });
           }
         });
@@ -118,7 +111,7 @@ class contract {
           }
         })
         .catch((err: any) => {
-          console.log("err ==> ", err);
+          // console.log("err ==> ", err);
         });
     });
   }
@@ -138,7 +131,7 @@ class contract {
           }
         })
         .catch((err: any) => {
-          console.log("err ==> ", err);
+          // console.log("err ==> ", err);
         });
     });
   }
@@ -163,7 +156,7 @@ class contract {
           }
         })
         .catch((err: any) => {
-          console.log("err ==> ", err);
+          // console.log("err ==> ", err);
         });
     });
   }
@@ -178,7 +171,7 @@ class contract {
           resolve(num);
         })
         .catch((err: any) => {
-          console.log("err ==> ", err);
+          // console.log("err ==> ", err);
         });
     });
   }

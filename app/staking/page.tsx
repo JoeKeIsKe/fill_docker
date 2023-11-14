@@ -5,34 +5,37 @@ import Card from "@/packages/card";
 import Tabs from "@/packages/Tabs";
 import NumberInput from "@/packages/NumberInput";
 import DescRow from "@/packages/DescRow";
-import Chart from "@/components/charts";
+import Chart from "@/components/Charts";
 import notification from "antd/es/notification";
 import { rootState } from "@/store/type";
 import {
   isIndent,
   getValueToFixed,
-  timestampToDateTime,
   numberWithCommas,
   getValueDivide,
 } from "@/utils";
 import { useMetaMask } from "@/hooks/useMetaMask";
-import { Button, Divider, Space } from "antd";
+import { Button, Divider, Space, Tag } from "antd";
 import { useSelector } from "react-redux";
 import data_fetcher_contract from "@/server/data_fetcher";
 import FIL_contract from "@/server/FILLiquid_contract";
 import BigNumber from "bignumber.js";
 import { DEFAULT_EMPTY } from "../borrow/components/constans";
+import { CHART_TIME_TYPE_MAP } from "../../constants";
 import { useDebounce } from "use-debounce";
 import { ExpectedStake } from "@/utils/type";
 import useLoading from "@/hooks/useLoading";
-import { getChartData } from "../api/modules/index";
 import { ReloadOutlined } from "@ant-design/icons";
 import * as echarts from "echarts/core";
-import InfoTips from "@/components/infoTips";
-import ConfirmModal from "@/components/confirmModal";
-import AddToWalletBtn from "@/components/addToWalletBtn";
+import InfoTips from "@/components/InfoTips";
+import ConfirmModal from "@/components/ConfirmModal";
+import AddToWalletBtn from "@/components/AddToWalletBtn";
+import store from "@/store";
+import { formatChartTime } from "../api/common";
+import { SLIPPAGE_TAG_MAP } from "@/constants";
 
 const TAB_KEYS = ["stake", "unstake"];
+const { CheckableTag } = Tag;
 
 interface Rewards {
   amountFIT: number | string;
@@ -41,35 +44,43 @@ interface Rewards {
 
 function Staking() {
   const [api, contextHolder] = notification.useNotification();
-  const { currentAccount, isNetworkCorrect } = useMetaMask();
+  const {
+    currentAccount = undefined,
+    isNetworkCorrect,
+    connectButton,
+  } = useMetaMask();
 
   const [amount, setAmount] = useState<number | null>();
   const [debouncedAmount] = useDebounce(amount, 600);
-  const [slippage, setSlippage] = useState();
+  const [slippage, setSlippage] = useState<any>();
   const [expected, setExpected] = useState<ExpectedStake>({
     expectedAmount: 0,
     expectedRate: 0,
   });
   const [tabKey, setTabKey] = useState<string>(TAB_KEYS[0]);
-  const [chartData, setChartData] = useState([]);
-  const [chartDate, setChartDate] = useState([]);
-  const [currentAPY, setCurrentAPY] = useState<string | number>();
   const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
   const [rewards, setRewards] = useState<Rewards>();
+  const [chartTimeType, setChartTimeType] =
+    useState<keyof typeof CHART_TIME_TYPE_MAP>("7d");
+  const [selectedTags, setSelectedTags] = useState<string>("");
 
-  const { filInfo, balance, stakeOverview } = useSelector(
-    (state: rootState) => state?.contract
-  );
+  const { balance } = useSelector((state: rootState) => state?.contract);
+
+  const { APY, panel } = useSelector((state: rootState) => state?.panel);
 
   const { loading, setLoading } = useLoading();
 
   const default_opt = useMemo(() => {
+    const dataList = APY?.[chartTimeType]?.map((item: any) => item.APY * 100);
+    const dateList = APY?.[chartTimeType]?.map((item: any) =>
+      formatChartTime(item.BlockTimeStamp)
+    );
     return {
       backgroundColor: "transparent",
       xAxis: {
         type: "category",
         boundaryGap: false,
-        data: chartDate,
+        data: dateList,
         axisLabel: {
           textStyle: {
             color: "rgba(100, 111, 126, 0.6)",
@@ -92,7 +103,7 @@ function Staking() {
       },
       series: [
         {
-          data: chartData,
+          data: dataList,
           type: "line",
           smooth: true,
           symbolSize: 0,
@@ -135,7 +146,7 @@ function Staking() {
         },
       ],
     };
-  }, [chartData, chartDate]);
+  }, [APY?.["1d"]?.[0]?.BlockTimeStamp, chartTimeType]);
 
   const onTabChange = (tabKey: string) => {
     setTabKey(tabKey);
@@ -145,6 +156,7 @@ function Staking() {
   const clear = () => {
     setAmount(undefined);
     setSlippage(undefined);
+    setSelectedTags("");
   };
 
   const onConfirm = async () => {
@@ -218,44 +230,26 @@ function Staking() {
     });
   };
 
-  const fetchChartData = async () => {
-    const res = await getChartData();
-    if (res) {
-      const { Senior } = res;
-      const target = Senior?.slice(-8) || [];
-      const currentTarget = Senior?.slice(-1) || [];
-      const APY = currentTarget[0]?.APY;
-      setCurrentAPY(getValueToFixed(APY * 100, 6));
-
-      const dataList = target.map((item: any) =>
-        getValueToFixed(item.APY * 100, 6)
-      );
-      const dateList = target.map((item: any) =>
-        timestampToDateTime(item.BlockTimeStamp, "MM-DD HH:mm")
-      );
-      setChartData(dataList);
-      setChartDate(dateList);
-    }
-  };
-
   const fetchPersonalData = () => {
     if (currentAccount) {
       data_fetcher_contract.fetchPersonalData(currentAccount);
     }
   };
 
-  const fetchData = () => {
+  const fetchData = (shouldRefresh?: boolean) => {
+    if (shouldRefresh) {
+      store.dispatch({
+        type: "common/change",
+        payload: { refreshAllData: true },
+      });
+    }
     if (!isNetworkCorrect) return;
     fetchPersonalData();
   };
 
   useEffect(() => {
-    fetchData();
+    fetchData(true);
   }, [currentAccount]);
-
-  useEffect(() => {
-    fetchChartData();
-  }, []);
 
   useEffect(() => {
     onExpectedRewards();
@@ -265,42 +259,97 @@ function Staking() {
     return [
       {
         title: "Total FIL Liquidity",
-        value: numberWithCommas(filInfo?.totalFIL || DEFAULT_EMPTY),
+        value: numberWithCommas(panel?.TotalFIL || DEFAULT_EMPTY),
         unit: "FIL",
       },
       {
         title: "Total FIT Outstanding",
-        value: numberWithCommas(stakeOverview?.fitTotalSupply || DEFAULT_EMPTY),
+        value: numberWithCommas(panel?.FitTotalSupply || DEFAULT_EMPTY),
         unit: "FIT",
       },
       {
         title: "Utilization Rate",
-        value: filInfo?.utilizationRate || DEFAULT_EMPTY,
+        value: numberWithCommas(panel?.UtilizationRate * 100) || DEFAULT_EMPTY,
         unit: "%",
       },
       {
         title: "FIL / FIT",
-        value: filInfo?.exchangeRate || DEFAULT_EMPTY,
+        value: numberWithCommas(panel?.FIL_FIT) || DEFAULT_EMPTY,
       },
       {
         title: "Staking APY",
-        value:
-          BigNumber(currentAPY || 0)
-            .decimalPlaces(2, 1)
-            .toNumber() || DEFAULT_EMPTY,
+        value: numberWithCommas(APY?.current || 0) || DEFAULT_EMPTY,
         unit: "%",
         tip: "The Staking APY is estimated with the weighted average borrowing term. Please refer to the White Paper for detailed APY calculation.",
       },
     ];
-  }, [filInfo, stakeOverview, currentAPY]);
+  }, [panel, APY?.current]);
+
+  const chartTimeData: any = Object.keys(CHART_TIME_TYPE_MAP);
+
+  const handleChangeChartTime = (
+    time: keyof typeof CHART_TIME_TYPE_MAP,
+    checked: boolean
+  ) => {
+    if (chartTimeType === time) {
+      setChartTimeType("all");
+    } else {
+      setChartTimeType(time);
+    }
+  };
+
+  const handleChangeSlippageTag = (tag: string, checked: boolean) => {
+    if (selectedTags === tag) {
+      setSelectedTags("");
+    } else {
+      setSelectedTags(tag);
+    }
+  };
+
+  useEffect(() => {
+    switch (selectedTags) {
+      case SLIPPAGE_TAG_MAP[0]:
+        setSlippage(
+          BigNumber(expected.expectedAmount)
+            .times(1 - 0.05)
+            .decimalPlaces(2, BigNumber.ROUND_DOWN)
+            .toNumber()
+        );
+        break;
+      case SLIPPAGE_TAG_MAP[1]:
+        setSlippage(
+          BigNumber(expected.expectedAmount)
+            .times(1 - 0.1)
+            .decimalPlaces(2, BigNumber.ROUND_DOWN)
+            .toNumber()
+        );
+        break;
+      case SLIPPAGE_TAG_MAP[2]:
+        setSlippage(
+          BigNumber(expected.expectedAmount)
+            .times(1 - 0.2)
+            .decimalPlaces(2, BigNumber.ROUND_DOWN)
+            .toNumber()
+        );
+        break;
+      case SLIPPAGE_TAG_MAP[3]:
+        setSlippage(0);
+        break;
+      case "":
+        setSlippage(undefined);
+        break;
+      default:
+        break;
+    }
+  }, [selectedTags, expected.expectedAmount]);
 
   return (
     <section>
       <label className="inline-block mb-[5px] font-medium text-sm text-[#06081B] hidden opacity-40"></label>
       <div className="text-[30px] font-semibold my-4">Stake</div>
-      <div className="flex gap-[24px] flex-col md:flex-row">
+      <div className="flex gap-[24px] flex-col md:flex-row items-center md:items-start">
         <Card title="Overview" className="flex-1">
-          <div className="grid grid-cols-6 gap-4 mb-[60px]">
+          <div className="grid grid-cols-6 gap-4 mb-[50px]">
             {overviewData.map((item, index) => (
               <div
                 className={`data-card col-span-2 ${
@@ -333,11 +382,22 @@ function Staking() {
               />
             </Space>
           </div>
+          <div className="flex justify-end mb-4">
+            {chartTimeData.slice(1).map((time: any) => (
+              <CheckableTag
+                key={time}
+                checked={chartTimeType === time}
+                onChange={(checked) => handleChangeChartTime(time, checked)}
+              >
+                {time}
+              </CheckableTag>
+            ))}
+          </div>
           <Chart option={default_opt} />
         </Card>
 
         {/* staking operation card */}
-        <div className="w-[330px] md:w-[415px]">
+        <div className="w-[330px] md:w-[400px]">
           <Card className="relative mb-4 btn-default text-white">
             <div className="absolute top-[14px] right-[14px] px-2 py-1 rounded-[24px] bg-gray-100 text-sm text-gray-500">
               {isIndent(currentAccount)}
@@ -346,7 +406,12 @@ function Staking() {
               <div>
                 <div className="text-sm font-semibold">
                   FIL Balance
-                  <ReloadOutlined className="ml-3" onClick={fetchData} />
+                  <ReloadOutlined
+                    className="ml-3"
+                    onClick={() => {
+                      fetchData(true);
+                    }}
+                  />
                 </div>
                 <p className="text-xl">{`${numberWithCommas(
                   balance.FIL,
@@ -356,13 +421,19 @@ function Staking() {
             </div>
             <div className="flex">
               <div className="flex flex-col">
-                <p className="text-sm font-semibold">FIT Balance</p>
-                <p className="text-xl">{`${numberWithCommas(
-                  balance.FIT,
-                  2
-                )} FIT`}</p>
+                <div className="text-sm font-semibold">
+                  FIT Balance
+                  <AddToWalletBtn coinType="FIT" />
+                </div>
+                <Space className="mt-1" align="end">
+                  <div className="text-xl">
+                    {`${numberWithCommas(balance.FIT, 2)} FIT`}
+                  </div>
+                  <div className="text-xs pb-1">{`≈ ${numberWithCommas(
+                    BigNumber(balance.FIT).times(panel?.FIL_FIT).toNumber()
+                  )} FIL`}</div>
+                </Space>
               </div>
-              <AddToWalletBtn coinType="FIT" />
             </div>
           </Card>
           <Card>
@@ -404,8 +475,22 @@ function Staking() {
                 value={slippage}
                 max={expected.expectedAmount || 9999999999}
                 min={0}
+                disabled={selectedTags === SLIPPAGE_TAG_MAP[3]}
                 onChange={(val) => setSlippage(val)}
               />
+              <Space className="mt-2" size={[0, 8]} wrap>
+                {SLIPPAGE_TAG_MAP.map((tag) => (
+                  <CheckableTag
+                    key={tag}
+                    checked={selectedTags.includes(tag)}
+                    onChange={(checked) =>
+                      handleChangeSlippageTag(tag, checked)
+                    }
+                  >
+                    {tag}
+                  </CheckableTag>
+                ))}
+              </Space>
             </div>
             <Divider />
             {tabKey === TAB_KEYS[0] ? (
@@ -434,14 +519,18 @@ function Staking() {
                 <DescRow title="Staking Fee" desc="0.5%" />
               </div>
             )}
-            <Button
-              type="primary"
-              className="w-full h-[45px] rounded-[24px] mt-8"
-              loading={loading}
-              onClick={onConfirm}
-            >
-              Confirm
-            </Button>
+            {currentAccount ? (
+              <Button
+                type="primary"
+                className="w-full h-[45px] rounded-[24px] mt-8"
+                loading={loading}
+                onClick={onConfirm}
+              >
+                Confirm
+              </Button>
+            ) : (
+              <div className="mt-8 w-full text-center">{connectButton()}</div>
+            )}
           </Card>
         </div>
       </div>

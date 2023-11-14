@@ -5,31 +5,22 @@ import { rootState } from "@/store/type";
 import { shallowEqual, useSelector } from "react-redux";
 import { Table, Space, Button, notification, Tag } from "antd";
 import { LoadingOutlined } from "@ant-design/icons";
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect } from "react";
 import stake_contract from "@/server/stake";
 import type { ColumnsType } from "antd/es/table";
 import store from "@/store";
-import ConfirmModal from "@/components/confirmModal";
+import ConfirmModal from "@/components/ConfirmModal";
 import { ReloadOutlined } from "@ant-design/icons";
 import { useMetaMask } from "@/hooks/useMetaMask";
 import useLoading from "@/hooks/useLoading";
 import Card from "@/packages/card";
+import { fetchChartAndPanelData } from "@/app/api/common";
 
 interface Props {}
 
 interface DataType {
   [key: string]: any;
 }
-
-interface StakeStatusType {
-  accumulatedInterestMint: number | string;
-  accumulatedStakeMint: number | string;
-}
-
-const defaultStakeStatus = {
-  accumulatedInterestMint: 0,
-  accumulatedStakeMint: 0,
-};
 
 const defaultPageNum = 6;
 
@@ -44,9 +35,7 @@ function StakingCard(props: Props) {
   const [selectedRow, setSelectedRow] = useState<any>();
 
   const [expectedRewards, setExpectedRewards] = useState<any>("");
-  const [receivedRewards, setReceivedRewards] = useState<any>("");
-  const [stakeStatus, setStakeStatus] =
-    useState<StakeStatusType>(defaultStakeStatus);
+  const [rewards, setRewards] = useState<any>("");
 
   const [api, contextHolder] = notification.useNotification();
 
@@ -59,18 +48,12 @@ function StakingCard(props: Props) {
     (state: rootState) => state?.commonStore,
     shallowEqual
   );
-  const { stakeOverview } = useSelector((state: rootState) => state?.contract);
 
-  const stakeStatusData = useMemo(() => {
-    return {
-      ...stakeStatus,
-      figTotal: stakeOverview?.figTotalSupply,
-    };
-  }, [stakeOverview, stakeStatus]);
+  const { panel } = useSelector((state: rootState) => state?.panel);
 
   const getList = async () => {
     if (!isNetworkCorrect) return;
-    const staker = currentAccount;
+    const staker = currentAccount || "";
     if (staker) {
       setListLoading(true);
       try {
@@ -82,14 +65,8 @@ function StakingCard(props: Props) {
     }
   };
 
-  const fetchStakerStatus = async () => {
-    if (!isNetworkCorrect) return;
-    const data: any = await stake_contract.getStakeStatus();
-    setStakeStatus(data);
-  };
-
   const onWithdrawBtnClick = async (row: any) => {
-    const staker = currentAccount;
+    const staker = currentAccount || "";
     setSelectedRow(row);
     onConfirmOpen();
     const res = await stake_contract.onExpectedRewardsFromVariableTerm(
@@ -102,7 +79,7 @@ function StakingCard(props: Props) {
   };
 
   const onWithdraw = async () => {
-    const staker = currentAccount;
+    const staker = currentAccount || "";
     setLoading(true);
     try {
       const res: any = await stake_contract.onUnstake(selectedRow?.id, staker);
@@ -113,7 +90,7 @@ function StakingCard(props: Props) {
             placement: "top",
           });
         } else {
-          setExpectedRewards(res);
+          setRewards(res?.amount || 0);
           onConfirmClose();
           onFeedbackOpen();
           refresh();
@@ -200,7 +177,7 @@ function StakingCard(props: Props) {
 
   useEffect(() => {
     getList();
-    fetchStakerStatus();
+    fetchChartAndPanelData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentAccount]);
 
@@ -216,27 +193,8 @@ function StakingCard(props: Props) {
   }, [refreshStakeData]);
 
   return (
-    <div>
-      <Card className="mb-[20px]">
-        <div>
-          <p className="text-xs font-semibold mb-4">{`Total FIG Outstanding: ${stakeStatusData.figTotal} FIG`}</p>
-          <div className="font-bold flex justify-around">
-            <div className="text-linear">
-              <p>From FIT Farming</p>
-              <p className="text-[24px] text-center">
-                {` ${stakeStatusData.accumulatedStakeMint}`}
-              </p>
-            </div>
-            <div>
-              <p>From Interest Repayment</p>
-              <p className="text-[24px] text-center">
-                {` ${stakeStatusData.accumulatedInterestMint}`}
-              </p>
-            </div>
-          </div>
-        </div>
-      </Card>
-      <Card>
+    <div className="relative">
+      <Card className="!p-[10px]">
         <div className="flex justify-end mb-2">
           <Button className="!flex items-center" type="text" onClick={refresh}>
             Refresh list
@@ -278,7 +236,7 @@ function StakingCard(props: Props) {
         isOpen={isFeedbackOpen}
         type="success"
         title="Successfully Withdrawn"
-        desc={`You received ${receivedRewards || 0} FIG`}
+        desc={`You received ${rewards || 0} FIG`}
         onConfirm={onFeedbackClose}
         onCancel={onFeedbackClose}
       />

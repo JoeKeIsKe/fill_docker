@@ -20,11 +20,6 @@ export interface StakeInfoType {
   id: string;
 }
 
-export interface StakeOverview {
-  fitTotalSupply: string | number;
-  figTotalSupply: string | number;
-}
-
 export interface BalanceType {
   filBalance: string | number;
   filTrustBalance: string | number;

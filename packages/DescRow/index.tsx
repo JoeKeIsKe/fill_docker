@@ -14,9 +14,7 @@ function DescRow(props: Props) {
     </div>
   ) : (
     <div className="mb-2 flex justify-between text-[#191D23]">
-      <span className="font-medium text-sm text-[#06081B] opacity-40">
-        {title}
-      </span>
+      <span className="font-semibold text-sm text-[#06081B]">{title}</span>
       <span className={`text-sm ${color ? "text-linear" : ""}`}>{desc}</span>
     </div>
   );

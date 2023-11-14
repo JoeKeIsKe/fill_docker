@@ -1,5 +1,5 @@
 import React, { useState, createContext, useContext, useMemo } from "react";
-import ConfirmModal from "../confirmModal";
+import ConfirmModal from "../ConfirmModal";
 
 export const MODAL_TYPES = {
   CONFIRM_MODAL: "CONFIRM_MODAL",

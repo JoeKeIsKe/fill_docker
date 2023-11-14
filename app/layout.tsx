@@ -8,7 +8,7 @@ import ErrorBoundary from "./lib/ErrorBoundary";
 const montserrat = Montserrat({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "FiLLiquid",
+  title: "FILLiquid",
 };
 
 export default function RootLayout({

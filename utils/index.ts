@@ -4,7 +4,7 @@ import dayjs from "dayjs";
 export function formatNumber(v: number | string, len = 4) {
   return Number(v).toLocaleString("en", { maximumFractionDigits: len });
 }
-export function isIndent(str: string, unit: number = 6) {
+export function isIndent(str: string | undefined, unit: number = 6) {
   return str && unit && str.length > unit * 2
     ? str?.slice(0, unit) + "..." + str?.slice(-unit)
     : str;

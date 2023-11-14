@@ -42,13 +42,13 @@ function MinerDetailTable(props: IProps) {
         title: "Principal",
         dataIndex: "remainingOriginalAmount",
         key: "remainingOriginalAmount",
-        render: (val) => `${numberWithCommas(val)} FIL`,
+        render: (val) => `${numberWithCommas(val, 6)} FIL`,
       },
       {
         title: "Interest",
         dataIndex: "interest",
         key: "interest",
-        render: (val) => `${numberWithCommas(val)} FIL`,
+        render: (val) => `${numberWithCommas(val, 6)} FIL`,
       },
       {
         title: "Total",

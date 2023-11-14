@@ -101,7 +101,7 @@ class contract {
           from: address,
         })
         .then((res: any) => {
-          resolve(getValueDivide(res, 18, 2));
+          resolve(getValueDivide(res, 18, 6));
         });
     });
   }
@@ -116,7 +116,7 @@ class contract {
         .call()
         .then((res: any) => {
           if (res) {
-            resolve(getValueDivide(Number(res[0]), 18, 2));
+            resolve(getValueDivide(Number(res[0]), 18, 6));
           }
         });
     });
@@ -141,24 +141,6 @@ class contract {
               }))
               .sort((a: any, b: any) => Number(b.id) - Number(a.id));
             resolve(list);
-          }
-        });
-    });
-  }
-
-  getStakeStatus() {
-    return new Promise((resolve, reject) => {
-      this.myContract.methods
-        .getStatus()
-        .call()
-        .then((res: any) => {
-          if (res) {
-            const { accumulatedStakeMint, accumulatedInterestMint } = res;
-            const stakeStatus = {
-              accumulatedStakeMint: formatUnits(accumulatedStakeMint),
-              accumulatedInterestMint: formatUnits(accumulatedInterestMint),
-            };
-            resolve(stakeStatus);
           }
         });
     });

@@ -9,7 +9,7 @@ import {
   useCallback,
   useMemo,
 } from "react";
-import { Button } from "antd";
+import { Button, Space } from "antd";
 import detectEthereumProvider from "@metamask/detect-provider";
 import notification from "antd/es/notification";
 import Modal from "@/packages/modal";
@@ -25,7 +25,7 @@ interface WalletState {
 
 interface MetaMaskContextData {
   wallet: WalletState;
-  currentAccount: string;
+  currentAccount: string | undefined;
   hasProvider: boolean | null;
   error: boolean;
   errorMsg: string;
@@ -64,7 +64,9 @@ export const MetaMaskContextProvider = ({ children }: PropsWithChildren) => {
   const [api, contextHolder] = notification.useNotification();
 
   const [wallet, setWallet] = useState(disconnectedState);
-  const [currentAccount, setCurrentAccount] = useState<string>("");
+  const [currentAccount, setCurrentAccount] = useState<string | undefined>(
+    undefined
+  );
 
   useEffect(() => {
     setCurrentAccount(wallet?.accounts[0]);
@@ -224,14 +226,16 @@ export const MetaMaskContextProvider = ({ children }: PropsWithChildren) => {
           {/* for now only one wallet is supported */}
           {["MetaMask"].map((wallet) => {
             return (
-              <p
-                className="flex items-center gap-x-2.5 p-2.5 rounded cursor-pointer hover:bg-slate-200"
+              <div
+                className="p-2 rounded cursor-pointer hover:bg-slate-200"
                 key={wallet}
                 onClick={connectMetaMask}
               >
-                <span className="icon">{getSvg(`wallect_metamask`)}</span>
-                {wallet}
-              </p>
+                <Space align="center">
+                  <span className="icon">{getSvg(`wallect_metamask`)}</span>
+                  <span>{wallet}</span>
+                </Space>
+              </div>
             );
           })}
         </div>

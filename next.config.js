@@ -9,12 +9,12 @@ const rewrites = () => {
     // const des_spex_url = 'https://calibration.app.spex.website/api/v1/spex'
     return [
       {
-        source: "/api/getdata",
-        destination: `${des_url}/getdata`,
+        source: "/api/:path*",
+        destination: `${des_url}/:path*`,
       },
       {
-        source: "/api/getFamilyCount",
-        destination: `${des_url_2}/getFamilyCount`,
+        source: "/api2/:path*",
+        destination: `${des_url_2}/:path*`,
       },
     ]
   };

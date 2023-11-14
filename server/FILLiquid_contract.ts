@@ -80,7 +80,7 @@ class contract {
     amount: number | string,
     slippage: number | string,
     tabKey: string,
-    account: string
+    account?: string
   ) {
     const isStake = tabKey === "stake";
     const type = isStake ? "deposit" : "redeem";

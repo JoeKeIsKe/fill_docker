@@ -98,3 +98,13 @@ export const NETWORK: NetworkItemType[] = [
     },
   },
 ];
+
+export const CHART_TIME_TYPE_MAP = {
+  all: "",
+  "1d": "1d",
+  "7d": "7d",
+  "1m": "1m",
+  "3m": "3m",
+};
+
+export const SLIPPAGE_TAG_MAP = ["5%", "10%", "20%", "Unlimited"];

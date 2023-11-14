@@ -1,8 +1,7 @@
 "use client";
 
-import "../custom.scss";
 import { ReactNode, useState, useEffect } from "react";
-import Header from "@/components/header";
+import Header from "@/components/Header";
 import { Provider, useDispatch } from "react-redux";
 import store from "@/store";
 import { ConfigProvider } from "antd";
@@ -10,25 +9,11 @@ import theme from "./ThemeConfig";
 import Loading from "../loading";
 import GlobalLoading from "./GlobalLoading";
 import { MetaMaskContextProvider } from "@/hooks/useMetaMask";
-import { GlobalModal } from "@/components/globalModal";
+import { GlobalModal } from "@/components/GlobalModal";
 import "../custom.scss";
-
-interface ConfirmProps {
-  open: boolean;
-  type?: "success" | "warning";
-  title?: string;
-  desc?: string;
-  callback?: () => void;
-}
-
-const defaultConfirmProps: ConfirmProps = {
-  open: false,
-};
 
 function CustomProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
-  const [confirmProps, setConfirmProps] =
-    useState<ConfirmProps>(defaultConfirmProps);
 
   useEffect(() => {
     if (window) {

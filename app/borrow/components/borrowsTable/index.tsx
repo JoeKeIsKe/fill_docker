@@ -4,15 +4,20 @@ import { useEffect, useMemo, useState } from "react";
 import type { TableColumnsType, TablePaginationConfig } from "antd";
 import { Space, Table, Button } from "antd";
 import { ReloadOutlined } from "@ant-design/icons";
-import BorrowModal from "../borrowModal";
-import RepayModal from "../repayModal";
+import BorrowModal from "../BorrowModal";
+import RepayModal from "../RepayModal";
 import { DEFAULT_EMPTY, REPAY_MODAL_TITLE } from "../constans";
 import FIL_contract from "@/server/FILLiquid_contract";
 import data_fetcher_contract from "@/server/data_fetcher";
 import { useMetaMask } from "@/hooks/useMetaMask";
 import { useSelector } from "react-redux";
 import { rootState } from "@/store/type";
-import { isIndent, numberWithCommas } from "@/utils";
+import {
+  isIndent,
+  numberWithCommas,
+  getValueDivide,
+  formatUnits,
+} from "@/utils";
 import store from "@/store";
 import {
   MinerListItem,
@@ -22,10 +27,11 @@ import {
 } from "@/utils/type";
 import Link from "next/link";
 import UnbindMiner from "../../../certified/unbindMiner";
-import { getBorrowingsFamily } from "../../../api/modules/index";
+import { getBorrowFamilies } from "../../../api/modules/index";
 import ActionButton from "@/packages/ActionButton";
 import { useDebounce } from "use-debounce";
-import InfoTips from "@/components/infoTips";
+import InfoTips from "@/components/InfoTips";
+import { LoadingOutlined } from "@ant-design/icons";
 
 interface ExpandedDataType extends MinerListItem {}
 
@@ -41,19 +47,14 @@ function BorrowsTable(props: IProps) {
   const isMyFamily = type === "my";
   const [debouncedSearchText] = useDebounce(searchText, 600);
 
+  const [loading, setLoading] = useState(false);
+
   const { currentAccount, wallet, isNetworkCorrect } = useMetaMask();
   const network = wallet?.chainId?.includes("0x1") ? "f0" : "t0";
 
   const [isBorrowModalOpen, setIsBorrowModalOpen] = useState<boolean>(false);
   const [isRepayModalOpen, setIsRepayModalOpen] = useState<boolean>(false);
   const [pageIndex, setPageIndex] = useState(1);
-  const [familyCountRaw, setFamilyCountRaw] = useState<string[] | []>([]);
-  const familyCount = useMemo(() => {
-    return familyCountRaw.slice(
-      (pageIndex - 1) * PAGE_SIZE,
-      pageIndex * PAGE_SIZE
-    );
-  }, [familyCountRaw, pageIndex]);
 
   const [familyBorrows, setFamilyBorrows] = useState<UserBorrow[] | []>([]);
   const [selectedMiner, setSelectedMiner] = useState<MinerListItem | null>(
@@ -126,7 +127,7 @@ function BorrowsTable(props: IProps) {
           ) : (
             <ActionButton
               name="Repay for this miner"
-              disabled={Number(row?.borrows) <= 0}
+              disabled={Number(row?.borrows) <= 0 || !currentAccount}
               onClick={() => onRepayClick(row, 3)}
             />
           ),
@@ -146,6 +147,20 @@ function BorrowsTable(props: IProps) {
         rowKey="minerId"
       />
     );
+  };
+
+  const getDebtRatioStyle = (rate: number) => {
+    if (Number(rate) > 85)
+      return {
+        color: "#ff4d4f",
+        fontWeight: 700,
+      };
+    if (Number(rate) > 75)
+      return {
+        color: "#faad14",
+        fontWeight: 700,
+      };
+    return {};
   };
 
   const columns: TableColumnsType<UserBorrow> = [
@@ -179,7 +194,9 @@ function BorrowsTable(props: IProps) {
       ),
       dataIndex: "liquidateConditionInfo",
       key: "ratio",
-      render: (val) => val?.rate,
+      render: (val) => (
+        <span style={getDebtRatioStyle(val?.rate)}>{val?.rate}</span>
+      ),
     },
   ];
 
@@ -197,10 +214,24 @@ function BorrowsTable(props: IProps) {
     });
   }
 
-  const data = isMyFamily && ownFamilyList ? ownFamilyList : familyBorrows;
-  // console.log("ownFamilyList ==> ", ownFamilyList);
-  // console.log("data ==> ", data);
-  // console.log("userBorrow ==> ", userBorrow);
+  const familyList = useMemo(() => {
+    const search = debouncedSearchText
+      ?.toLocaleLowerCase()
+      .trim()
+      .replace("t0", "")
+      .replace("f0", "");
+    if (search) {
+      return familyBorrows.filter((item) => {
+        return (
+          item.user.toLowerCase().includes(search) ||
+          item.minerBorrowInfo?.some((i) => i.minerId.includes(search))
+        );
+      });
+    }
+    return familyBorrows;
+  }, [familyBorrows, debouncedSearchText]);
+
+  const data = isMyFamily && ownFamilyList ? ownFamilyList : familyList;
 
   const minerBorrowInfo: BorrowModalData = {
     minerId: selectedMiner?.minerId || "",
@@ -236,7 +267,7 @@ function BorrowsTable(props: IProps) {
     : {
         current: pageIndex,
         pageSize: PAGE_SIZE,
-        total: familyCountRaw?.length,
+        total: familyBorrows?.length,
       };
 
   const onBorrowClick = (miner: MinerListItem) => {
@@ -257,46 +288,70 @@ function BorrowsTable(props: IProps) {
   };
 
   const getUserBorrow = (refresh?: boolean) => {
+    if (refresh) {
+      store.dispatch({
+        type: "common/change",
+        payload: { refreshAllData: true },
+      });
+    }
     if (currentAccount) {
       FIL_contract.getUserBorrow(currentAccount);
-      if (refresh) {
-        store.dispatch({
-          type: "common/change",
-          payload: { refreshAllData: true },
-        });
-      }
     }
   };
 
   const getOwnFamily = () => {
-    data_fetcher_contract.getOwnFamily(currentAccount);
-  };
-
-  const getFamilyCount = async () => {
-    if (!isMyFamily && currentAccount) {
-      const res: any = await getBorrowingsFamily();
-      setFamilyCountRaw(
-        res._data.filter(
-          (item: string) =>
-            item?.toLocaleLowerCase() !== currentAccount.toLocaleLowerCase()
-        ) || []
-      );
+    if (currentAccount) {
+      data_fetcher_contract.getOwnFamily(currentAccount);
     }
   };
 
   const getFamilyBorrows = async () => {
     if (!isMyFamily) {
-      const list: any = await data_fetcher_contract.getBatchedFamily(
-        familyCount
+      const res: any = await getBorrowFamilies();
+      const l = res._data?.map((r: any) => {
+        const list = r.MinerBorrowInfo?.map((item: any) => ({
+          availableBalance: getValueDivide(
+            item?.AvailableBalance?.Neg ? 0 : item?.AvailableBalance?.Value,
+            18,
+            2
+          ),
+          balance: formatUnits(item.Balance),
+          borrowSum: formatUnits(item.BorrowSum),
+          debtOutStanding: getValueDivide(Number(item.DebtOutStanding), 18, 2),
+          haveCollateralizing: item.HaveCollateralizing,
+          minerId: item.MinerId.toString(),
+          borrows: item?.Borrows?.length,
+        }));
+        return {
+          user: r.User,
+          availableCredit: getValueDivide(Number(r.AvailableCredit), 18, 2),
+          balanceSum: formatUnits(r.BalanceSum),
+          borrowSum: formatUnits(r.BorrowSum),
+          debtOutStanding: getValueDivide(Number(r.DebtOutStanding), 18, 2),
+          liquidateConditionInfo: {
+            rate: getValueDivide(
+              Number(r.LiquidateConditionInfo?.Rate) * 100,
+              6,
+              2
+            ),
+            alertable: r.LiquidateConditionInfo?.Alertable,
+            liquidatable: r.LiquidateConditionInfo?.Liquidatable,
+          },
+          minerBorrowInfo: list,
+        };
+      });
+      setFamilyBorrows(
+        l.filter(
+          (item: UserBorrow) => item.user.toLowerCase() !== currentAccount
+        )
       );
-      setFamilyBorrows(list);
     }
   };
 
-  const getData = (refresh?: boolean) => {
-    if (!isNetworkCorrect) return;
+  const getData = async (refresh?: boolean) => {
     getUserBorrow(refresh);
-    getFamilyBorrows();
+    await getFamilyBorrows();
+    if (!isNetworkCorrect) return;
     getOwnFamily();
   };
 
@@ -304,54 +359,34 @@ function BorrowsTable(props: IProps) {
     setPageIndex(page.current || 1);
   };
 
-  const handleSearch = async () => {
+  useEffect(() => {
+    getOwnFamily();
+    getUserBorrow();
+    getFamilyBorrows();
+  }, [currentAccount]);
+
+  useEffect(() => {
     setPageIndex(1);
-    if (
-      searchText &&
-      (searchText.includes("t0") || searchText.includes("f0"))
-    ) {
-      const address: any = await FIL_contract.getFamilyByMiner(
-        searchText?.trim().replace("t0", "").replace("f0", "")
-      );
-      const list = familyCountRaw.filter((item) =>
-        item.toLocaleLowerCase().includes(address?.toLocaleLowerCase())
-      );
-      return setFamilyCountRaw(list);
-    }
-    if (searchText) {
-      const list = familyCountRaw.filter((item) => item.includes(searchText));
-      setFamilyCountRaw(list);
-    }
-    if (!searchText) {
-      getFamilyCount();
+  }, [debouncedSearchText]);
+
+  const updateList = async () => {
+    if (loading) return;
+    try {
+      setLoading(true);
+      getData(true);
+    } finally {
+      setTimeout(() => {
+        setLoading(false);
+      }, 2000);
     }
   };
-
-  useEffect(() => {
-    getUserBorrow();
-  }, [currentAccount]);
-
-  useEffect(() => {
-    getFamilyBorrows();
-  }, [familyCount]);
-
-  useEffect(() => {
-    getFamilyCount();
-    getOwnFamily();
-  }, [currentAccount]);
-
-  useEffect(() => {
-    if (!isMyFamily) {
-      handleSearch();
-    }
-  }, [debouncedSearchText]);
 
   return (
     <div className="relative mt-[50px] md:mt-0">
       <Button
         className="flex items-center absolute -top-[40px] right-[0px] z-1"
         type="text"
-        onClick={() => getData(true)}
+        onClick={updateList}
       >
         Refresh list
         <ReloadOutlined />
@@ -366,6 +401,10 @@ function BorrowsTable(props: IProps) {
           dataSource={data}
           pagination={hasPagination}
           rowKey="user"
+          loading={{
+            spinning: loading,
+            indicator: <LoadingOutlined />,
+          }}
           onChange={handleTableChange}
         />
       )}
@@ -373,7 +412,7 @@ function BorrowsTable(props: IProps) {
       <BorrowModal
         isOpen={isBorrowModalOpen}
         data={minerBorrowInfo}
-        updateList={() => getData(true)}
+        updateList={updateList}
         onCancel={() => setIsBorrowModalOpen(false)}
       />
       <RepayModal
@@ -381,7 +420,7 @@ function BorrowsTable(props: IProps) {
         title={repayModalTitle}
         rawData={minerRepayInfo}
         hideTabs={repayModalTitle !== REPAY_MODAL_TITLE[1]}
-        updateList={() => getData(true)}
+        updateList={updateList}
         onCancel={() => setIsRepayModalOpen(false)}
       />
     </div>

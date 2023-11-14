@@ -2,43 +2,51 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Card from "@/packages/card";
-import Chart from "@/components/charts";
-import PieChart from "@/components/pieChart";
+import Chart from "@/components/Charts";
+import PieChart from "@/components/PieChart";
 import { rootState } from "@/store/type";
-import { timestampToDateTime, numberWithCommas } from "@/utils";
-import { Button, Input, Space } from "antd";
+import { numberWithCommas } from "@/utils";
+import { Button, Input, Space, Tag } from "antd";
 import { shallowEqual, useSelector } from "react-redux";
-import BorrowsTable from "./components/borrowsTable";
+import BorrowsTable from "./components/BorrowsTable";
 import AddMiner from "../certified/addMiner";
 import { DEFAULT_EMPTY } from "./components/constans";
-import { getChartData } from "../api/modules/index";
 import { SearchOutlined } from "@ant-design/icons";
 import BigNumber from "bignumber.js";
 import * as echarts from "echarts/core";
-import InfoTips from "@/components/infoTips";
+import InfoTips from "@/components/InfoTips";
+import { fetchChartAndPanelData, formatChartTime } from "../api/common";
+import { CHART_TIME_TYPE_MAP } from "../../constants";
+import { useMetaMask } from "@/hooks/useMetaMask";
+
+const { CheckableTag } = Tag;
 
 function Borrow() {
-  const [chartData, setChartData] = useState([]);
-  const [chartDate, setChartDate] = useState([]);
+  const { currentAccount } = useMetaMask();
   const [searchText, setSearchText] = useState<string | null>();
+  const [chartTimeType, setChartTimeType] =
+    useState<keyof typeof CHART_TIME_TYPE_MAP>("7d");
 
-  const { userBorrow, filInfo } = useSelector(
+  const { userBorrow } = useSelector(
     (state: rootState) => state?.contract,
     shallowEqual
   );
 
-  const available = BigNumber(filInfo?.totalFIL || 0)
-    .times(0.9)
-    .minus(BigNumber(filInfo?.utilizedLiquidity || 0))
-    .toFixed(2, BigNumber.ROUND_DOWN);
+  const { APR, panel } = useSelector((state: rootState) => state?.panel);
 
   const default_opt = useMemo(() => {
+    const dataList = APR?.[chartTimeType]?.map(
+      (item: any) => item.InterestRate * 100
+    );
+    const dateList = APR?.[chartTimeType]?.map((item: any) =>
+      formatChartTime(item.BlockTimeStamp)
+    );
     return {
       backgroundColor: "transparent",
       xAxis: {
         type: "category",
         boundaryGap: false,
-        data: chartDate,
+        data: dateList,
         axisLabel: {
           textStyle: {
             color: "rgba(100, 111, 126, 0.6)",
@@ -63,7 +71,7 @@ function Borrow() {
       },
       series: [
         {
-          data: chartData,
+          data: dataList,
           type: "line",
           smooth: true,
           symbolSize: 0,
@@ -106,13 +114,10 @@ function Borrow() {
         },
       ],
     };
-  }, [chartData, chartDate]);
+  }, [APR?.["1d"]?.[0]?.BlockTimeStamp, chartTimeType]);
 
   const pieData: any = useMemo(() => {
-    if (
-      !Number(filInfo?.utilizedLiquidity) &&
-      !Number(userBorrow?.availableCredit)
-    ) {
+    if (!Number(panel?.UtilizedLiquidity)) {
       return [
         {
           value: 0,
@@ -123,27 +128,27 @@ function Borrow() {
     } else {
       return [
         {
-          value: filInfo?.utilizedLiquidity,
+          value: panel?.UtilizedLiquidity,
           name: "Utilized",
           itemStyle: { color: "#0093E9" },
         },
         {
-          value: available,
+          value: panel?.AvailableFIL,
           name: "Available",
           itemStyle: { color: "#4adfe7" },
         },
         {
-          value: BigNumber(filInfo?.totalFIL || 0)
-            .minus(available)
-            .minus(filInfo?.utilizedLiquidity || 0)
-            .decimalPlaces(6, 1)
+          value: BigNumber(panel?.TotalFIL || 0)
+            .minus(panel?.AvailableFIL)
+            .minus(panel?.UtilizedLiquidity || 0)
+            .decimalPlaces(6, BigNumber.ROUND_DOWN)
             .toNumber(),
           name: "",
           itemStyle: { color: "rgb(156, 163, 175, 0.3)" },
         },
       ];
     }
-  }, [filInfo, available]);
+  }, [panel]);
 
   const pie_option = useMemo(() => {
     return {
@@ -151,6 +156,16 @@ function Borrow() {
         {
           type: "pie",
           radius: ["60%", "80%"],
+          tooltip: {
+            formatter: (params: any) => {
+              return `${params.marker} ${
+                params.name
+              } <b style='padding-left:8px'>${numberWithCommas(
+                params.data.value,
+                6
+              )}</b> FIL`;
+            },
+          },
           label: {
             show: false,
             position: "center",
@@ -162,28 +177,14 @@ function Borrow() {
         },
       ],
     };
-  }, [pieData]);
-
-  const fetchChartData = async () => {
-    const res = await getChartData();
-    if (res) {
-      const { Basic } = res;
-      const target = Basic?.slice(-8) || [];
-      const dataList = target.map((item: any) => item.InterestRate * 100);
-      const dateList = target.map((item: any) =>
-        timestampToDateTime(item.BlockTimeStamp, "MM-DD HH:mm")
-      );
-      setChartData(dataList);
-      setChartDate(dateList);
-    }
-  };
+  }, [pieData?.[0]?.value]);
 
   const handleSearchChange = (e: any) => {
     setSearchText(e.target.value);
   };
 
   useEffect(() => {
-    fetchChartData();
+    fetchChartAndPanelData();
   }, []);
 
   const overviewData = useMemo(() => {
@@ -191,7 +192,7 @@ function Borrow() {
       {
         title: "Available Liquidity",
         value: numberWithCommas(
-          Number(available) <= 0 ? DEFAULT_EMPTY : available
+          Number(panel?.AvailableFIL) <= 0 ? DEFAULT_EMPTY : panel?.AvailableFIL
         ),
         unit: "FIL",
         tips: "Up to 90% of the Total FIL Liquidity is available to borrow",
@@ -199,17 +200,30 @@ function Borrow() {
       {
         title: "Total Utilized",
         value: `${numberWithCommas(
-          filInfo?.utilizedLiquidity || 0
-        )} of ${numberWithCommas(filInfo?.totalFIL || 0)}`,
+          panel?.UtilizedLiquidity || 0
+        )} of ${numberWithCommas(panel?.TotalFIL || 0)}`,
         unit: "FIL",
       },
       {
         title: "Current Borrowing APR",
-        value: filInfo?.interestRate || DEFAULT_EMPTY,
+        value: numberWithCommas(panel?.InterestRate * 100),
         unit: "%",
       },
     ];
-  }, [available, filInfo]);
+  }, [panel]);
+
+  const chartTimeData: any = Object.keys(CHART_TIME_TYPE_MAP);
+
+  const handleChange = (
+    time: keyof typeof CHART_TIME_TYPE_MAP,
+    checked: boolean
+  ) => {
+    if (chartTimeType === time) {
+      setChartTimeType("all");
+    } else {
+      setChartTimeType(time);
+    }
+  };
 
   return (
     <section>
@@ -247,7 +261,7 @@ function Borrow() {
             <div className="data-card flex-1">
               <p className="text-xs font-semibold mb-4">Utilization Rate</p>
               <p className="text-[22px] font-bold">
-                {filInfo?.utilizationRate || DEFAULT_EMPTY}
+                {numberWithCommas(panel?.UtilizationRate * 100)}
                 <span className="text-sm font-normal ml-2">%</span>
               </p>
               <div className="w-[250px] h-[220px] m-auto">
@@ -262,29 +276,39 @@ function Borrow() {
                 <InfoTips content="Due to the on-chain transactions, the visualization could be delayed." />
               </Space>
             </div>
-            <Chart height="100%" option={default_opt} />
+            <div className="flex justify-end mb-4">
+              {chartTimeData.slice(1).map((time: any) => (
+                <CheckableTag
+                  key={time}
+                  checked={chartTimeType === time}
+                  onChange={(checked) => handleChange(time, checked)}
+                >
+                  {time}
+                </CheckableTag>
+              ))}
+            </div>
+            <Chart height="70%" option={default_opt} />
           </div>
         </div>
       </Card>
 
       {/* borrowings */}
       <Card>
-        {userBorrow?.minerBorrowInfo !== undefined &&
-          (userBorrow?.minerBorrowInfo?.length ? (
-            <div className="mb-8">
-              <p className="font-semibold text-xl mb-4">My Family</p>
-              <BorrowsTable type="my" />
-              {(userBorrow?.minerBorrowInfo || []).length < 5 && (
-                <div className="text-center mt-4">
-                  <AddMiner btn="+ Add Miner" />
-                </div>
-              )}
-            </div>
-          ) : (
-            <div className="flex justify-center">
-              <AddMiner />
-            </div>
-          ))}
+        {userBorrow?.minerBorrowInfo?.length && currentAccount ? (
+          <div className="mb-8">
+            <p className="font-semibold text-xl mb-4">My Family</p>
+            <BorrowsTable type="my" />
+            {(userBorrow?.minerBorrowInfo || []).length < 5 && (
+              <div className="text-center mt-4">
+                <AddMiner btn="+ Add Miner" />
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="flex justify-center">
+            <AddMiner />
+          </div>
+        )}
         <p className="font-semibold text-xl mb-4">
           List of Families / Borrowings
         </p>

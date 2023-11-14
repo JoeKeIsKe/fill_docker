@@ -23,11 +23,12 @@
     position: absolute;
     top: 0;
     left: 0;
-    width: 160px;
+    width: inherit;
   }
 }
 
 .connect-btn {
+  width: 100%;
   border: 2px solid transparent;
   border-radius: 60px;
   background-clip: padding-box, border-box;
@@ -48,10 +49,7 @@
   background-color: rgba(100, 111, 126, 0.06);
   border-radius: 12px;
   padding: 16px;
-  // min-width: 258px;
-
-  &.small {
-  }
+  line-height: 1.2;
 }
 
 .text-linear {
@@ -86,6 +84,7 @@
   background-color: #fff;
   border-radius: 12px;
   padding: 24px;
+  min-width: 350px;
 }
 
 .card-default .title {
@@ -218,6 +217,14 @@
       inset-inline-start: 20px;
     }
   }
+}
+
+.ant-tag-checkable-checked {
+  background-color: #4094e0;
+}
+
+.ant-tag-checkable:not(.ant-tag-checkable-checked) {
+  background-color: rgba(0, 0, 0, 0.06);
 }
 
 .custom_steps {

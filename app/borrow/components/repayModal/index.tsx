@@ -12,7 +12,7 @@ import Link from "next/link";
 import useLoading from "@/hooks/useLoading";
 import FIL_contract from "@/server/FILLiquid_contract";
 import { useMetaMask } from "@/hooks/useMetaMask";
-import ConfirmModal from "@/components/confirmModal";
+import ConfirmModal from "@/components/ConfirmModal";
 
 interface IProps {
   isOpen?: boolean;

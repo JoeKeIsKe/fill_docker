@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { walletState, contractState, commonState } from "./type";
+import { walletState, contractState, panelState, commonState } from "./type";
 
 const walletSlice = createSlice({
   name: "wallet",
@@ -40,6 +40,39 @@ const contractSlice = createSlice({
   },
 });
 
+const panelSlice = createSlice({
+  name: "panel",
+  initialState: {
+    APY: {
+      dataList: [],
+      dateList: [],
+      current: 0,
+    },
+    APR: {
+      dataList: [],
+      dateList: [],
+      current: 0,
+    },
+    panel: {
+      AccumulatedInterestMint: "0",
+      AccumulatedStakeMint: "0",
+      AvailableFIL: "0",
+      FIL_FIT: 0,
+      FigTotalSupply: "0",
+      FitTotalSupply: "0",
+      InterestRate: 0,
+      TotalFIL: "0",
+      UtilizationRate: 0,
+      UtilizedLiquidity: "0",
+    },
+  },
+  reducers: {
+    change: (state: panelState, action) => {
+      return { ...state, ...action.payload };
+    },
+  },
+});
+
 const commonSlice = createSlice({
   name: "common",
   initialState: {
@@ -56,6 +89,7 @@ const commonSlice = createSlice({
 
 const walletReducer = walletSlice.reducer;
 const contractReducer = contractSlice.reducer;
+const panelReducerr = panelSlice.reducer;
 const commonReducer = commonSlice.reducer;
 
-export { walletReducer, contractReducer, commonReducer };
+export { walletReducer, contractReducer, panelReducerr, commonReducer };

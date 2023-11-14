@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Card from "@/packages/card";
-import MinerDetailTable from "../../components/minerDetailTable";
+import MinerDetailTable from "../../components/MinerDetailTable";
 import FIL_contract from "@/server/FILLiquid_contract";
 import { MinerBorrows } from "@/utils/type";
 

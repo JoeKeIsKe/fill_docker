@@ -10,7 +10,14 @@ export function getChartData(params?: {}): Promise<any> {
 
 export function getBorrowingsFamily(params?: {}): Promise<any> {
   return getReq({
-    url: "api/getFamilyCount",
+    url: "api2/getFamilyCount",
+    params,
+  });
+}
+
+export function getBorrowFamilies(params?: {}): Promise<any> {
+  return getReq({
+    url: "api/getfamilies",
     params,
   });
 }

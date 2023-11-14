@@ -1,9 +1,4 @@
-import {
-  FilLiquidInfo,
-  StakeOverview,
-  UserBorrow,
-  MinerListItem,
-} from "@/utils/type";
+import { FilLiquidInfo, UserBorrow, MinerListItem } from "@/utils/type";
 
 export interface ITEM {
   label: string;
@@ -33,11 +28,52 @@ export interface contractState {
   userBorrow?: UserBorrow;
   ownFamilyList?: UserBorrow[];
   filInfo?: FilLiquidInfo;
-  stakeOverview?: StakeOverview;
   balance: {
     FIL: number | string;
     FIT: number | string;
   };
+}
+
+export interface PanelObject {
+  TotalFIL: string;
+  FitTotalSupply: string;
+  UtilizationRate: number;
+  FIL_FIT: number;
+  AvailableFIL: string;
+  UtilizedLiquidity: string;
+  InterestRate: number;
+  FigTotalSupply: string;
+  AccumulatedStakeMint: string;
+  AccumulatedInterestMint: string;
+}
+
+interface BasicItem {
+  BlockTimeStamp: number;
+  UtilizationRate: number;
+  FIL_FIT: number;
+  InterestRate: number;
+  AccumulatedInterestMint: string;
+  AccumulatedStakeMint: string;
+}
+
+export interface panelState {
+  APY: {
+    all: BasicItem[];
+    "1d": BasicItem[];
+    "7d": BasicItem[];
+    "1m": BasicItem[];
+    "3m": BasicItem[];
+    current: number | string;
+  };
+  APR: {
+    all: BasicItem[];
+    "1d": BasicItem[];
+    "7d": BasicItem[];
+    "1m": BasicItem[];
+    "3m": BasicItem[];
+    current: number | string;
+  };
+  panel: PanelObject;
 }
 
 export interface creditState {
@@ -61,6 +97,7 @@ export interface rootState {
   contract: contractState;
   user: userState;
   wallet: walletState;
+  panel: panelState;
   commonStore: commonState;
   credit: creditState;
 }
