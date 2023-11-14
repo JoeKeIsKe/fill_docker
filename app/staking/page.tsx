@@ -65,7 +65,6 @@ function Staking() {
   const [selectedTags, setSelectedTags] = useState<string>("");
 
   const { balance } = useSelector((state: rootState) => state?.contract);
-
   const { APY, panel } = useSelector((state: rootState) => state?.panel);
 
   const { loading, setLoading } = useLoading();
@@ -309,25 +308,11 @@ function Staking() {
   useEffect(() => {
     switch (selectedTags) {
       case SLIPPAGE_TAG_MAP[0]:
-        setSlippage(
-          BigNumber(expected.expectedAmount)
-            .times(1 - 0.05)
-            .decimalPlaces(2, BigNumber.ROUND_DOWN)
-            .toNumber()
-        );
-        break;
       case SLIPPAGE_TAG_MAP[1]:
-        setSlippage(
-          BigNumber(expected.expectedAmount)
-            .times(1 - 0.1)
-            .decimalPlaces(2, BigNumber.ROUND_DOWN)
-            .toNumber()
-        );
-        break;
       case SLIPPAGE_TAG_MAP[2]:
         setSlippage(
           BigNumber(expected.expectedAmount)
-            .times(1 - 0.2)
+            .times(1 - Number.parseInt(selectedTags) / 100)
             .decimalPlaces(2, BigNumber.ROUND_DOWN)
             .toNumber()
         );
@@ -393,7 +378,7 @@ function Staking() {
               </CheckableTag>
             ))}
           </div>
-          <Chart option={default_opt} />
+          {APY?.all?.length ? <Chart option={default_opt} /> : null}
         </Card>
 
         {/* staking operation card */}
@@ -425,7 +410,7 @@ function Staking() {
                   FIT Balance
                   <AddToWalletBtn coinType="FIT" />
                 </div>
-                <Space className="mt-1" align="end">
+                <Space align="end">
                   <div className="text-xl">
                     {`${numberWithCommas(balance.FIT, 2)} FIT`}
                   </div>

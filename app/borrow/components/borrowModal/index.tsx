@@ -38,6 +38,10 @@ const defaultExpected = {
   expectedInterestRate: 0,
 };
 
+const defaultBorrowFactors = {
+  maxBorrowAPR: undefined,
+};
+
 function BorrowModal(props: IProps) {
   const { isOpen = false, data, onCancel, updateList } = props;
 
@@ -52,6 +56,7 @@ function BorrowModal(props: IProps) {
   const { loading, setLoading } = useLoading();
   const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
   const [rewards, setRewards] = useState<Rewards>();
+  const [borrowFactors, setBorrowFactors] = useState(defaultBorrowFactors);
 
   const { wallet } = useMetaMask();
   const network = wallet?.chainId?.includes("0x1") ? "f0" : "t0";
@@ -132,6 +137,15 @@ function BorrowModal(props: IProps) {
     }
   };
 
+  const getBorrowFactors = async () => {
+    if (data?.minerId) {
+      const res: any = await FIL_contract.getBorrowPayBackFactors();
+      setBorrowFactors({
+        maxBorrowAPR: res,
+      });
+    }
+  };
+
   const clear = () => {
     setAmount(undefined);
     setSlippage(undefined);
@@ -160,6 +174,7 @@ function BorrowModal(props: IProps) {
   useEffect(() => {
     onMinerBorrows();
     getMaxBorrowable();
+    getBorrowFactors();
   }, [data, data?.minerId]);
 
   const familyData = useMemo(() => {
@@ -255,31 +270,17 @@ function BorrowModal(props: IProps) {
   useEffect(() => {
     switch (selectedTags) {
       case SLIPPAGE_TAG_MAP[0]:
-        setSlippage(
-          BigNumber(expected.expectedInterestRate)
-            .times(1 + 0.05)
-            .decimalPlaces(2, BigNumber.ROUND_DOWN)
-            .toNumber()
-        );
-        break;
       case SLIPPAGE_TAG_MAP[1]:
-        setSlippage(
-          BigNumber(expected.expectedInterestRate)
-            .times(1 + 0.1)
-            .decimalPlaces(2, BigNumber.ROUND_DOWN)
-            .toNumber()
-        );
-        break;
       case SLIPPAGE_TAG_MAP[2]:
         setSlippage(
           BigNumber(expected.expectedInterestRate)
-            .times(1 + 0.2)
+            .times(1 + Number.parseInt(selectedTags) / 100)
             .decimalPlaces(2, BigNumber.ROUND_DOWN)
             .toNumber()
         );
         break;
       case SLIPPAGE_TAG_MAP[3]:
-        setSlippage(100);
+        setSlippage((borrowFactors?.maxBorrowAPR || 0) * 100 + 10);
         break;
       case "":
         setSlippage(undefined);

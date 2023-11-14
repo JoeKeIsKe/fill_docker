@@ -42,7 +42,7 @@ function AddToWalletBtn({ coinType }: Props) {
   return (
     <>
       <Button
-        className="bg-gray-400 text-[#fff] !text-xs !rounded-[24px] border-none hover:!text-[#fff] h-[28px] ml-2"
+        className="bg-gray-400 text-[#fff] !text-xs !rounded-[24px] border-none hover:!text-[#fff] !h-[22px] ml-2"
         size="small"
         onClick={handleAddToWallet}
       >

@@ -44,13 +44,19 @@ const panelSlice = createSlice({
   name: "panel",
   initialState: {
     APY: {
-      dataList: [],
-      dateList: [],
+      all: [],
+      "1d": [],
+      "7d": [],
+      "1m": [],
+      "3m": [],
       current: 0,
     },
     APR: {
-      dataList: [],
-      dateList: [],
+      all: [],
+      "1d": [],
+      "7d": [],
+      "1m": [],
+      "3m": [],
       current: 0,
     },
     panel: {

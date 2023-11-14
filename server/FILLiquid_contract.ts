@@ -289,6 +289,19 @@ class contract {
     });
   }
 
+  getBorrowPayBackFactors() {
+    return new Promise((resolve, reject) => {
+      this.myContract.methods
+        .getBorrowPayBackFactors()
+        .call()
+        .then((res: any) => {
+          if (res) {
+            resolve(getValueDivide(res[3], 6));
+          }
+        });
+    });
+  }
+
   //bind miner
   bindMiner(minerAddr: string, signature: string, account: string) {
     this.account = account;

@@ -287,7 +287,9 @@ function Borrow() {
                 </CheckableTag>
               ))}
             </div>
-            <Chart height="70%" option={default_opt} />
+            {APR?.all?.length ? (
+              <Chart height="70%" option={default_opt} />
+            ) : null}
           </div>
         </div>
       </Card>
