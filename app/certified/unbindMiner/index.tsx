@@ -20,7 +20,7 @@ interface IProps {
 }
 
 export default ({ minerId, disabled }: IProps) => {
-  const { wallet, currentAccount } = useMetaMask();
+  const { wallet, currentAccount = "" } = useMetaMask();
   const { loading, setLoading } = useLoading("unbind");
   const network = wallet?.chainId?.includes("0x1") ? "f0" : "t0";
 
