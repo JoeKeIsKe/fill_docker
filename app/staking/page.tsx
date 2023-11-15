@@ -378,7 +378,7 @@ function Staking() {
               </CheckableTag>
             ))}
           </div>
-          {APY?.all?.length ? <Chart option={default_opt} /> : null}
+          <Chart option={default_opt} />
         </Card>
 
         {/* staking operation card */}
