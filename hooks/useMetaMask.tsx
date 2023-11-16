@@ -122,7 +122,7 @@ export const MetaMaskContextProvider = ({ children }: PropsWithChildren) => {
     });
 
     // If user has multiple wallets, find MetaMask Provider
-    if (provider?.providers) {
+    if (provider?.providers && typeof window !== "undefined") {
       provider.providers.forEach(async (p: any) => {
         if (p.isMetaMask) {
           provider = p;
